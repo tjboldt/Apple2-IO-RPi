@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name Hardware)(type KiCad)(uri /home/terence/source/Apple2-IO-RPi/Hardware/Hardware.pretty)(options "")(descr ""))
+)

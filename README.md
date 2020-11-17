@@ -1,6 +1,8 @@
 # Apple2-IO-RPi
 Apple II expansion card using a Raspberry Pi for I/O
 
+![Image of Board](/Hardware/Apple2IORPi.jpg)
+
 ## Project Status
 This is a very early stage project. Currently one partially completed physical prototype exists that sends data unidirectional from the Raspberry Pi Zero W to the Apple II via 8 bit parallel data bus. The schematics are incomplete but now include bidirectional communications. There is no firmware or PCB design yet, nor code for the RPi.
 

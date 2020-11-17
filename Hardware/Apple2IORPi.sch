@@ -19,7 +19,7 @@ U 1 1 5FA0A8C3
 P 3000 2700
 F 0 "J0" H 3050 4117 50  0000 C CNN
 F 1 "Apple II Expansion Bus" H 3050 4026 50  0000 C CNN
-F 2 "Hardware:Apple II Expansion Edge Connector" H 3000 2700 50  0001 C CNN
+F 2 "Apple2:Apple II Expansion Edge Connector" H 3000 2700 50  0001 C CNN
 F 3 "~" H 3000 2700 50  0001 C CNN
 	1    3000 2700
 	1    0    0    -1  

@@ -1,4 +1,4 @@
-update=Mon 16 Nov 2020 05:12:41 PM
+update=Thu 19 Nov 2020 03:42:45 PM
 version=1
 last_client=kicad
 [general]
@@ -247,7 +247,18 @@ dPairWidth=0.2
 dPairGap=0.25
 dPairViaGap=0.25
 [pcbnew/Netclasses/1]
-Name=Ground
+Name=3V3
+Clearance=0.1778
+TrackWidth=0.3556
+ViaDiameter=0.762
+ViaDrill=0.50038
+uViaDiameter=0.3
+uViaDrill=0.1
+dPairWidth=0.2
+dPairGap=0.25
+dPairViaGap=0.25
+[pcbnew/Netclasses/2]
+Name=5V
 Clearance=0.254
 TrackWidth=0.8128
 ViaDiameter=0.762
@@ -257,8 +268,8 @@ uViaDrill=0.1
 dPairWidth=0.2
 dPairGap=0.25
 dPairViaGap=0.25
-[pcbnew/Netclasses/2]
-Name=Power
+[pcbnew/Netclasses/3]
+Name=Ground
 Clearance=0.254
 TrackWidth=0.8128
 ViaDiameter=0.762

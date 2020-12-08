@@ -1,5 +1,5 @@
 ; ProDOS Global Page
-Device2S1 = $bf14 ;POINTER FOR SLOT 2 DRIVE 1 DRIVER
+Device5S1 = $bf1a ;POINTER FOR SLOT 5 DRIVE 1 DRIVER
 DeviceCount = $bf31 ;DEVICE COUNT -1
 DeviceList = $bf32 ;DEVICE LIST
 
@@ -27,9 +27,9 @@ NibbleStorage = $1d
 
 ; Register the driver with ProDOS
  lda #<Driver
- sta Device2S1
+ sta Device5S1
  lda #>Driver
- sta Device2S1+1
+ sta Device5S1+1
 ; Add the drive to the device list
  inc DeviceCount
  lda DeviceCount
@@ -61,9 +61,8 @@ DoCommand:
 
 ; ProDOS Status Command Handler
 GetStatus: 
- lda #$00 ;0 indicates ready to read/write
- lda #$ff ;low byte number of blocks 
- lda #$ff ;high byte number of blocks
+ ldx #$ff ;low byte number of blocks 
+ ldy #$ff ;high byte number of blocks
  lda #$0 ;zero accumulator and clear carry for success
  clc
  rts

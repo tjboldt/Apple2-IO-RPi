@@ -3,7 +3,7 @@ Main file   : Driver.asm
 Current file: Driver.asm
 
 000000r 1               ; ProDOS Global Page
-000000r 1               Device2S1 = $bf14 ;POINTER FOR SLOT 2 DRIVE 1 DRIVER
+000000r 1               Device5S1 = $bf1a ;POINTER FOR SLOT 5 DRIVE 1 DRIVER
 000000r 1               DeviceCount = $bf31 ;DEVICE COUNT -1
 000000r 1               DeviceList = $bf32 ;DEVICE LIST
 000000r 1               
@@ -31,9 +31,9 @@ Current file: Driver.asm
 001000  1               
 001000  1               ; Register the driver with ProDOS
 001000  1  A9 16         lda #<Driver
-001002  1  8D 14 BF      sta Device2S1
+001002  1  8D 1A BF      sta Device5S1
 001005  1  A9 10         lda #>Driver
-001007  1  8D 15 BF      sta Device2S1+1
+001007  1  8D 1B BF      sta Device5S1+1
 00100A  1               ; Add the drive to the device list
 00100A  1  EE 31 BF      inc DeviceCount
 00100D  1  AD 31 BF      lda DeviceCount
@@ -56,131 +56,130 @@ Current file: Driver.asm
 001020  1  A5 42         lda Command
 001022  1  F0 0C         beq GetStatus ;0 = Status command
 001024  1  C9 01         cmp #ReadBlockCommand
-001026  1  F0 12         beq ReadBlock
+001026  1  F0 10         beq ReadBlock
 001028  1  C9 02         cmp #WriteBlockCommand
-00102A  1  F0 36         beq WriteBlock
+00102A  1  F0 34         beq WriteBlock
 00102C  1  38            sec ;set carry as we don't support any other commands
 00102D  1  A9 53         lda #$53 ;Invalid parameter error
 00102F  1  60            rts
 001030  1               
 001030  1               ; ProDOS Status Command Handler
 001030  1               GetStatus:
-001030  1  A9 00         lda #$00 ;0 indicates ready to read/write
-001032  1  A9 FF         lda #$ff ;low byte number of blocks
-001034  1  A9 FF         lda #$ff ;high byte number of blocks
-001036  1  A9 00         lda #$0 ;zero accumulator and clear carry for success
-001038  1  18            clc
-001039  1  60            rts
-00103A  1               
-00103A  1               ; ProDOS Read Block Command
-00103A  1               ReadBlock:
-00103A  1  A9 01         lda #ReadBlockCommand
-00103C  1  20 8A 10      jsr SendCommand
-00103F  1  A5 46         lda BlockLo
-001041  1  20 9D 10      jsr SendByte
-001044  1  A5 47         lda BlockHi
-001046  1  20 9D 10      jsr SendByte
-001049  1  A0 00         ldy #$0
-00104B  1  20 59 10      jsr read256
-00104E  1  E6 45         inc BufferHi
-001050  1  20 59 10      jsr read256
-001053  1  C6 45         dec BufferHi
-001055  1  A9 00         lda #$0 ;zero accumulator and clear carry for success
-001057  1  18            clc
-001058  1  60            rts
-001059  1               
-001059  1               read256:
-001059  1  20 C0 10      jsr GetByte
-00105C  1  91 44         sta (BufferLo),y
-00105E  1  C8            iny
-00105F  1  D0 F8         bne read256
-001061  1  60            rts
-001062  1               
-001062  1               ; ProDOS Write Block Command
-001062  1               WriteBlock:
-001062  1  A9 02         lda #WriteBlockCommand
-001064  1  20 8A 10      jsr SendCommand
-001067  1  A5 46         lda BlockLo
-001069  1  20 9D 10      jsr SendByte
-00106C  1  A5 47         lda BlockHi
-00106E  1  20 9D 10      jsr SendByte
-001071  1  A0 00         ldy #$0
-001073  1  20 81 10      jsr write256
-001076  1  E6 45         inc BufferHi
-001078  1  20 81 10      jsr write256
-00107B  1  C6 45         dec BufferHi
-00107D  1  A9 00         lda #$0 ;zero accumulator and clear carry for success
-00107F  1  18            clc
-001080  1  60            rts
-001081  1               
-001081  1               write256:
-001081  1  B1 44         lda (BufferLo),y
-001083  1  20 9D 10      jsr SendByte
-001086  1  C8            iny
-001087  1  D0 F8         bne write256
-001089  1  60            rts
-00108A  1               
-00108A  1               SendCommand:
-00108A  1  09 D0         ora #$D0 ;Write Hi, Read Hi, Command Write Lo, Command Read Hi
-00108C  1  8D DD C0      sta OutputByte
-00108F  1               commandWait:
-00108F  1  AD DE C0      lda InputByte
+001030  1  A2 FF         ldx #$ff ;low byte number of blocks
+001032  1  A0 FF         ldy #$ff ;high byte number of blocks
+001034  1  A9 00         lda #$0 ;zero accumulator and clear carry for success
+001036  1  18            clc
+001037  1  60            rts
+001038  1               
+001038  1               ; ProDOS Read Block Command
+001038  1               ReadBlock:
+001038  1  A9 01         lda #ReadBlockCommand
+00103A  1  20 88 10      jsr SendCommand
+00103D  1  A5 46         lda BlockLo
+00103F  1  20 9B 10      jsr SendByte
+001042  1  A5 47         lda BlockHi
+001044  1  20 9B 10      jsr SendByte
+001047  1  A0 00         ldy #$0
+001049  1  20 57 10      jsr read256
+00104C  1  E6 45         inc BufferHi
+00104E  1  20 57 10      jsr read256
+001051  1  C6 45         dec BufferHi
+001053  1  A9 00         lda #$0 ;zero accumulator and clear carry for success
+001055  1  18            clc
+001056  1  60            rts
+001057  1               
+001057  1               read256:
+001057  1  20 BE 10      jsr GetByte
+00105A  1  91 44         sta (BufferLo),y
+00105C  1  C8            iny
+00105D  1  D0 F8         bne read256
+00105F  1  60            rts
+001060  1               
+001060  1               ; ProDOS Write Block Command
+001060  1               WriteBlock:
+001060  1  A9 02         lda #WriteBlockCommand
+001062  1  20 88 10      jsr SendCommand
+001065  1  A5 46         lda BlockLo
+001067  1  20 9B 10      jsr SendByte
+00106A  1  A5 47         lda BlockHi
+00106C  1  20 9B 10      jsr SendByte
+00106F  1  A0 00         ldy #$0
+001071  1  20 7F 10      jsr write256
+001074  1  E6 45         inc BufferHi
+001076  1  20 7F 10      jsr write256
+001079  1  C6 45         dec BufferHi
+00107B  1  A9 00         lda #$0 ;zero accumulator and clear carry for success
+00107D  1  18            clc
+00107E  1  60            rts
+00107F  1               
+00107F  1               write256:
+00107F  1  B1 44         lda (BufferLo),y
+001081  1  20 9B 10      jsr SendByte
+001084  1  C8            iny
+001085  1  D0 F8         bne write256
+001087  1  60            rts
+001088  1               
+001088  1               SendCommand:
+001088  1  09 D0         ora #$D0 ;Write Hi, Read Hi, Command Write Lo, Command Read Hi
+00108A  1  8D DD C0      sta OutputByte
+00108D  1               commandWait:
+00108D  1  AD DE C0      lda InputByte
+001090  1  0A            asl
+001091  1  0A            asl
 001092  1  0A            asl
-001093  1  0A            asl
-001094  1  0A            asl
-001095  1  30 F8         bmi commandWait
-001097  1  A9 F0         lda #$F0 ;set write/read/command flags high
-001099  1  8D DD C0      sta OutputByte
-00109C  1  60            rts
-00109D  1               
-00109D  1               SendByte:
-00109D  1  48            pha
+001093  1  30 F8         bmi commandWait
+001095  1  A9 F0         lda #$F0 ;set write/read/command flags high
+001097  1  8D DD C0      sta OutputByte
+00109A  1  60            rts
+00109B  1               
+00109B  1               SendByte:
+00109B  1  48            pha
+00109C  1  4A            lsr
+00109D  1  4A            lsr
 00109E  1  4A            lsr
 00109F  1  4A            lsr
-0010A0  1  4A            lsr
-0010A1  1  4A            lsr
-0010A2  1  20 AA 10      jsr SendNibble
-0010A5  1  68            pla
-0010A6  1  20 AA 10      jsr SendNibble
-0010A9  1  60            rts
-0010AA  1               
-0010AA  1               SendNibble:
-0010AA  1  29 0F         and #$0F
-0010AC  1  09 70         ora #$70 ;Write bit low
-0010AE  1  48            pha
-0010AF  1               waitWrite:
-0010AF  1  AD DE C0      lda InputByte
-0010B2  1  0A            asl ;Second highest bit goes low when ready
-0010B3  1  30 FA         bmi waitWrite
-0010B5  1  68            pla
-0010B6  1  8D DD C0      sta OutputByte
-0010B9  1               finishWrite:
-0010B9  1  AD DE C0      lda InputByte
-0010BC  1  0A            asl
-0010BD  1  10 FA         bpl finishWrite
-0010BF  1  60            rts
-0010C0  1               
-0010C0  1               GetByte:
-0010C0  1  20 D3 10      jsr GetNibble
+0010A0  1  20 A8 10      jsr SendNibble
+0010A3  1  68            pla
+0010A4  1  20 A8 10      jsr SendNibble
+0010A7  1  60            rts
+0010A8  1               
+0010A8  1               SendNibble:
+0010A8  1  29 0F         and #$0F
+0010AA  1  09 70         ora #$70 ;Write bit low
+0010AC  1  48            pha
+0010AD  1               waitWrite:
+0010AD  1  AD DE C0      lda InputByte
+0010B0  1  0A            asl ;Second highest bit goes low when ready
+0010B1  1  30 FA         bmi waitWrite
+0010B3  1  68            pla
+0010B4  1  8D DD C0      sta OutputByte
+0010B7  1               finishWrite:
+0010B7  1  AD DE C0      lda InputByte
+0010BA  1  0A            asl
+0010BB  1  10 FA         bpl finishWrite
+0010BD  1  60            rts
+0010BE  1               
+0010BE  1               GetByte:
+0010BE  1  20 D1 10      jsr GetNibble
+0010C1  1  0A            asl
+0010C2  1  0A            asl
 0010C3  1  0A            asl
 0010C4  1  0A            asl
-0010C5  1  0A            asl
-0010C6  1  0A            asl
-0010C7  1  85 1D         sta NibbleStorage
-0010C9  1  20 D3 10      jsr GetNibble
-0010CC  1  29 0F         and #$0f
-0010CE  1  05 1D         ora NibbleStorage
-0010D0  1  A5 1D         lda NibbleStorage
-0010D2  1  60            rts
-0010D3  1               
-0010D3  1               GetNibble:
-0010D3  1  A9 B0         lda #$b0 ;set read flag low
-0010D5  1  8D DD C0      sta OutputByte
-0010D8  1               waitRead:
-0010D8  1  AD DE C0      lda InputByte
-0010DB  1  30 FB         bmi waitRead
-0010DD  1  29 F0         and #$f0 ;set all flags high
-0010DF  1  8D DD C0      sta OutputByte
-0010E2  1  60            rts
-0010E3  1               
-0010E3  1               
+0010C5  1  85 1D         sta NibbleStorage
+0010C7  1  20 D1 10      jsr GetNibble
+0010CA  1  29 0F         and #$0f
+0010CC  1  05 1D         ora NibbleStorage
+0010CE  1  A5 1D         lda NibbleStorage
+0010D0  1  60            rts
+0010D1  1               
+0010D1  1               GetNibble:
+0010D1  1  A9 B0         lda #$b0 ;set read flag low
+0010D3  1  8D DD C0      sta OutputByte
+0010D6  1               waitRead:
+0010D6  1  AD DE C0      lda InputByte
+0010D9  1  30 FB         bmi waitRead
+0010DB  1  29 F0         and #$f0 ;set all flags high
+0010DD  1  8D DD C0      sta OutputByte
+0010E0  1  60            rts
+0010E1  1               
+0010E1  1               

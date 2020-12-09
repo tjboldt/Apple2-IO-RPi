@@ -1,4 +1,4 @@
-ca65 V2.18 - Ubuntu 2.18-1
+ca65 V2.19 - Git 59c58acb
 Main file   : Driver.asm
 Current file: Driver.asm
 
@@ -74,11 +74,11 @@ Current file: Driver.asm
 001038  1               ; ProDOS Read Block Command
 001038  1               ReadBlock:
 001038  1  A9 01         lda #ReadBlockCommand
-00103A  1  20 88 10      jsr SendCommand
+00103A  1  20 88 10      jsr SendByte
 00103D  1  A5 46         lda BlockLo
-00103F  1  20 9B 10      jsr SendByte
+00103F  1  20 88 10      jsr SendByte
 001042  1  A5 47         lda BlockHi
-001044  1  20 9B 10      jsr SendByte
+001044  1  20 88 10      jsr SendByte
 001047  1  A0 00         ldy #$0
 001049  1  20 57 10      jsr read256
 00104C  1  E6 45         inc BufferHi
@@ -89,7 +89,7 @@ Current file: Driver.asm
 001056  1  60            rts
 001057  1               
 001057  1               read256:
-001057  1  20 BE 10      jsr GetByte
+001057  1  20 AB 10      jsr GetByte
 00105A  1  91 44         sta (BufferLo),y
 00105C  1  C8            iny
 00105D  1  D0 F8         bne read256
@@ -98,11 +98,11 @@ Current file: Driver.asm
 001060  1               ; ProDOS Write Block Command
 001060  1               WriteBlock:
 001060  1  A9 02         lda #WriteBlockCommand
-001062  1  20 88 10      jsr SendCommand
+001062  1  20 88 10      jsr SendByte
 001065  1  A5 46         lda BlockLo
-001067  1  20 9B 10      jsr SendByte
+001067  1  20 88 10      jsr SendByte
 00106A  1  A5 47         lda BlockHi
-00106C  1  20 9B 10      jsr SendByte
+00106C  1  20 88 10      jsr SendByte
 00106F  1  A0 00         ldy #$0
 001071  1  20 7F 10      jsr write256
 001074  1  E6 45         inc BufferHi
@@ -114,72 +114,59 @@ Current file: Driver.asm
 00107F  1               
 00107F  1               write256:
 00107F  1  B1 44         lda (BufferLo),y
-001081  1  20 9B 10      jsr SendByte
+001081  1  20 88 10      jsr SendByte
 001084  1  C8            iny
 001085  1  D0 F8         bne write256
 001087  1  60            rts
 001088  1               
-001088  1               SendCommand:
-001088  1  09 D0         ora #$D0 ;Write Hi, Read Hi, Command Write Lo, Command Read Hi
-00108A  1  8D DD C0      sta OutputByte
-00108D  1               commandWait:
-00108D  1  AD DE C0      lda InputByte
-001090  1  0A            asl
-001091  1  0A            asl
-001092  1  0A            asl
-001093  1  30 F8         bmi commandWait
-001095  1  A9 F0         lda #$F0 ;set write/read/command flags high
-001097  1  8D DD C0      sta OutputByte
-00109A  1  60            rts
-00109B  1               
-00109B  1               SendByte:
-00109B  1  48            pha
-00109C  1  4A            lsr
-00109D  1  4A            lsr
-00109E  1  4A            lsr
-00109F  1  4A            lsr
-0010A0  1  20 A8 10      jsr SendNibble
-0010A3  1  68            pla
-0010A4  1  20 A8 10      jsr SendNibble
-0010A7  1  60            rts
-0010A8  1               
-0010A8  1               SendNibble:
-0010A8  1  29 0F         and #$0F
-0010AA  1  09 70         ora #$70 ;Write bit low
-0010AC  1  48            pha
-0010AD  1               waitWrite:
-0010AD  1  AD DE C0      lda InputByte
-0010B0  1  0A            asl ;Second highest bit goes low when ready
-0010B1  1  30 FA         bmi waitWrite
-0010B3  1  68            pla
-0010B4  1  8D DD C0      sta OutputByte
-0010B7  1               finishWrite:
-0010B7  1  AD DE C0      lda InputByte
-0010BA  1  0A            asl
-0010BB  1  10 FA         bpl finishWrite
+001088  1               SendByte:
+001088  1  48            pha
+001089  1  4A            lsr
+00108A  1  4A            lsr
+00108B  1  4A            lsr
+00108C  1  4A            lsr
+00108D  1  20 95 10      jsr SendNibble
+001090  1  68            pla
+001091  1  20 95 10      jsr SendNibble
+001094  1  60            rts
+001095  1               
+001095  1               SendNibble:
+001095  1  29 0F         and #$0F
+001097  1  09 70         ora #$70 ;Write bit low
+001099  1  48            pha
+00109A  1               waitWrite:
+00109A  1  AD DE C0      lda InputByte
+00109D  1  0A            asl ;Second highest bit goes low when ready
+00109E  1  30 FA         bmi waitWrite
+0010A0  1  68            pla
+0010A1  1  8D DD C0      sta OutputByte
+0010A4  1               finishWrite:
+0010A4  1  AD DE C0      lda InputByte
+0010A7  1  0A            asl
+0010A8  1  10 FA         bpl finishWrite
+0010AA  1  60            rts
+0010AB  1               
+0010AB  1               GetByte:
+0010AB  1  20 BE 10      jsr GetNibble
+0010AE  1  0A            asl
+0010AF  1  0A            asl
+0010B0  1  0A            asl
+0010B1  1  0A            asl
+0010B2  1  85 1D         sta NibbleStorage
+0010B4  1  20 BE 10      jsr GetNibble
+0010B7  1  29 0F         and #$0f
+0010B9  1  05 1D         ora NibbleStorage
+0010BB  1  A5 1D         lda NibbleStorage
 0010BD  1  60            rts
 0010BE  1               
-0010BE  1               GetByte:
-0010BE  1  20 D1 10      jsr GetNibble
-0010C1  1  0A            asl
-0010C2  1  0A            asl
-0010C3  1  0A            asl
-0010C4  1  0A            asl
-0010C5  1  85 1D         sta NibbleStorage
-0010C7  1  20 D1 10      jsr GetNibble
-0010CA  1  29 0F         and #$0f
-0010CC  1  05 1D         ora NibbleStorage
-0010CE  1  A5 1D         lda NibbleStorage
-0010D0  1  60            rts
-0010D1  1               
-0010D1  1               GetNibble:
-0010D1  1  A9 B0         lda #$b0 ;set read flag low
-0010D3  1  8D DD C0      sta OutputByte
-0010D6  1               waitRead:
-0010D6  1  AD DE C0      lda InputByte
-0010D9  1  30 FB         bmi waitRead
-0010DB  1  29 F0         and #$f0 ;set all flags high
-0010DD  1  8D DD C0      sta OutputByte
-0010E0  1  60            rts
-0010E1  1               
-0010E1  1               
+0010BE  1               GetNibble:
+0010BE  1  A9 B0         lda #$b0 ;set read flag low
+0010C0  1  8D DD C0      sta OutputByte
+0010C3  1               waitRead:
+0010C3  1  AD DE C0      lda InputByte
+0010C6  1  30 FB         bmi waitRead
+0010C8  1  29 F0         and #$f0 ;set all flags high
+0010CA  1  8D DD C0      sta OutputByte
+0010CD  1  60            rts
+0010CE  1               
+0010CE  1               

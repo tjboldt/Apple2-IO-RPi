@@ -70,7 +70,7 @@ GetStatus:
 ; ProDOS Read Block Command
 ReadBlock: 
  lda #ReadBlockCommand
- jsr SendCommand
+ jsr SendByte
  lda BlockLo
  jsr SendByte
  lda BlockHi
@@ -94,7 +94,7 @@ read256:
 ; ProDOS Write Block Command
 WriteBlock:
  lda #WriteBlockCommand
- jsr SendCommand
+ jsr SendByte
  lda BlockLo
  jsr SendByte
  lda BlockHi
@@ -113,19 +113,6 @@ write256:
  jsr SendByte
  iny
  bne write256
- rts
-
-SendCommand:
- ora #$D0 ;Write Hi, Read Hi, Command Write Lo, Command Read Hi
- sta OutputByte
-commandWait: 
- lda InputByte
- asl
- asl
- asl
- bmi commandWait
- lda #$F0 ;set write/read/command flags high
- sta OutputByte
  rts
 
 SendByte:

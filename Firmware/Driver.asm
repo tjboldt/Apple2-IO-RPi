@@ -140,6 +140,8 @@ finishWrite:
  lda InputByte
  asl
  bpl finishWrite
+ lda #$FF
+ sta OutputByte
  rts
 
 GetByte:

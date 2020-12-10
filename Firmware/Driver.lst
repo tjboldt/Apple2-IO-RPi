@@ -1,4 +1,4 @@
-ca65 V2.19 - Git 59c58acb
+ca65 V2.18 - Ubuntu 2.18-1
 Main file   : Driver.asm
 Current file: Driver.asm
 
@@ -89,7 +89,7 @@ Current file: Driver.asm
 001056  1  60            rts
 001057  1               
 001057  1               read256:
-001057  1  20 AB 10      jsr GetByte
+001057  1  20 B0 10      jsr GetByte
 00105A  1  91 44         sta (BufferLo),y
 00105C  1  C8            iny
 00105D  1  D0 F8         bne read256
@@ -144,29 +144,31 @@ Current file: Driver.asm
 0010A4  1  AD DE C0      lda InputByte
 0010A7  1  0A            asl
 0010A8  1  10 FA         bpl finishWrite
-0010AA  1  60            rts
-0010AB  1               
-0010AB  1               GetByte:
-0010AB  1  20 BE 10      jsr GetNibble
-0010AE  1  0A            asl
-0010AF  1  0A            asl
-0010B0  1  0A            asl
-0010B1  1  0A            asl
-0010B2  1  85 1D         sta NibbleStorage
-0010B4  1  20 BE 10      jsr GetNibble
-0010B7  1  29 0F         and #$0f
-0010B9  1  05 1D         ora NibbleStorage
-0010BB  1  A5 1D         lda NibbleStorage
-0010BD  1  60            rts
-0010BE  1               
-0010BE  1               GetNibble:
-0010BE  1  A9 B0         lda #$b0 ;set read flag low
-0010C0  1  8D DD C0      sta OutputByte
-0010C3  1               waitRead:
-0010C3  1  AD DE C0      lda InputByte
-0010C6  1  30 FB         bmi waitRead
-0010C8  1  29 F0         and #$f0 ;set all flags high
-0010CA  1  8D DD C0      sta OutputByte
-0010CD  1  60            rts
-0010CE  1               
-0010CE  1               
+0010AA  1  A9 FF         lda #$FF
+0010AC  1  8D DD C0      sta OutputByte
+0010AF  1  60            rts
+0010B0  1               
+0010B0  1               GetByte:
+0010B0  1  20 C3 10      jsr GetNibble
+0010B3  1  0A            asl
+0010B4  1  0A            asl
+0010B5  1  0A            asl
+0010B6  1  0A            asl
+0010B7  1  85 1D         sta NibbleStorage
+0010B9  1  20 C3 10      jsr GetNibble
+0010BC  1  29 0F         and #$0f
+0010BE  1  05 1D         ora NibbleStorage
+0010C0  1  A5 1D         lda NibbleStorage
+0010C2  1  60            rts
+0010C3  1               
+0010C3  1               GetNibble:
+0010C3  1  A9 B0         lda #$b0 ;set read flag low
+0010C5  1  8D DD C0      sta OutputByte
+0010C8  1               waitRead:
+0010C8  1  AD DE C0      lda InputByte
+0010CB  1  30 FB         bmi waitRead
+0010CD  1  29 F0         and #$f0 ;set all flags high
+0010CF  1  8D DD C0      sta OutputByte
+0010D2  1  60            rts
+0010D3  1               
+0010D3  1               

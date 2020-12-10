@@ -163,7 +163,12 @@ GetNibble:
 waitRead:
  lda InputByte
  bmi waitRead
- and #$f0 ;set all flags high
+ ora #$f0 ;set all flags high
  sta OutputByte
+ pha
+finishRead:
+ lda InputByte
+ bpl finishRead
+ pla
  rts
  

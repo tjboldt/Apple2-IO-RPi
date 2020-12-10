@@ -1,4 +1,4 @@
-ca65 V2.18 - Ubuntu 2.18-1
+ca65 V2.19 - Git b22d8c74
 Main file   : Driver.asm
 Current file: Driver.asm
 
@@ -167,8 +167,13 @@ Current file: Driver.asm
 0010C8  1               waitRead:
 0010C8  1  AD DE C0      lda InputByte
 0010CB  1  30 FB         bmi waitRead
-0010CD  1  29 F0         and #$f0 ;set all flags high
+0010CD  1  09 F0         ora #$f0 ;set all flags high
 0010CF  1  8D DD C0      sta OutputByte
-0010D2  1  60            rts
-0010D3  1               
-0010D3  1               
+0010D2  1  48            pha
+0010D3  1               finishRead:
+0010D3  1  AD DE C0      lda InputByte
+0010D6  1  10 FB         bpl finishRead
+0010D8  1  68            pla
+0010D9  1  60            rts
+0010DA  1               
+0010DA  1               

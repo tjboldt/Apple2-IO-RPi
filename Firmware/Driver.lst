@@ -37,7 +37,7 @@ Current file: Driver.asm
 00100A  1               ; Add the drive to the device list
 00100A  1  EE 31 BF      inc DeviceCount
 00100D  1  AD 31 BF      lda DeviceCount
-001010  1  A9 50         lda #SlotDrive
+001010  1  A0 50         ldy #SlotDrive
 001012  1  99 32 BF      sta DeviceList,y
 001015  1  60            rts
 001016  1               

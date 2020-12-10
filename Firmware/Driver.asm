@@ -33,7 +33,7 @@ NibbleStorage = $1d
 ; Add the drive to the device list
  inc DeviceCount
  lda DeviceCount
- lda #SlotDrive
+ ldy #SlotDrive
  sta DeviceList,y
  rts
 

@@ -154,7 +154,6 @@ GetByte:
  jsr GetNibble
  and #$0f
  ora NibbleStorage
- lda NibbleStorage
  rts
 
 GetNibble:

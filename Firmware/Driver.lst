@@ -1,4 +1,4 @@
-ca65 V2.19 - Git b22d8c74
+ca65 V2.18 - Ubuntu 2.18-1
 Main file   : Driver.asm
 Current file: Driver.asm
 
@@ -149,31 +149,30 @@ Current file: Driver.asm
 0010AF  1  60            rts
 0010B0  1               
 0010B0  1               GetByte:
-0010B0  1  20 C3 10      jsr GetNibble
+0010B0  1  20 C1 10      jsr GetNibble
 0010B3  1  0A            asl
 0010B4  1  0A            asl
 0010B5  1  0A            asl
 0010B6  1  0A            asl
 0010B7  1  85 1D         sta NibbleStorage
-0010B9  1  20 C3 10      jsr GetNibble
+0010B9  1  20 C1 10      jsr GetNibble
 0010BC  1  29 0F         and #$0f
 0010BE  1  05 1D         ora NibbleStorage
-0010C0  1  A5 1D         lda NibbleStorage
-0010C2  1  60            rts
-0010C3  1               
-0010C3  1               GetNibble:
-0010C3  1  A9 B0         lda #$b0 ;set read flag low
-0010C5  1  8D DD C0      sta OutputByte
-0010C8  1               waitRead:
-0010C8  1  AD DE C0      lda InputByte
-0010CB  1  30 FB         bmi waitRead
-0010CD  1  09 F0         ora #$f0 ;set all flags high
-0010CF  1  8D DD C0      sta OutputByte
-0010D2  1  48            pha
-0010D3  1               finishRead:
-0010D3  1  AD DE C0      lda InputByte
-0010D6  1  10 FB         bpl finishRead
-0010D8  1  68            pla
-0010D9  1  60            rts
-0010DA  1               
-0010DA  1               
+0010C0  1  60            rts
+0010C1  1               
+0010C1  1               GetNibble:
+0010C1  1  A9 B0         lda #$b0 ;set read flag low
+0010C3  1  8D DD C0      sta OutputByte
+0010C6  1               waitRead:
+0010C6  1  AD DE C0      lda InputByte
+0010C9  1  30 FB         bmi waitRead
+0010CB  1  09 F0         ora #$f0 ;set all flags high
+0010CD  1  8D DD C0      sta OutputByte
+0010D0  1  48            pha
+0010D1  1               finishRead:
+0010D1  1  AD DE C0      lda InputByte
+0010D4  1  10 FB         bpl finishRead
+0010D6  1  68            pla
+0010D7  1  60            rts
+0010D8  1               
+0010D8  1               

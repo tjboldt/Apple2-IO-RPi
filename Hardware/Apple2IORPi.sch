@@ -1,5 +1,6 @@
 EESchema Schematic File Version 4
-EELAYER 30 0
+LIBS:Apple2IORPi-cache
+EELAYER 26 0
 EELAYER END
 $Descr USLedger 17000 11000
 encoding utf-8
@@ -319,7 +320,7 @@ Connection ~ 5700 6800
 Wire Wire Line
 	3600 5300 3600 8900
 Wire Wire Line
-	3600 8900 6250 8900
+	3600 8900 4600 8900
 Wire Wire Line
 	5700 2700 7700 2700
 Wire Wire Line
@@ -936,4 +937,18 @@ Wire Wire Line
 Connection ~ 5700 2700
 Wire Wire Line
 	4550 3900 4550 5700
+Wire Wire Line
+	5850 8100 5800 8100
+Wire Wire Line
+	4600 8100 4600 8900
+Connection ~ 4600 8900
+Wire Wire Line
+	4600 8900 6250 8900
+Wire Wire Line
+	5850 8200 5800 8200
+Wire Wire Line
+	5800 8200 5800 8100
+Connection ~ 5800 8100
+Wire Wire Line
+	5800 8100 4600 8100
 $EndSCHEMATC

@@ -9,4 +9,4 @@ ca65 Firmware.asm -D STARTSLOT=\$c400 -o Slot4.o
 ca65 Firmware.asm -D STARTSLOT=\$c500 -o Slot5.o
 ca65 Firmware.asm -D STARTSLOT=\$c600 -o Slot6.o
 ca65 Firmware.asm -D STARTSLOT=\$c700 -o Slot7.o
-ld65 Slot0.o Slot1.o Slot2.o Slot3.o Slot4.o Slot6.o Slot6.o Slot7.o -o Firmware.bin -t none
+ld65 Slot0.o Slot1.o Slot2.o Slot3.o Slot4.o Slot5.o Slot6.o Slot7.o -o Firmware.bin -t none

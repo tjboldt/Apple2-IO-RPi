@@ -3,11 +3,21 @@ Apple II expansion card using a Raspberry Pi for I/O
 
 ![Image of Board](/Hardware/Apple2IORPi.jpg)
 
-## Project Status
-This is an early stage project. Currently one board has been assembled and tested. Running the driver from RAM, it is now possible for the Apple II to read and write to a virutal hard drive image stored on the RPi assuming the card is in slot 5 only. The code has no error handling or tests yet and is incomplete. There is no EPROM firmware yet.
-
 ## Purpose
-The purpose of this project is to provide I/O for an Apple II series 8 bit computer via a Raspberry Pi Zero W which is powered by the Apple II expansion bus. Initially this would be storage via virtual ProDOS compatible drive. Next might be adding virtual serial card support over wifi. Future enhancements could use the RPi for more complex processing as per request from the Apple II. For example, the Apple II could request a web page or application and the RPi could calculate this in Apple II hi-res graphics mode and send the image data back to the II for display purposes.
+The purpose of this project is to provide I/O for an Apple II series 8 bit computer via a Raspberry Pi Zero W which is powered by the Apple II expansion bus. Initially this is storage via virtual ProDOS compatible drive. Next might be adding virtual serial card support over wifi. Future enhancements could use the RPi for more complex processing as per request from the Apple II. For example, the Apple II could request a web page or application and the RPi could calculate this in Apple II hi-res graphics mode and send the image data back to the II for display purposes.
+
+## Project Status
+This is an early stage project. Currently one board has been assembled and tested. It is now possible for the Apple II to boot from and write to a virutal hard drive image stored on the RPi in any slot. The code has no error handling or tests yet and is incomplete.
+
+## Roadmap
+1. DONE - Build initial prototype that reads/writes virtual hard drive
+2. DONE - Create firmware to make the card a bootable device
+3. DONE - Fix board with updated second prototype PCB
+4. Add ProDOS clock driver
+5. Add RPi terminal access
+6. Add web service call support
+7. Proxy VNC connection, rendering as Apple II compatible graphics
+8. Create new schematic/PCB with faster data transfer
 
 ## Setup
 1. Have PCBs made from the gerber and drill files in the Hardware folder

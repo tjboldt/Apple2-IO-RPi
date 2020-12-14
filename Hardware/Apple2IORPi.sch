@@ -6,8 +6,8 @@ $Descr USLedger 17000 11000
 encoding utf-8
 Sheet 1 1
 Title "Apple II I/O RPi"
-Date "2020-11-19"
-Rev "0.5"
+Date "2020-12-13"
+Rev "0.6"
 Comp "Terence J. Boldt"
 Comment1 "Initial draft desgn"
 Comment2 "Provides storage and network for the Apple ]["
@@ -23,17 +23,6 @@ F 1 "Apple II Expansion Bus" H 3350 5426 50  0000 C CNN
 F 2 "Apple2:Apple II Expansion Edge Connector" H 3300 4100 50  0001 C CNN
 F 3 "~" H 3300 4100 50  0001 C CNN
 	1    3300 4100
-	1    0    0    -1  
-$EndComp
-$Comp
-L Memory_EPROM:2764 U1
-U 1 1 5FA0EF8B
-P 6250 7800
-F 0 "U1" H 6250 8981 50  0000 C CNN
-F 1 "2764" H 6250 8890 50  0000 C CNN
-F 2 "Package_DIP:DIP-28_W15.24mm" H 6250 7800 50  0001 C CNN
-F 3 "https://downloads.reactivemicro.com/Electronics/ROM/2764%20EPROM.pdf" H 6250 7800 50  0001 C CNN
-	1    6250 7800
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -293,45 +282,22 @@ Wire Wire Line
 Wire Wire Line
 	3000 2900 3000 5500
 Wire Wire Line
-	3000 8600 5700 8600
+	3000 8600 5650 8600
 Wire Wire Line
-	5850 8700 5700 8700
-Wire Wire Line
-	5700 8700 5700 8600
-Connection ~ 5700 8600
-Wire Wire Line
-	5700 8600 5850 8600
-Wire Wire Line
-	5700 8500 5700 8400
-Wire Wire Line
-	5700 8400 5850 8400
-Wire Wire Line
-	5700 8500 5850 8500
-Wire Wire Line
-	5700 8400 5700 6800
+	5700 8400 5700 8300
 Wire Wire Line
 	5700 6800 6250 6800
-Connection ~ 5700 8400
 Wire Wire Line
 	3100 5300 3100 6800
 Wire Wire Line
 	3100 6800 5700 6800
 Connection ~ 5700 6800
 Wire Wire Line
-	3600 5300 3600 8900
-Wire Wire Line
-	3600 8900 4600 8900
-Wire Wire Line
 	5700 2700 7700 2700
 Wire Wire Line
 	5700 2700 5700 3850
 Wire Wire Line
-	6250 8900 6750 8900
-Wire Wire Line
-	8600 8900 8600 7750
-Wire Wire Line
 	8600 6300 9400 6300
-Connection ~ 6250 8900
 Wire Wire Line
 	8600 6300 8600 6000
 Wire Wire Line
@@ -718,7 +684,6 @@ Wire Wire Line
 Wire Wire Line
 	6250 6750 6250 6800
 Connection ~ 7550 6750
-Connection ~ 6250 6800
 Wire Wire Line
 	3100 5200 3050 5200
 Wire Wire Line
@@ -843,11 +808,6 @@ Connection ~ 7200 6750
 Wire Wire Line
 	7200 6750 7050 6750
 Wire Wire Line
-	6750 8650 6750 8900
-Connection ~ 6750 8900
-Wire Wire Line
-	6750 8900 8600 8900
-Wire Wire Line
 	6750 8350 6750 7800
 Wire Wire Line
 	6750 7800 7050 7800
@@ -940,15 +900,64 @@ Wire Wire Line
 Wire Wire Line
 	5850 8100 5800 8100
 Wire Wire Line
-	4600 8100 4600 8900
-Connection ~ 4600 8900
-Wire Wire Line
-	4600 8900 6250 8900
-Wire Wire Line
 	5850 8200 5800 8200
 Wire Wire Line
 	5800 8200 5800 8100
 Connection ~ 5800 8100
 Wire Wire Line
 	5800 8100 4600 8100
+Wire Wire Line
+	5850 8300 5700 8300
+Connection ~ 5700 8300
+Wire Wire Line
+	5700 8300 5700 6800
+Wire Wire Line
+	8600 9050 6750 9050
+Connection ~ 4600 9050
+Wire Wire Line
+	4600 9050 3600 9050
+Connection ~ 6750 9050
+Wire Wire Line
+	6750 9050 6250 9050
+Wire Wire Line
+	6250 9000 6250 9050
+Connection ~ 6250 9050
+Wire Wire Line
+	6250 9050 4600 9050
+Wire Wire Line
+	8600 7750 8600 9050
+Wire Wire Line
+	6750 8650 6750 9050
+Connection ~ 6250 6800
+$Comp
+L Memory_EPROM:27C256 U1
+U 1 1 5FD87325
+P 6250 7900
+F 0 "U1" H 6250 9178 50  0000 C CNN
+F 1 "27C256" H 6250 9087 50  0000 C CNN
+F 2 "Package_DIP:DIP-28_W15.24mm" H 6250 7900 50  0001 C CNN
+F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/doc0014.pdf" H 6250 7900 50  0001 C CNN
+	1    6250 7900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3600 5300 3600 9050
+Wire Wire Line
+	4600 8100 4600 9050
+Connection ~ 5700 8400
+Wire Wire Line
+	5700 8400 5850 8400
+Wire Wire Line
+	5650 8600 5650 8700
+Connection ~ 5650 8700
+Wire Wire Line
+	5650 8700 5650 8800
+Wire Wire Line
+	5650 8700 5850 8700
+Wire Wire Line
+	5650 8800 5850 8800
+Wire Wire Line
+	5700 8400 5700 8600
+Wire Wire Line
+	5700 8600 5850 8600
 $EndSCHEMATC

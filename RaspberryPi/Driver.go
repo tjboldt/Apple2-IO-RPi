@@ -262,6 +262,7 @@ func main() {
 
 				writeBlock(buffer)
 				file.WriteAt(buffer, int64(block) * 512)
+				file.Sync()
 				break
 			case GetTimeCommand:
 				/*

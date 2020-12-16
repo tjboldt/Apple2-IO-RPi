@@ -16,6 +16,7 @@ InputByte = $c08e
 OutputByte = $c08d
 ReadBlockCommand = $01
 WriteBlockCommand = $02
+GetTimeCommand = $03
 NibbleStorage = $1d
 
  .org STARTSLOT
@@ -85,7 +86,16 @@ GetStatus:
 
 ; ProDOS Read Block Command
 ReadBlock: 
- lda #ReadBlockCommand
+ ldy #$00 ;Get the current time on each block read for now
+ lda #GetTimeCommand
+ jsr SendByte
+getTimeByte:
+ jsr GetByte
+ sta $bf90,y
+ iny
+ cpy #$04
+ bne getTimeByte
+ lda #ReadBlockCommand ;read the block after setting the clock
  jsr SendByte
  lda BlockLo
  jsr SendByte

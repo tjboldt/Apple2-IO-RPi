@@ -1,13 +1,15 @@
 package main
 
 import (
-	//"time"
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/conn/gpio/gpioreg"
 	"periph.io/x/periph/host"
 	"fmt"
 	"os"
+	"time"
+	"errors"
 )
+var edgeTimeout time.Duration
 
 var out_write gpio.PinIO
 var out_read gpio.PinIO
@@ -26,7 +28,11 @@ var in_bit2 gpio.PinIO
 var in_bit1 gpio.PinIO
 var in_bit0 gpio.PinIO
 
-func readNibble() byte {
+const ReadBlockCommand = 1
+const WriteBlockCommand = 2
+const GetTimeCommand = 3
+
+func readNibble() (byte, error) {
 	// let the Apple II know we are ready to read
 	//fmt.Printf("let the Apple II know we are ready to read\n")
 	out_read.Out(gpio.Low)
@@ -34,7 +40,10 @@ func readNibble() byte {
 	// wait for the Apple II to write
 	//fmt.Printf("wait for the Apple II to write\n")
 	for in_write.Read() == gpio.High {
-		in_write.WaitForEdge(-1)
+		if !in_write.WaitForEdge(edgeTimeout) {
+			//fmt.Printf("Timed out reading nibble -- write stuck high\n")
+			return 0, errors.New("Timed out reading nibble -- write stuck high\n")
+		}
 	}
 
 	// get a nibble of data
@@ -66,24 +75,34 @@ func readNibble() byte {
 	// wait for the Apple II to finish writing
 	//fmt.Printf("wait for the Apple II to finish writing\n")
 	for in_write.Read() == gpio.Low {
-		in_write.WaitForEdge(-1)
+		if !in_write.WaitForEdge(edgeTimeout) {
+			//fmt.Printf("Timed out reading nibble -- write stuck low\n")
+			return 0, errors.New("Timed out reading nibble -- write stuck low")
+		}
 	}
 
-	return nibble
+	return nibble, nil
 }
 
-func readByte() byte {
-	data := byte(0)
-	data = readNibble() << byte(4)
-	data += readNibble()
-	return data
+func readByte() (byte, error) {
+	data, err := readNibble()
+	data = data << byte(4)
+	if err != nil { return 0, err }
+	highNibble, err := readNibble()
+	if err != nil { return 0, err }
+	data += highNibble
+	//fmt.Printf("R%02X ", data)
+	return data, nil
 }
 
-func writeNibble(data byte) {
+func writeNibble(data byte) error {
 	// wait for the Apple II to be ready to read
 	//fmt.Printf("wait for the Apple II to be ready to read\n")
 	for in_read.Read() == gpio.High {
-		in_read.WaitForEdge(-1)
+		if !in_read.WaitForEdge(edgeTimeout) {
+			//fmt.Printf("Timed out writing nibble -- read stuck high\n")
+			return errors.New("Timed out writing nibble -- read stuck high")
+		}
 	}
 
 	bit3 := gpio.Low
@@ -118,23 +137,35 @@ func writeNibble(data byte) {
 	// wait for the Apple II to finsih reading
 	//fmt.Printf("wait for the Apple II to finsih reading\n")
 	for in_read.Read() == gpio.Low {
-		in_read.WaitForEdge(-1)
+		if !in_read.WaitForEdge(edgeTimeout) {
+			//fmt.Printf("Timed out writing nibble -- read stuck low\n")
+			return errors.New("Timed out writing nibble -- read stuck low")
+		}
 	}
 
 	// let the Apple II know we are done writing
 	//fmt.Printf("let the Apple II know we are done writing\n")
 	out_write.Out(gpio.High)
+	return nil
 }
 
-func writeByte(data byte) {
-	writeNibble(data >> 4)
-	writeNibble(data & 15)
+func writeByte(data byte) error {
+	//fmt.Printf("W%02X ", data)
+	err := writeNibble(data >> 4)
+	if err != nil { return err }
+	err = writeNibble(data & 15)
+	if err != nil { return err }
+
+	return nil
 }
 
-func readBlock(buffer []byte) {
+func readBlock(buffer []byte) error {
 	for i := 0; i < 512; i++ {
-		writeByte(buffer[i])
+		err := writeByte(buffer[i])
+		if err != nil { return err }
 	}
+
+	return nil
 }
 
 func dumpBlock(buffer []byte) {
@@ -143,10 +174,14 @@ func dumpBlock(buffer []byte) {
 	}
 }
 
-func writeBlock(buffer []byte) {
+func writeBlock(buffer []byte) error {
+	var err error
 	for i := 0; i < 512; i++ {
-		buffer[i] = readByte()
+		buffer[i], err = readByte()
+		if err != nil { return err }
 	}
+
+	return nil
 }
 
 func main() {
@@ -169,11 +204,17 @@ func main() {
 	in_bit1 = gpioreg.ByName("GPIO13")
 	in_bit0 = gpioreg.ByName("GPIO6")
 
+	in_write.In(gpio.PullDown, gpio.BothEdges)
+	in_read.In(gpio.PullDown, gpio.BothEdges)
+
+	edgeTimeout = time.Second * 5
+
 	fmt.Printf("Starting Apple II RPi...\n")
-	fileName := "Total Replay v4.0-rc.1.hdv"
+	fileName := os.Args[1]
 	file, err := os.OpenFile(fileName, os.O_RDWR, 0755)
 	if err != nil {
-	//log.Fatal(err)
+		fmt.Printf("ERROR: %s", err.Error())
+		os.Exit(1)
 	}
 	//if err := f.Close(); err != nil {
 	//log.Fatal(err)
@@ -187,34 +228,76 @@ func main() {
 	//dumpBlock(buffer)
 
 	for {
-		command := readByte();
-		if (command == 1) {
-			blockLow := readByte();
-			blockHigh := readByte();
+		//fmt.Printf("Check for command")
+
+		command,err  := readByte();
+		if err != nil {
+			//fmt.Printf("Timed out waiting for command\n")
+		} else {
+			switch command {
+			case ReadBlockCommand:
+				blockLow,_ := readByte();
+				blockHigh,_ := readByte();
 
 
-			var block int64
-			block = int64(blockHigh) * 256 + int64(blockLow)
+				var block int64
+				block = int64(blockHigh) * 256 + int64(blockLow)
 
-			fmt.Printf("Read block %d\n", block)
-
-
-			file.ReadAt(buffer, int64(block) * 512)
-			//dumpBlock(buffer)
-			readBlock(buffer)
-		}
-		if (command == 2) {
-			blockLow := readByte();
-			blockHigh := readByte();
+				fmt.Printf("Read block %d\n", block)
 
 
-			var block int64
-			block = int64(blockHigh) * 256 + int64(blockLow)
+				file.ReadAt(buffer, int64(block) * 512)
+				//dumpBlock(buffer)
+				readBlock(buffer)
+				break
+			case WriteBlockCommand:
+				blockLow,_ := readByte();
+				blockHigh,_ := readByte();
 
-			fmt.Printf("Write block %d\n", block)
 
-			writeBlock(buffer)
-			file.WriteAt(buffer, int64(block) * 512)
+				var block int64
+				block = int64(blockHigh) * 256 + int64(blockLow)
+
+				fmt.Printf("Write block %d\n", block)
+
+				writeBlock(buffer)
+				file.WriteAt(buffer, int64(block) * 512)
+				break
+			case GetTimeCommand:
+				/*
+				        49041 ($BF91)     49040 ($BF90)
+
+				        7 6 5 4 3 2 1 0   7 6 5 4 3 2 1 0
+				       +-+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
+				DATE:  |    year     |  month  |   day   |
+				       +-+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
+				
+				        7 6 5 4 3 2 1 0   7 6 5 4 3 2 1 0
+				       +-+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
+				TIME:  |    hour       | |    minute     |
+				       +-+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
+				
+				       49043 ($BF93)     49042 ($BF92)
+				*/
+				now := time.Now()
+
+				year := now.Year() % 100
+				month := now.Month()
+				day := now.Day()
+				hour := now.Hour()
+				minute := now.Minute()
+
+				bf91 := (byte(year) << 1) + (byte(month) >> 3)
+				bf90 := ((byte(month) & 15) << 5) + byte(day)
+				bf93 := byte(hour)
+				bf92 := byte(minute)
+
+				writeByte(bf90)
+				writeByte(bf91)
+				writeByte(bf92)
+				writeByte(bf93)
+				break
+			}
 		}
 	}
 }

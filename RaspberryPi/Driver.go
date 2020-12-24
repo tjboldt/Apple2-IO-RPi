@@ -113,13 +113,22 @@ func handleWriteBlockCommand(file *os.File) {
 }
 
 func handleExecCommand() {
+	fmt.Printf("Reading command to execute...\n")
 	linuxCommand,err := readString()
+	fmt.Printf("Command to run: %s\n", linuxCommand)
 	cmd := exec.Command("bash", "-c", linuxCommand)
 	cmdOut, err := cmd.Output()
 	if err != nil {
 		fmt.Printf("Failed to execute command\n")
+		writeString("Failed to execute command")
+		return
 	}
-	writeString(cmdOut)
+	fmt.Printf("Command output: %s\n", cmdOut)
+	err = writeString(string(cmdOut))
+	if err != nil {
+		fmt.Printf("Failed to send command output\n")
+		return
+	}
 }
 
 func handleGetTimeCommand() {
@@ -210,10 +219,10 @@ func dumpBlock(buffer []byte) {
 }
 
 func readString() (string, error) {
-	inByte := byte(0)
+	inByte := byte(255)
 	var inBytes bytes.Buffer
 	var err error
-	for inByte == 0 {
+	for inByte != 0 {
 		inByte,err = readByte()
 		if err != nil {
 			return "", err
@@ -223,10 +232,12 @@ func readString() (string, error) {
 	return string(inBytes.Bytes()), nil
 }
 
-func writeString(outBytes []byte) error {
-	for outByte := range outBytes {
-		err := writeByte(byte(outByte))
+func writeString(outString string) error {
+	for _, character := range outString {
+		fmt.Printf("Out: %s\n", character);
+		err := writeByte(byte(character)|128)
 		if err != nil {
+			fmt.Printf("Failed to write string\n")
 			return err
 		}
 	}

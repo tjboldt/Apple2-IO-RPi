@@ -9,6 +9,7 @@ import (
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/conn/gpio/gpioreg"
 	"periph.io/x/periph/host"
+	"strings"
 	"time"
 )
 
@@ -124,7 +125,8 @@ func handleExecCommand() {
 		return
 	}
 	fmt.Printf("Command output: %s\n", cmdOut)
-	err = writeString(string(cmdOut))
+	apple2string := strings.Replace(string(cmdOut), "\n", "\r", -1)
+	err = writeString(apple2string)
 	if err != nil {
 		fmt.Printf("Failed to send command output\n")
 		return
@@ -219,13 +221,14 @@ func dumpBlock(buffer []byte) {
 }
 
 func readString() (string, error) {
-	inByte := byte(255)
 	var inBytes bytes.Buffer
-	var err error
-	for inByte != 0 {
-		inByte,err = readByte()
+	for {
+		inByte,err := readByte()
 		if err != nil {
 			return "", err
+		}
+		if inByte == 0 {
+			break
 		}
 		inBytes.WriteByte(inByte)
 	}
@@ -234,7 +237,6 @@ func readString() (string, error) {
 
 func writeString(outString string) error {
 	for _, character := range outString {
-		fmt.Printf("Out: %s\n", character);
 		err := writeByte(byte(character)|128)
 		if err != nil {
 			fmt.Printf("Failed to write string\n")

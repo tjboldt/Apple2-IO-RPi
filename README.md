@@ -13,8 +13,8 @@ This is an early stage project. Currently one board has been assembled and teste
 1. DONE - Build initial prototype that reads/writes virtual hard drive
 2. DONE - Create firmware to make the card a bootable device
 3. DONE - Fix board with updated second prototype PCB
-4. DONE - Add ProDOS clock driver
-5. Add RPi terminal access
+4. WORKING - Add ProDOS clock driver (real driver later, for now just directly sets values)
+5. WORKING - Add RPi terminal access (does not keep context between commands yet)
 6. Add web service call support
 7. Proxy VNC connection, rendering as Apple II compatible graphics
 8. Create new schematic/PCB with faster data transfer

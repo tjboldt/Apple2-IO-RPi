@@ -459,8 +459,6 @@ Wire Wire Line
 Wire Wire Line
 	2400 4600 2400 5700
 Wire Wire Line
-	5350 6350 5350 4550
-Wire Wire Line
 	4550 3900 4650 3900
 Text Notes 4000 3950 0    50   ~ 0
 Direction is\nR/W Inverted

@@ -373,8 +373,6 @@ Wire Wire Line
 Wire Wire Line
 	850  3300 850  4400
 Wire Wire Line
-	3800 5050 3800 3250
-Wire Wire Line
 	3000 2600 3100 2600
 Text Notes 2450 2650 0    50   ~ 0
 Direction is\nR/W Inverted

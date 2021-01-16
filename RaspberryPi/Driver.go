@@ -103,7 +103,12 @@ func handleReadBlockCommand(file *os.File) {
 
 	file.ReadAt(buffer, int64(block)*512)
 	//dumpBlock(buffer)
-	readBlock(buffer)
+	err := readBlock(buffer)
+	if err == nil {
+		fmt.Printf("Read block completed\n")
+	} else {
+		fmt.Printf("Failed to read block\n")
+	}
 }
 
 func handleWriteBlockCommand(file *os.File) {
@@ -119,6 +124,7 @@ func handleWriteBlockCommand(file *os.File) {
 	writeBlock(buffer)
 	file.WriteAt(buffer, int64(block)*512)
 	file.Sync()
+	fmt.Printf("Write block completed\n")
 }
 
 func handleExecCommand() {
@@ -142,6 +148,7 @@ func handleExecCommand() {
 }
 
 func handleGetTimeCommand() {
+	fmt.Printf("Sending date/time...\n")
 	/*  49041 ($BF91)     49040 ($BF90)
 
 	        7 6 5 4 3 2 1 0   7 6 5 4 3 2 1 0
@@ -173,6 +180,7 @@ func handleGetTimeCommand() {
 	writeByte(bf91)
 	writeByte(bf92)
 	writeByte(bf93)
+	fmt.Printf("Send time complete\n")
 }
 
 func readBlock(buffer []byte) error {

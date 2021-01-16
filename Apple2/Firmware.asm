@@ -11,7 +11,6 @@ IOError = $27
 NoDevice = $28
 WriteProtect = $2B
 
-SlotDrive = $50
 InputByte = $c08e
 OutputByte = $c08d
 InputFlags = $c08b
@@ -52,15 +51,6 @@ Boot:
  sta     BufferHi
  jsr     Driver  ;get the block
 
-; lda     #$00    ;block 1
-; sta     BlockLo
-; sta     BlockHi
-; sta     BufferLo   ;buffer at $A00
-; lda     #$0A
-; sta     BufferHi
-; jsr     Driver   ;get the block
-
-; ldx     #sdrive ;set up for slot n
  jmp     $801    ;execute the block
 
 ;;
@@ -170,7 +160,7 @@ waitRead:
  lda InputFlags,x
  rol
  bcs waitRead
- lda InputByte
+ lda InputByte,x
  pha
  lda #$0f ;set all flags high
  sta OutputFlags,x

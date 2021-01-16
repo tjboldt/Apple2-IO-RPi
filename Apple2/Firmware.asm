@@ -147,31 +147,37 @@ SendByte:
  pha 
 waitWrite: 
  lda InputFlags,x
- asl ;Second highest bit goes low when ready
- bmi waitWrite
+ ror
+ ror ;Second lowest bit goes low when ready
+ bcs waitWrite
  pla
  sta OutputByte,x
+ lda #$0e ; set bit 0 low to indicate write started
+ sta OutputFlags,x 
 finishWrite:
  lda InputFlags,x
- asl
- bpl finishWrite
- lda #$FF
+ ror
+ ror
+ bcc finishWrite
+ lda #$0f
  sta OutputFlags,x
  rts
 
 GetByte:
- lda #$b0 ;set read flag low
+ lda #$0d ;set read flag low
  sta OutputFlags,x
 waitRead:
  lda InputFlags,x
- bmi waitRead
+ ror
+ bcs waitRead
  lda InputByte
  pha
- lda #$f0 ;set all flags high
+ lda #$0f ;set all flags high
  sta OutputFlags,x
 finishRead:
  lda InputFlags,x
- bpl finishRead
+ ror
+ bcc finishRead
  pla
 end:
  rts

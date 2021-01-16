@@ -147,8 +147,8 @@ SendByte:
  pha 
 waitWrite: 
  lda InputFlags,x
- ror
- ror ;Second lowest bit goes low when ready
+ rol
+ rol 
  bcs waitWrite
  pla
  sta OutputByte,x
@@ -156,8 +156,8 @@ waitWrite:
  sta OutputFlags,x 
 finishWrite:
  lda InputFlags,x
- ror
- ror
+ rol
+ rol
  bcc finishWrite
  lda #$0f
  sta OutputFlags,x
@@ -168,7 +168,7 @@ GetByte:
  sta OutputFlags,x
 waitRead:
  lda InputFlags,x
- ror
+ rol
  bcs waitRead
  lda InputByte
  pha
@@ -176,7 +176,7 @@ waitRead:
  sta OutputFlags,x
 finishRead:
  lda InputFlags,x
- ror
+ rol
  bcc finishRead
  pla
 end:

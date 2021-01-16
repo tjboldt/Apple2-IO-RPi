@@ -17,8 +17,8 @@ var edgeTimeout time.Duration
 
 var out_write gpio.PinIO
 var out_read gpio.PinIO
-var out_commandWrite gpio.PinIO
-var out_commandRead gpio.PinIO
+var out_reserved2 gpio.PinIO
+var out_reserved1 gpio.PinIO
 var out_bit7 gpio.PinIO
 var out_bit6 gpio.PinIO
 var out_bit5 gpio.PinIO
@@ -29,8 +29,8 @@ var out_bit1 gpio.PinIO
 var out_bit0 gpio.PinIO
 var in_write gpio.PinIO
 var in_read gpio.PinIO
-var in_commandWrite gpio.PinIO
-var in_commandRead gpio.PinIO
+var in_reserved2 gpio.PinIO
+var in_reserved1 gpio.PinIO
 var in_bit7 gpio.PinIO
 var in_bit6 gpio.PinIO
 var in_bit5 gpio.PinIO
@@ -199,10 +199,10 @@ func writeBlock(buffer []byte) error {
 }
 
 func initGpio() {
-	out_write = gpioreg.ByName("GPIO5")
-	out_read = gpioreg.ByName("GPIO11")
-	out_commandWrite = gpioreg.ByName("GPIO7")
-	out_commandRead = gpioreg.ByName("GPIO8")
+	out_write = gpioreg.ByName("GPIO24")
+	out_read = gpioreg.ByName("GPIO25")
+	out_reserved2 = gpioreg.ByName("GPIO7") //note GPIO7 and CPIO8 require extra effort to use
+	out_reserved1 = gpioreg.ByName("GPIO8")
 	out_bit7 = gpioreg.ByName("GPIO5")
 	out_bit6 = gpioreg.ByName("GPIO11")
 	out_bit5 = gpioreg.ByName("GPIO9")
@@ -211,10 +211,10 @@ func initGpio() {
 	out_bit2 = gpioreg.ByName("GPIO27")
 	out_bit1 = gpioreg.ByName("GPIO17")
 	out_bit0 = gpioreg.ByName("GPIO4")
-	in_write = gpioreg.ByName("GPIO12")
-	in_read = gpioreg.ByName("GPIO16")
-	in_commandWrite = gpioreg.ByName("GPIO23")
-	in_commandRead = gpioreg.ByName("GPIO18")
+	in_write = gpioreg.ByName("GPIO23")
+	in_read = gpioreg.ByName("GPIO18")
+	in_reserved2 = gpioreg.ByName("GPIO14")
+	in_reserved1 = gpioreg.ByName("GPIO15")
 	in_bit7 = gpioreg.ByName("GPIO12")
 	in_bit6 = gpioreg.ByName("GPIO16")
 	in_bit5 = gpioreg.ByName("GPIO20")
@@ -226,6 +226,18 @@ func initGpio() {
 
 	in_write.In(gpio.PullDown, gpio.BothEdges)
 	in_read.In(gpio.PullDown, gpio.BothEdges)
+	out_reserved1.Out(gpio.High)
+	out_reserved2.Out(gpio.High)
+	out_read.Out(gpio.High)
+	out_write.Out(gpio.High)
+	out_bit7.Out(gpio.Low)
+	out_bit6.Out(gpio.Low)
+	out_bit5.Out(gpio.Low)
+	out_bit4.Out(gpio.Low)
+	out_bit3.Out(gpio.Low)
+	out_bit2.Out(gpio.Low)
+	out_bit1.Out(gpio.Low)
+	out_bit0.Out(gpio.Low)
 
 	edgeTimeout = time.Second * 5
 }

@@ -14,6 +14,8 @@ WriteProtect = $2B
 SlotDrive = $50
 InputByte = $c08e
 OutputByte = $c08d
+InputFlags = $c08b
+OutputFlags = $c087
 ReadBlockCommand = $01
 WriteBlockCommand = $02
 GetTimeCommand = $03
@@ -142,58 +144,40 @@ write256:
  rts
 
 SendByte:
- pha
- lsr
- lsr
- lsr
- lsr
- jsr SendNibble
- pla
- jsr SendNibble
- rts
-
-SendNibble:
- and #$0F
- ora #$70 ;Write bit low
  pha 
 waitWrite: 
- lda InputByte,x
- asl ;Second highest bit goes low when ready
- bmi waitWrite
+ lda InputFlags,x
+ rol
+ rol 
+ bcs waitWrite
  pla
  sta OutputByte,x
+ lda #$0e ; set bit 0 low to indicate write started
+ sta OutputFlags,x 
 finishWrite:
- lda InputByte,x
- asl
- bpl finishWrite
- lda #$FF
- sta OutputByte,x
+ lda InputFlags,x
+ rol
+ rol
+ bcc finishWrite
+ lda #$0f
+ sta OutputFlags,x
  rts
 
 GetByte:
- jsr GetNibble
- asl
- asl
- asl
- asl
- sta NibbleStorage 
- jsr GetNibble
- and #$0f
- ora NibbleStorage
- rts
-
-GetNibble:
- lda #$b0 ;set read flag low
- sta OutputByte,x
+ lda #$0d ;set read flag low
+ sta OutputFlags,x
 waitRead:
- lda InputByte,x
- bmi waitRead
- ora #$f0 ;set all flags high
- sta OutputByte,x
+ lda InputFlags,x
+ rol
+ bcs waitRead
+ lda InputByte
  pha
+ lda #$0f ;set all flags high
+ sta OutputFlags,x
 finishRead:
- lda InputByte,x
- bpl finishRead
+ lda InputFlags,x
+ rol
+ bcc finishRead
  pla
 end:
  rts

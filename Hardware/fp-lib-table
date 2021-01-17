@@ -1,3 +1,3 @@
 (fp_lib_table
-  (lib (name Apple2)(type KiCad)(uri /home/terence/source/Apple2-IO-RPi/Hardware/Apple2.pretty)(options "")(descr ""))
+  (lib (name Apple2)(type KiCad)(uri C:/Users/teren/Apple2-IO-RPi/Hardware/Apple2.pretty)(options "")(descr ""))
 )

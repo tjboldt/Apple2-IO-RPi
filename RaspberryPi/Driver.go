@@ -17,16 +17,24 @@ var edgeTimeout time.Duration
 
 var out_write gpio.PinIO
 var out_read gpio.PinIO
-var out_commandWrite gpio.PinIO
-var out_commandRead gpio.PinIO
+var out_reserved2 gpio.PinIO
+var out_reserved1 gpio.PinIO
+var out_bit7 gpio.PinIO
+var out_bit6 gpio.PinIO
+var out_bit5 gpio.PinIO
+var out_bit4 gpio.PinIO
 var out_bit3 gpio.PinIO
 var out_bit2 gpio.PinIO
 var out_bit1 gpio.PinIO
 var out_bit0 gpio.PinIO
 var in_write gpio.PinIO
 var in_read gpio.PinIO
-var in_commandWrite gpio.PinIO
-var in_commandRead gpio.PinIO
+var in_reserved2 gpio.PinIO
+var in_reserved1 gpio.PinIO
+var in_bit7 gpio.PinIO
+var in_bit6 gpio.PinIO
+var in_bit5 gpio.PinIO
+var in_bit4 gpio.PinIO
 var in_bit3 gpio.PinIO
 var in_bit2 gpio.PinIO
 var in_bit1 gpio.PinIO
@@ -95,7 +103,12 @@ func handleReadBlockCommand(file *os.File) {
 
 	file.ReadAt(buffer, int64(block)*512)
 	//dumpBlock(buffer)
-	readBlock(buffer)
+	err := readBlock(buffer)
+	if err == nil {
+		fmt.Printf("Read block completed\n")
+	} else {
+		fmt.Printf("Failed to read block\n")
+	}
 }
 
 func handleWriteBlockCommand(file *os.File) {
@@ -111,6 +124,7 @@ func handleWriteBlockCommand(file *os.File) {
 	writeBlock(buffer)
 	file.WriteAt(buffer, int64(block)*512)
 	file.Sync()
+	fmt.Printf("Write block completed\n")
 }
 
 func handleExecCommand() {
@@ -134,6 +148,7 @@ func handleExecCommand() {
 }
 
 func handleGetTimeCommand() {
+	fmt.Printf("Sending date/time...\n")
 	/*  49041 ($BF91)     49040 ($BF90)
 
 	        7 6 5 4 3 2 1 0   7 6 5 4 3 2 1 0
@@ -165,6 +180,7 @@ func handleGetTimeCommand() {
 	writeByte(bf91)
 	writeByte(bf92)
 	writeByte(bf93)
+	fmt.Printf("Send time complete\n")
 }
 
 func readBlock(buffer []byte) error {
@@ -191,18 +207,26 @@ func writeBlock(buffer []byte) error {
 }
 
 func initGpio() {
-	out_write = gpioreg.ByName("GPIO5")
-	out_read = gpioreg.ByName("GPIO11")
-	out_commandWrite = gpioreg.ByName("GPIO9")
-	out_commandRead = gpioreg.ByName("GPIO10")
+	out_write = gpioreg.ByName("GPIO24")
+	out_read = gpioreg.ByName("GPIO25")
+	out_reserved2 = gpioreg.ByName("GPIO7") //note GPIO7 and CPIO8 require extra effort to use
+	out_reserved1 = gpioreg.ByName("GPIO8")
+	out_bit7 = gpioreg.ByName("GPIO5")
+	out_bit6 = gpioreg.ByName("GPIO11")
+	out_bit5 = gpioreg.ByName("GPIO9")
+	out_bit4 = gpioreg.ByName("GPIO10")
 	out_bit3 = gpioreg.ByName("GPIO22")
 	out_bit2 = gpioreg.ByName("GPIO27")
 	out_bit1 = gpioreg.ByName("GPIO17")
 	out_bit0 = gpioreg.ByName("GPIO4")
-	in_write = gpioreg.ByName("GPIO12")
-	in_read = gpioreg.ByName("GPIO16")
-	in_commandWrite = gpioreg.ByName("GPIO20")
-	in_commandRead = gpioreg.ByName("GPIO21")
+	in_write = gpioreg.ByName("GPIO23")
+	in_read = gpioreg.ByName("GPIO18")
+	in_reserved2 = gpioreg.ByName("GPIO14")
+	in_reserved1 = gpioreg.ByName("GPIO15")
+	in_bit7 = gpioreg.ByName("GPIO12")
+	in_bit6 = gpioreg.ByName("GPIO16")
+	in_bit5 = gpioreg.ByName("GPIO20")
+	in_bit4 = gpioreg.ByName("GPIO21")
 	in_bit3 = gpioreg.ByName("GPIO26")
 	in_bit2 = gpioreg.ByName("GPIO19")
 	in_bit1 = gpioreg.ByName("GPIO13")
@@ -210,6 +234,18 @@ func initGpio() {
 
 	in_write.In(gpio.PullDown, gpio.BothEdges)
 	in_read.In(gpio.PullDown, gpio.BothEdges)
+	out_reserved1.Out(gpio.High)
+	out_reserved2.Out(gpio.High)
+	out_read.Out(gpio.High)
+	out_write.Out(gpio.High)
+	out_bit7.Out(gpio.Low)
+	out_bit6.Out(gpio.Low)
+	out_bit5.Out(gpio.Low)
+	out_bit4.Out(gpio.Low)
+	out_bit3.Out(gpio.Low)
+	out_bit2.Out(gpio.Low)
+	out_bit1.Out(gpio.Low)
+	out_bit0.Out(gpio.Low)
 
 	edgeTimeout = time.Second * 5
 }
@@ -247,36 +283,8 @@ func writeString(outString string) error {
 	return nil
 }
 
+
 func readByte() (byte, error) {
-	data, err := readNibble()
-	data = data << byte(4)
-	if err != nil {
-		return 0, err
-	}
-	highNibble, err := readNibble()
-	if err != nil {
-		return 0, err
-	}
-	data += highNibble
-	//fmt.Printf("R%02X ", data)
-	return data, nil
-}
-
-func writeByte(data byte) error {
-	//fmt.Printf("W%02X ", data)
-	err := writeNibble(data >> 4)
-	if err != nil {
-		return err
-	}
-	err = writeNibble(data & 15)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func readNibble() (byte, error) {
 	// let the Apple II know we are ready to read
 	if debug {
 		fmt.Printf("let the Apple II know we are ready to read\n")
@@ -290,34 +298,50 @@ func readNibble() (byte, error) {
 	for in_write.Read() == gpio.High {
 		if !in_write.WaitForEdge(edgeTimeout) {
 			if debug {
-				fmt.Printf("Timed out reading nibble -- write stuck high\n")
+				fmt.Printf("Timed out reading byte -- write stuck high\n")
 			}
-			return 0, errors.New("Timed out reading nibble -- write stuck high\n")
+			return 0, errors.New("Timed out reading byte -- write stuck high\n")
 		}
 	}
 
 	// get a nibble of data
 	if debug {
-		fmt.Printf("get a nibble of data\n")
+		fmt.Printf("get a byte of data\n")
 	}
-	var nibble byte
-	nibble = 0
+	var data byte
+	data = 0
+	bit7 := in_bit7.Read()
+	bit6 := in_bit6.Read()
+	bit5 := in_bit5.Read()
+	bit4 := in_bit4.Read()
 	bit3 := in_bit3.Read()
 	bit2 := in_bit2.Read()
 	bit1 := in_bit1.Read()
 	bit0 := in_bit0.Read()
 
+	if bit7 == gpio.High {
+		data += 128
+	}
+	if bit6 == gpio.High {
+		data += 64
+	}
+	if bit5 == gpio.High {
+		data += 32
+	}
+	if bit4 == gpio.High {
+		data += 16
+	}
 	if bit3 == gpio.High {
-		nibble += 8
+		data += 8
 	}
 	if bit2 == gpio.High {
-		nibble += 4
+		data += 4
 	}
 	if bit1 == gpio.High {
-		nibble += 2
+		data += 2
 	}
 	if bit0 == gpio.High {
-		nibble += 1
+		data += 1
 	}
 
 	// let the Apple II know we are done reading
@@ -329,16 +353,16 @@ func readNibble() (byte, error) {
 	for in_write.Read() == gpio.Low {
 		if !in_write.WaitForEdge(edgeTimeout) {
 			if debug {
-				fmt.Printf("Timed out reading nibble -- write stuck low\n")
+				fmt.Printf("Timed out reading byte -- write stuck low\n")
 			}
-			return 0, errors.New("Timed out reading nibble -- write stuck low")
+			return 0, errors.New("Timed out reading byte -- write stuck low")
 		}
 	}
 
-	return nibble, nil
+	return data, nil
 }
 
-func writeNibble(data byte) error {
+func writeByte(data byte) error {
 	// wait for the Apple II to be ready to read
 	if debug {
 		fmt.Printf("wait for the Apple II to be ready to read\n")
@@ -346,16 +370,41 @@ func writeNibble(data byte) error {
 	for in_read.Read() == gpio.High {
 		if !in_read.WaitForEdge(edgeTimeout) {
 			if debug {
-				fmt.Printf("Timed out writing nibble -- read stuck high\n")
+				fmt.Printf("Timed out writing byte -- read stuck high\n")
 			}
-			return errors.New("Timed out writing nibble -- read stuck high")
+			return errors.New("Timed out writing byte -- read stuck high")
 		}
 	}
 
+	bit7 := gpio.Low
+	bit6 := gpio.Low
+	bit5 := gpio.Low
+	bit4 := gpio.Low
 	bit3 := gpio.Low
 	bit2 := gpio.Low
 	bit1 := gpio.Low
 	bit0 := gpio.Low
+
+	if ((data & 128) >> 7) == 1 {
+		bit7 = gpio.High
+	}
+	out_bit7.Out(bit7)
+
+	if ((data & 64) >> 6) == 1 {
+		bit6 = gpio.High
+	}
+	out_bit6.Out(bit6)
+
+	if ((data & 32) >> 5) == 1 {
+		bit5 = gpio.High
+	}
+	out_bit5.Out(bit5)
+
+	if ((data & 16) >> 4) == 1 {
+		bit4 = gpio.High
+	}
+	out_bit4.Out(bit4)
+
 	if ((data & 8) >> 3) == 1 {
 		bit3 = gpio.High
 	}
@@ -387,9 +436,9 @@ func writeNibble(data byte) error {
 	for in_read.Read() == gpio.Low {
 		if !in_read.WaitForEdge(edgeTimeout) {
 			if debug {
-				fmt.Printf("Timed out writing nibble -- read stuck low\n")
+				fmt.Printf("Timed out writing byte -- read stuck low\n")
 			}
-			return errors.New("Timed out writing nibble -- read stuck low")
+			return errors.New("Timed out writing byte -- read stuck low")
 		}
 	}
 

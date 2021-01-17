@@ -10,3 +10,9 @@ ca65 Firmware.asm -D STARTSLOT=\$c500 -o Slot5.o --listing Firmware5.lst
 ca65 Firmware.asm -D STARTSLOT=\$c600 -o Slot6.o --listing Firmware6.lst
 ca65 Firmware.asm -D STARTSLOT=\$c700 -o Slot7.o --listing Firmware7.lst
 ld65 Slot0.o Slot1.o Slot2.o Slot3.o Slot4.o Slot5.o Slot6.o Slot7.o -o Firmware.bin -t none
+cat \
+Firmware.bin Firmware.bin Firmware.bin Firmware.bin \
+Firmware.bin Firmware.bin Firmware.bin Firmware.bin \
+Firmware.bin Firmware.bin Firmware.bin Firmware.bin \
+Firmware.bin Firmware.bin Firmware.bin Firmware.bin \
+> Firmware_27256_EPROM.bin

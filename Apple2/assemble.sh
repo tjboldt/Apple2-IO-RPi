@@ -1,6 +1,4 @@
 #!/bin/sh
-ca65 Driver.asm --listing Driver.lst
-ld65 Driver.o -o Driver.bin -t none
 ca65 Firmware.asm -D STARTSLOT=\$c000 -o Slot0.o 
 ca65 Firmware.asm -D STARTSLOT=\$c100 -o Slot1.o --listing Firmware1.lst
 ca65 Firmware.asm -D STARTSLOT=\$c200 -o Slot2.o --listing Firmware2.lst

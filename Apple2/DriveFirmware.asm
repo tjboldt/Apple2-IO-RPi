@@ -176,5 +176,6 @@ end:
 .byte 0
 .endrepeat
 .byte      0,0     ;0000 blocks = check status
-.byte      3       ;bit 0=read 1=status
+.byte      7       ;bit 0=status 1=read 2=write
 .byte     Driver&$00FF ;low byte of entry
+

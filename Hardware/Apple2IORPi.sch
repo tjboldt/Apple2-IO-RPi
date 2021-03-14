@@ -1,15 +1,14 @@
 EESchema Schematic File Version 4
-LIBS:Apple2IORPi-cache
-EELAYER 26 0
+EELAYER 30 0
 EELAYER END
 $Descr USLedger 17000 11000
 encoding utf-8
 Sheet 1 1
 Title "Apple II I/O RPi"
-Date "2020-12-29"
-Rev "0.9"
+Date "2021-03-08"
+Rev "1.0"
 Comp "Terence J. Boldt"
-Comment1 "Third Prototype"
+Comment1 "Fourth Prototype"
 Comment2 "Provides storage and network for the Apple ]["
 Comment3 "Raspberry Pi Zero W as a daughter board"
 Comment4 "Expansion card for Apple ][ computers"
@@ -202,11 +201,9 @@ Wire Wire Line
 Wire Wire Line
 	1450 1600 1450 4200
 Wire Wire Line
-	1450 9650 4100 9650
-Wire Wire Line
 	4150 7850 4700 7850
 Wire Wire Line
-	1550 7850 4150 7850
+	1550 7850 2350 7850
 Connection ~ 4150 7850
 Wire Wire Line
 	4150 1400 6150 1400
@@ -366,8 +363,6 @@ Wire Wire Line
 Wire Wire Line
 	7850 3400 8400 3400
 Connection ~ 7850 5000
-Text Notes 3150 9850 0    50   ~ 0
-Enable Firmware EPROM\non IO_SELECT low
 Wire Wire Line
 	1550 3300 850  3300
 Wire Wire Line
@@ -388,7 +383,7 @@ U 1 1 5FB50A31
 P 6050 2800
 F 0 "U3" H 6050 3125 50  0000 C CNN
 F 1 "74LS32" H 6050 3034 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 6050 2800 50  0001 C CNN
+F 2 "Apple2:74LS32" H 6050 2800 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 6050 2800 50  0001 C CNN
 	1    6050 2800
 	1    0    0    -1  
@@ -407,7 +402,7 @@ U 2 1 5FB9C73F
 P 3550 4550
 F 0 "U3" H 3550 4875 50  0000 C CNN
 F 1 "74LS32" H 3550 4784 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 3550 4550 50  0001 C CNN
+F 2 "Apple2:74LS32" H 3550 4550 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 3550 4550 50  0001 C CNN
 	2    3550 4550
 	1    0    0    -1  
@@ -427,7 +422,7 @@ U 3 1 5FBF09C5
 P 6150 4600
 F 0 "U3" H 6150 4925 50  0000 C CNN
 F 1 "74LS32" H 6150 4834 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 6150 4600 50  0001 C CNN
+F 2 "Apple2:74LS32" H 6150 4600 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 6150 4600 50  0001 C CNN
 	3    6150 4600
 	1    0    0    -1  
@@ -443,7 +438,7 @@ U 4 1 5FC54438
 P 3550 5050
 F 0 "U3" H 3550 5375 50  0000 C CNN
 F 1 "74LS32" H 3550 5284 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 3550 5050 50  0001 C CNN
+F 2 "Apple2:74LS32" H 3550 5050 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 3550 5050 50  0001 C CNN
 	4    3550 5050
 	1    0    0    -1  
@@ -474,7 +469,7 @@ U 1 1 5FD4E618
 P 2600 3600
 F 0 "U2" H 2600 3925 50  0000 C CNN
 F 1 "74LS00" H 2600 3834 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 2600 3600 50  0001 C CNN
+F 2 "Apple2:74LS00" H 2600 3600 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74ls00" H 2600 3600 50  0001 C CNN
 	1    2600 3600
 	1    0    0    -1  
@@ -490,7 +485,7 @@ U 2 1 5FD74B7A
 P 3400 3600
 F 0 "U2" H 3400 3925 50  0000 C CNN
 F 1 "74LS00" H 3400 3834 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 3400 3600 50  0001 C CNN
+F 2 "Apple2:74LS00" H 3400 3600 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74ls00" H 3400 3600 50  0001 C CNN
 	2    3400 3600
 	1    0    0    -1  
@@ -524,7 +519,7 @@ U 3 1 5FE27921
 P 2850 4950
 F 0 "U2" H 2850 5275 50  0000 C CNN
 F 1 "74LS00" H 2850 5184 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 2850 4950 50  0001 C CNN
+F 2 "Apple2:74LS00" H 2850 4950 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74ls00" H 2850 4950 50  0001 C CNN
 	3    2850 4950
 	1    0    0    -1  
@@ -538,7 +533,7 @@ U 4 1 5FE48B46
 P 2700 4400
 F 0 "U2" H 2700 4725 50  0000 C CNN
 F 1 "74LS00" H 2700 4634 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 2700 4400 50  0001 C CNN
+F 2 "Apple2:74LS00" H 2700 4400 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74ls00" H 2700 4400 50  0001 C CNN
 	4    2700 4400
 	1    0    0    -1  
@@ -558,7 +553,7 @@ U 5 1 5FED8457
 P 6000 8300
 F 0 "U2" H 6230 8346 50  0000 L CNN
 F 1 "74LS00" H 6230 8255 50  0000 L CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 6000 8300 50  0001 C CNN
+F 2 "Apple2:74LS00" H 6000 8300 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74ls00" H 6000 8300 50  0001 C CNN
 	5    6000 8300
 	1    0    0    -1  
@@ -569,7 +564,7 @@ U 5 1 5FEDB516
 P 6750 8300
 F 0 "U3" H 6980 8346 50  0000 L CNN
 F 1 "74LS32" H 6980 8255 50  0000 L CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 6750 8300 50  0001 C CNN
+F 2 "Apple2:74LS32" H 6750 8300 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 6750 8300 50  0001 C CNN
 	5    6750 8300
 	1    0    0    -1  
@@ -819,19 +814,8 @@ F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/doc0014.pdf" H 4700 8950 50
 $EndComp
 Wire Wire Line
 	4100 9650 4100 9750
-Connection ~ 4100 9750
-Wire Wire Line
-	4100 9750 4100 9850
 Wire Wire Line
 	4100 9750 4300 9750
-Wire Wire Line
-	4100 9850 4300 9850
-Wire Wire Line
-	4150 9650 4300 9650
-Wire Wire Line
-	2050 10100 4700 10100
-Wire Wire Line
-	4150 7850 4150 9650
 $Comp
 L 74xx:74LS245 U6
 U 1 1 5FED6949
@@ -893,7 +877,7 @@ Wire Wire Line
 Wire Wire Line
 	900  2700 900  9050
 Wire Wire Line
-	2050 4000 2050 10100
+	2050 4000 2050 4300
 Connection ~ 2050 4000
 Wire Wire Line
 	1550 4000 1550 7850
@@ -1105,13 +1089,13 @@ Wire Wire Line
 Wire Wire Line
 	11800 7750 11550 7750
 Wire Wire Line
-	2700 10250 11800 10250
+	2700 10250 7900 10250
 Wire Wire Line
 	11850 10300 11850 7850
 Wire Wire Line
 	11850 7850 11550 7850
 Wire Wire Line
-	2750 10300 11850 10300
+	2750 10300 9000 10300
 Wire Wire Line
 	11550 7150 12500 7150
 Wire Wire Line
@@ -1155,15 +1139,7 @@ Wire Wire Line
 Wire Wire Line
 	12600 2750 13150 2750
 Wire Wire Line
-	13150 2750 13150 5150
-Wire Wire Line
-	13150 5150 11700 5150
-Wire Wire Line
 	12600 2850 13200 2850
-Wire Wire Line
-	13200 2850 13200 5250
-Wire Wire Line
-	13200 5250 11750 5250
 Wire Wire Line
 	11000 3150 10950 3150
 Wire Wire Line
@@ -1171,43 +1147,15 @@ Wire Wire Line
 Wire Wire Line
 	10950 4550 11800 4550
 Wire Wire Line
-	11800 4550 11800 5350
-Wire Wire Line
-	11800 5350 11550 5350
-Wire Wire Line
 	10900 3050 10900 4600
 Wire Wire Line
 	10900 4600 11850 4600
-Wire Wire Line
-	11850 4600 11850 5450
-Wire Wire Line
-	11850 5450 11550 5450
 Wire Wire Line
 	10900 3050 11000 3050
 Wire Wire Line
 	11550 5850 11850 5850
 Wire Wire Line
-	11850 5850 11850 5450
-Connection ~ 11850 5450
-Wire Wire Line
 	11550 5750 11800 5750
-Wire Wire Line
-	11800 5750 11800 5350
-Connection ~ 11800 5350
-Wire Wire Line
-	11550 5650 11750 5650
-Wire Wire Line
-	11750 5650 11750 5250
-Connection ~ 11750 5250
-Wire Wire Line
-	11750 5250 11550 5250
-Wire Wire Line
-	11550 5550 11700 5550
-Wire Wire Line
-	11700 5550 11700 5150
-Connection ~ 11700 5150
-Wire Wire Line
-	11700 5150 11550 5150
 Wire Wire Line
 	4150 2550 4150 7850
 $Comp
@@ -1262,7 +1210,7 @@ U 5 1 60BA60C0
 P 7500 8300
 F 0 "U8" H 7730 8346 50  0000 L CNN
 F 1 "74LS32" H 7730 8255 50  0000 L CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 7500 8300 50  0001 C CNN
+F 2 "Apple2:74LS32" H 7500 8300 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 7500 8300 50  0001 C CNN
 	5    7500 8300
 	1    0    0    -1  
@@ -1298,7 +1246,7 @@ U 1 1 60D9A204
 P 6550 6250
 F 0 "U8" H 6550 6575 50  0000 C CNN
 F 1 "74LS32" H 6550 6484 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 6550 6250 50  0001 C CNN
+F 2 "Apple2:74LS32" H 6550 6250 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 6550 6250 50  0001 C CNN
 	1    6550 6250
 	1    0    0    -1  
@@ -1309,7 +1257,7 @@ U 2 1 60D9A31D
 P 6550 6850
 F 0 "U8" H 6550 7175 50  0000 C CNN
 F 1 "74LS32" H 6550 7084 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 6550 6850 50  0001 C CNN
+F 2 "Apple2:74LS32" H 6550 6850 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 6550 6850 50  0001 C CNN
 	2    6550 6850
 	1    0    0    -1  
@@ -1352,7 +1300,7 @@ U 3 1 60F3F0CC
 P 3500 6350
 F 0 "U8" H 3500 6675 50  0000 C CNN
 F 1 "74LS32" H 3500 6584 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 3500 6350 50  0001 C CNN
+F 2 "Apple2:74LS32" H 3500 6350 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 3500 6350 50  0001 C CNN
 	3    3500 6350
 	1    0    0    -1  
@@ -1363,7 +1311,7 @@ U 4 1 60F3F167
 P 3500 6900
 F 0 "U8" H 3500 7225 50  0000 C CNN
 F 1 "74LS32" H 3500 7134 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 3500 6900 50  0001 C CNN
+F 2 "Apple2:74LS32" H 3500 6900 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 3500 6900 50  0001 C CNN
 	4    3500 6900
 	1    0    0    -1  
@@ -1408,4 +1356,106 @@ Text Notes 3000 7100 0    50   ~ 0
 A3
 Text Notes 3000 6550 0    50   ~ 0
 A2
+Wire Wire Line
+	1600 10100 1600 4300
+Wire Wire Line
+	1600 4300 2050 4300
+Wire Wire Line
+	2800 9100 2800 9850
+Wire Wire Line
+	2800 9850 4300 9850
+Text Notes 3100 9700 0    50   ~ 0
+Enable Firmware EPROM\non IO_SELECT low
+Wire Wire Line
+	1450 9650 4100 9650
+Wire Wire Line
+	2550 6250 2550 9100
+Wire Wire Line
+	2550 9100 2800 9100
+Connection ~ 2550 6250
+Wire Wire Line
+	1600 10100 4700 10100
+$Comp
+L Jumper:Jumper_3_Bridged12 JP1
+U 1 1 6080C80D
+P 2100 9350
+F 0 "JP1" H 2100 9554 50  0000 C CNN
+F 1 "AT28C64B Busy / 27C256 VPP" H 2100 9463 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 2100 9350 50  0001 C CNN
+F 3 "~" H 2100 9350 50  0001 C CNN
+	1    2100 9350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4300 9650 4300 9550
+Wire Wire Line
+	4300 9550 2100 9550
+Wire Wire Line
+	2100 9550 2100 9500
+Wire Wire Line
+	2350 9350 2350 7850
+Connection ~ 2350 7850
+Wire Wire Line
+	2350 7850 4150 7850
+$Comp
+L Jumper:Jumper_3_Bridged12 JP2
+U 1 1 60884040
+P 7900 9500
+F 0 "JP2" H 7900 9704 50  0000 C CNN
+F 1 "AT28C64B NC / 27C256 A13" H 7900 9613 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 7900 9500 50  0001 C CNN
+F 3 "~" H 7900 9500 50  0001 C CNN
+	1    7900 9500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Jumper:Jumper_3_Bridged12 JP3
+U 1 1 608852FA
+P 9000 9500
+F 0 "JP3" H 9000 9704 50  0000 C CNN
+F 1 "AT28C64B W / 27C256 A14" H 9000 9613 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 9000 9500 50  0001 C CNN
+F 3 "~" H 9000 9500 50  0001 C CNN
+	1    9000 9500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9000 10300 9000 9650
+Wire Wire Line
+	7900 9650 7900 10250
+Wire Wire Line
+	8150 9500 8150 10250
+Wire Wire Line
+	8150 10250 11800 10250
+Wire Wire Line
+	9250 9500 9250 10300
+Wire Wire Line
+	9250 10300 11850 10300
+Wire Wire Line
+	8750 9500 8750 7400
+Wire Wire Line
+	8750 7400 2700 7400
+Wire Wire Line
+	2700 7400 2700 6800
+Connection ~ 2700 6800
+Wire Wire Line
+	1850 9350 1850 10400
+Wire Wire Line
+	1850 10400 11950 10400
+Wire Wire Line
+	11800 4550 11800 5750
+Wire Wire Line
+	11850 4600 11850 5850
+Wire Wire Line
+	13200 2850 13200 5650
+Wire Wire Line
+	11550 5650 13200 5650
+Wire Wire Line
+	13150 2750 13150 5550
+Wire Wire Line
+	11550 5550 13150 5550
+Wire Wire Line
+	11550 5150 11950 5150
+Wire Wire Line
+	11950 5150 11950 10400
 $EndSCHEMATC

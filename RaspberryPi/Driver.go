@@ -67,7 +67,6 @@ func main() {
 		os.Exit(1)
 	}
 
-
 	for {
 		if debug {
 			fmt.Printf("Check for command\n")
@@ -129,7 +128,7 @@ func handleWriteBlockCommand(file *os.File) {
 
 func handleExecCommand() {
 	fmt.Printf("Reading command to execute...\n")
-	linuxCommand,err := readString()
+	linuxCommand, err := readString()
 	fmt.Printf("Command to run: %s\n", linuxCommand)
 	cmd := exec.Command("bash", "-c", linuxCommand)
 	cmdOut, err := cmd.Output()
@@ -259,7 +258,7 @@ func dumpBlock(buffer []byte) {
 func readString() (string, error) {
 	var inBytes bytes.Buffer
 	for {
-		inByte,err := readByte()
+		inByte, err := readByte()
 		if err != nil {
 			return "", err
 		}
@@ -273,7 +272,7 @@ func readString() (string, error) {
 
 func writeString(outString string) error {
 	for _, character := range outString {
-		err := writeByte(byte(character)|128)
+		err := writeByte(byte(character) | 128)
 		if err != nil {
 			fmt.Printf("Failed to write string\n")
 			return err
@@ -282,7 +281,6 @@ func writeString(outString string) error {
 	writeByte(0)
 	return nil
 }
-
 
 func readByte() (byte, error) {
 	// let the Apple II know we are ready to read

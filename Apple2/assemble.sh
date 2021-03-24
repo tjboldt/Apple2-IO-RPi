@@ -16,3 +16,7 @@ DriveFirmware.bin DriveFirmware.bin DriveFirmware.bin DriveFirmware.bin \
 > Firmware_27256_EPROM.bin
 rm Slot*.o
 rm DriveFirmware.bin
+
+ca65 Rpi.Command.asm -o Rpi.Command.o
+ld65 Rpi.Command.o -o Rpi.Command.bin -t none
+rm Rpi.Command.o

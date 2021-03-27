@@ -46,7 +46,7 @@ DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
 DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
 > Firmware_27256_EPROM.bin
 cat \
-DriveFirmware.bin MenuFirmware.bin DriveFirmware.bin DriveFirmware.bin \
+DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
 > Firmware_AT28C64B_EEPROM.bin
 
 ca65 Rpi.Command.asm -o Rpi.Command.o

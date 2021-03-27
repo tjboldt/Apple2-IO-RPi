@@ -35,45 +35,60 @@ SaveFileCommand = $07
  stx Unit 
 
 ;force EPROM to second page on boot
- lda #$1f ;set all flags high and page 1 of EPROMi
+ lda #$1f ;set all flags high and page 3 of EPROM for menu
 PageJump:
  sta OutputFlags
- jmp Start
+ jmp Start ;this jump is only called if coming in from PageJump with A=$2f
 
 ;entry points for ProDOS
 DriverEntry:
  lda #$0f ;set all flags high and page 0 of EPROM
  sta OutputFlags
-;since the firmware page changes to 0, this falls through to the driver
 
 Start:
- jsr $fc58
- ldy #$00
-PrintString:
- lda Text,y
- ora #$80
- beq GetChar
- jsr $fded
- iny
- bne PrintString
 
-GetChar: 
- jsr $fd1b
- sec	;subtract ascii "1" to get 0 - 3 from "1" to "4"
- sbc #$b1
- asl	;put in top nibble as EPROM page 
- asl
- asl
- asl
- ora #$0f ;set all flags high
- jmp PageJump
+; Put command firmware here
+;
+;
+;
 
-Text:
 
-.byte	"1. Boot",$8d
-.byte	"2. File Access",$8d
-.byte	"3. Command Line",$8d
+SendByte:
+ pha 
+waitWrite: 
+ lda InputFlags
+ rol
+ rol 
+ bcs waitWrite
+ pla
+ sta OutputByte
+ lda #$0e ; set bit 0 low to indicate write started
+ sta OutputFlags 
+finishWrite:
+ lda InputFlags
+ rol
+ rol
+ bcc finishWrite
+ lda #$0f
+ sta OutputFlags
+ rts
 
+GetByte:
+ lda #$0d ;set read flag low
+ sta OutputFlags
+waitRead:
+ lda InputFlags
+ rol
+ bcs waitRead
+ lda InputByte
+ pha
+ lda #$0f ;set all flags high
+ sta OutputFlags
+finishRead:
+ lda InputFlags
+ rol
+ bcc finishRead
+ pla
 end:
  rts
 

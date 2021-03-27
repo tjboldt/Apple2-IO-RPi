@@ -15,10 +15,10 @@ Current file: DriveFirmware.asm
 000000r 1               NoDevice = $28
 000000r 1               WriteProtect = $2B
 000000r 1               
-000000r 1               InputByte = $c08e
-000000r 1               OutputByte = $c08d
-000000r 1               InputFlags = $c08b
-000000r 1               OutputFlags = $c087
+000000r 1               InputByte = $c08e+SLOT*$10
+000000r 1               OutputByte = $c08d+SLOT*$10
+000000r 1               InputFlags = $c08b+SLOT*$10
+000000r 1               OutputFlags = $c087+SLOT*$10
 000000r 1               
 000000r 1               ReadBlockCommand = $01
 000000r 1               WriteBlockCommand = $02
@@ -39,15 +39,15 @@ Current file: DriveFirmware.asm
 00C50A  1  86 43         stx Unit
 00C50C  1               
 00C50C  1               ;force EPROM to second page on boot
-00C50C  1  A9 1F         lda #$1f ;set all flags high and page 1 of EPROM
+00C50C  1  A9 3F         lda #$3f ;set all flags high and page 3 of EPROM for menu
 00C50E  1               PageJump:
-00C50E  1  9D 87 C0      sta OutputFlags,x
+00C50E  1  8D D7 C0      sta OutputFlags
 00C511  1  4C 1C C5      jmp Start ;this jump is only called if coming in from PageJump with A=$0f
 00C514  1               
 00C514  1               ;entry points for ProDOS
 00C514  1               DriverEntry:
 00C514  1  A9 0F         lda #$0f ;set all flags high and page 0 of EPROM
-00C516  1  9D 87 C0      sta OutputFlags,x
+00C516  1  8D D7 C0      sta OutputFlags
 00C519  1  4C 32 C5      jmp Driver
 00C51C  1               
 00C51C  1               ;load first two blocks and execute to boot
@@ -147,36 +147,36 @@ Current file: DriveFirmware.asm
 00C5AE  1               SendByte:
 00C5AE  1  48            pha
 00C5AF  1               waitWrite:
-00C5AF  1  BD 8B C0      lda InputFlags,x
+00C5AF  1  AD DB C0      lda InputFlags
 00C5B2  1  2A            rol
 00C5B3  1  2A            rol
 00C5B4  1  B0 F9         bcs waitWrite
 00C5B6  1  68            pla
-00C5B7  1  9D 8D C0      sta OutputByte,x
+00C5B7  1  8D DD C0      sta OutputByte
 00C5BA  1  A9 0E         lda #$0e ; set bit 0 low to indicate write started
-00C5BC  1  9D 87 C0      sta OutputFlags,x
+00C5BC  1  8D D7 C0      sta OutputFlags
 00C5BF  1               finishWrite:
-00C5BF  1  BD 8B C0      lda InputFlags,x
+00C5BF  1  AD DB C0      lda InputFlags
 00C5C2  1  2A            rol
 00C5C3  1  2A            rol
 00C5C4  1  90 F9         bcc finishWrite
 00C5C6  1  A9 0F         lda #$0f
-00C5C8  1  9D 87 C0      sta OutputFlags,x
+00C5C8  1  8D D7 C0      sta OutputFlags
 00C5CB  1  60            rts
 00C5CC  1               
 00C5CC  1               GetByte:
 00C5CC  1  A9 0D         lda #$0d ;set read flag low
-00C5CE  1  9D 87 C0      sta OutputFlags,x
+00C5CE  1  8D D7 C0      sta OutputFlags
 00C5D1  1               waitRead:
-00C5D1  1  BD 8B C0      lda InputFlags,x
+00C5D1  1  AD DB C0      lda InputFlags
 00C5D4  1  2A            rol
 00C5D5  1  B0 FA         bcs waitRead
-00C5D7  1  BD 8E C0      lda InputByte,x
+00C5D7  1  AD DE C0      lda InputByte
 00C5DA  1  48            pha
 00C5DB  1  A9 0F         lda #$0f ;set all flags high
-00C5DD  1  9D 87 C0      sta OutputFlags,x
+00C5DD  1  8D D7 C0      sta OutputFlags
 00C5E0  1               finishRead:
-00C5E0  1  BD 8B C0      lda InputFlags,x
+00C5E0  1  AD DB C0      lda InputFlags
 00C5E3  1  2A            rol
 00C5E4  1  90 FA         bcc finishRead
 00C5E6  1  68            pla

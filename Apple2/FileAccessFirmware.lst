@@ -1,6 +1,6 @@
 ca65 V2.18 - N/A
-Main file   : MenuFirmware.asm
-Current file: MenuFirmware.asm
+Main file   : FileAccessFirmware.asm
+Current file: FileAccessFirmware.asm
 
 000000r 1               ;ProDOS Zero Page
 000000r 1               Command = $42 ;ProDOS Command
@@ -39,56 +39,66 @@ Current file: MenuFirmware.asm
 00C50A  1  86 43         stx Unit
 00C50C  1               
 00C50C  1               ;force EPROM to second page on boot
-00C50C  1  A9 1F         lda #$1f ;set all flags high and page 1 of EPROMi
+00C50C  1  A9 3F         lda #$3f ;set all flags high and page 3 of EPROM for menu
 00C50E  1               PageJump:
 00C50E  1  8D D7 C0      sta OutputFlags
-00C511  1  4C 19 C5      jmp Start
+00C511  1  4C 19 C5      jmp Start ;this jump is only called if coming in from PageJump with A=$2f
 00C514  1               
 00C514  1               ;entry points for ProDOS
 00C514  1               DriverEntry:
 00C514  1  A9 0F         lda #$0f ;set all flags high and page 0 of EPROM
 00C516  1  8D D7 C0      sta OutputFlags
-00C519  1               ;since the firmware page changes to 0, this falls through to the driver
 00C519  1               
 00C519  1               Start:
-00C519  1  20 58 FC      jsr $fc58
-00C51C  1  A0 00         ldy #$00
-00C51E  1               PrintString:
-00C51E  1  B9 3A C5      lda Text,y
-00C521  1  09 80         ora #$80
-00C523  1  F0 06         beq GetChar
-00C525  1  20 ED FD      jsr $fded
-00C528  1  C8            iny
-00C529  1  D0 F3         bne PrintString
-00C52B  1               
-00C52B  1               GetChar:
-00C52B  1  20 1B FD      jsr $fd1b
-00C52E  1  38            sec	;subtract ascii "1" to get 0 - 3 from "1" to "4"
-00C52F  1  E9 B1         sbc #$b1
-00C531  1  0A            asl	;put in top nibble as EPROM page
-00C532  1  0A            asl
-00C533  1  0A            asl
-00C534  1  0A            asl
-00C535  1  09 0F         ora #$0f ;set all flags high
-00C537  1  4C 0E C5      jmp PageJump
-00C53A  1               
-00C53A  1               Text:
-00C53A  1               
-00C53A  1  31 2E 20 42  .byte	"1. Boot",$8d
-00C53E  1  6F 6F 74 8D  
-00C542  1  32 2E 20 46  .byte	"2. File Access",$8d
-00C546  1  69 6C 65 20  
-00C54A  1  41 63 63 65  
-00C551  1  33 2E 20 43  .byte	"3. Command Line",$8d
-00C555  1  6F 6D 6D 61  
-00C559  1  6E 64 20 4C  
-00C561  1               
-00C561  1               end:
-00C561  1  60            rts
-00C562  1               
-00C562  1  00 00 00 00  .repeat	251-<end
-00C566  1  00 00 00 00  
-00C56A  1  00 00 00 00  
+00C519  1               
+00C519  1               ; Put command firmware here
+00C519  1               ;
+00C519  1               ;
+00C519  1               ;
+00C519  1               
+00C519  1               
+00C519  1               SendByte:
+00C519  1  48            pha
+00C51A  1               waitWrite:
+00C51A  1  AD DB C0      lda InputFlags
+00C51D  1  2A            rol
+00C51E  1  2A            rol
+00C51F  1  B0 F9         bcs waitWrite
+00C521  1  68            pla
+00C522  1  8D DD C0      sta OutputByte
+00C525  1  A9 0E         lda #$0e ; set bit 0 low to indicate write started
+00C527  1  8D D7 C0      sta OutputFlags
+00C52A  1               finishWrite:
+00C52A  1  AD DB C0      lda InputFlags
+00C52D  1  2A            rol
+00C52E  1  2A            rol
+00C52F  1  90 F9         bcc finishWrite
+00C531  1  A9 0F         lda #$0f
+00C533  1  8D D7 C0      sta OutputFlags
+00C536  1  60            rts
+00C537  1               
+00C537  1               GetByte:
+00C537  1  A9 0D         lda #$0d ;set read flag low
+00C539  1  8D D7 C0      sta OutputFlags
+00C53C  1               waitRead:
+00C53C  1  AD DB C0      lda InputFlags
+00C53F  1  2A            rol
+00C540  1  B0 FA         bcs waitRead
+00C542  1  AD DE C0      lda InputByte
+00C545  1  48            pha
+00C546  1  A9 0F         lda #$0f ;set all flags high
+00C548  1  8D D7 C0      sta OutputFlags
+00C54B  1               finishRead:
+00C54B  1  AD DB C0      lda InputFlags
+00C54E  1  2A            rol
+00C54F  1  90 FA         bcc finishRead
+00C551  1  68            pla
+00C552  1               end:
+00C552  1  60            rts
+00C553  1               
+00C553  1  00 00 00 00  .repeat	251-<end
+00C557  1  00 00 00 00  
+00C55B  1  00 00 00 00  
 00C5FC  1               .byte 0
 00C5FC  1               .endrepeat
 00C5FC  1  00 00        .byte      0,0     ;0000 blocks = check status

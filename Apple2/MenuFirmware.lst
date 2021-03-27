@@ -1,0 +1,101 @@
+ca65 V2.18 - N/A
+Main file   : MenuFirmware.asm
+Current file: MenuFirmware.asm
+
+000000r 1               ;ProDOS Zero Page
+000000r 1               Command = $42 ;ProDOS Command
+000000r 1               Unit = $43 ;ProDOS unit (SDDD0000)
+000000r 1               BufferLo = $44
+000000r 1               BufferHi = $45
+000000r 1               BlockLo = $46
+000000r 1               BlockHi = $47
+000000r 1               
+000000r 1               ; ProDOS Error Codes
+000000r 1               IOError = $27
+000000r 1               NoDevice = $28
+000000r 1               WriteProtect = $2B
+000000r 1               
+000000r 1               InputByte = $c08e
+000000r 1               OutputByte = $c08d
+000000r 1               InputFlags = $c08b
+000000r 1               OutputFlags = $c087
+000000r 1               
+000000r 1               ReadBlockCommand = $01
+000000r 1               WriteBlockCommand = $02
+000000r 1               GetTimeCommand = $03
+000000r 1               ChangeDriveCommand = $04
+000000r 1               ExecCommand = $05
+000000r 1               LoadFileCommand = $06
+000000r 1               SaveFileCommand = $07
+000000r 1               
+000000r 1                .org SLOT*$100 + $C000
+00C500  1               ;ID bytes for booting and drive detection
+00C500  1  E0 20         cpx #$20    ;ID bytes for ProDOS and the
+00C502  1  E0 00         cpx #$00    ; Apple Autostart ROM
+00C504  1  E0 03         cpx #$03    ;
+00C506  1               
+00C506  1  A2 50         ldx #SLOT*$10
+00C508  1  86 2B         stx $2b
+00C50A  1  86 43         stx Unit
+00C50C  1               
+00C50C  1               ;force EPROM to second page on boot
+00C50C  1  A9 1F         lda #$1f ;set all flags high and page 1 of EPROMi
+00C50E  1               PageJump:
+00C50E  1  9D 87 C0      sta OutputFlags,x
+00C511  1  4C 19 C5      jmp Start
+00C514  1               
+00C514  1               ;entry points for ProDOS
+00C514  1               DriverEntry:
+00C514  1  A9 0F         lda #$0f ;set all flags high and page 0 of EPROM
+00C516  1  9D 87 C0      sta OutputFlags,x
+00C519  1               ;since the firmware page changes to 0, this falls through to the driver
+00C519  1               
+00C519  1               Start:
+00C519  1  20 58 FC      jsr $fc58
+00C51C  1  A0 00         ldy #$00
+00C51E  1               PrintString:
+00C51E  1  B9 3A C5      lda Text,y
+00C521  1  09 80         ora #$80
+00C523  1  F0 06         beq GetChar
+00C525  1  20 ED FD      jsr $fded
+00C528  1  C8            iny
+00C529  1  D0 F3         bne PrintString
+00C52B  1               
+00C52B  1               GetChar:
+00C52B  1  20 1B FD      jsr $fd1b
+00C52E  1  38            sec	;subtract ascii "1" to get 0 - 3 from "1" to "4"
+00C52F  1  E9 B1         sbc #$b1
+00C531  1  0A            asl	;put in top nibble as EPROM page
+00C532  1  0A            asl
+00C533  1  0A            asl
+00C534  1  0A            asl
+00C535  1  09 0F         ora #$0f ;set all flags high
+00C537  1  4C 0E C5      jmp PageJump
+00C53A  1               
+00C53A  1               Text:
+00C53A  1               
+00C53A  1  31 2E 20 42  .byte	"1. Boot",$8d
+00C53E  1  6F 6F 74 8D  
+00C542  1  32 2E 20 53  .byte	"2. Set Clock",$8d
+00C546  1  65 74 20 43  
+00C54A  1  6C 6F 63 6B  
+00C54F  1  33 2E 20 43  .byte	"3. Command Line",$8d
+00C553  1  6F 6D 6D 61  
+00C557  1  6E 64 20 4C  
+00C55F  1  34 2E 20 46  .byte	"4. File Access",$8d
+00C563  1  69 6C 65 20  
+00C567  1  41 63 63 65  
+00C56E  1               
+00C56E  1               end:
+00C56E  1  60            rts
+00C56F  1               
+00C56F  1  00 00 00 00  .repeat	251-<end
+00C573  1  00 00 00 00  
+00C577  1  00 00 00 00  
+00C5FC  1               .byte 0
+00C5FC  1               .endrepeat
+00C5FC  1  00 00        .byte      0,0     ;0000 blocks = check status
+00C5FE  1  07           .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
+00C5FF  1  14           .byte     DriverEntry&$00FF ;low byte of entry
+00C600  1               
+00C600  1               

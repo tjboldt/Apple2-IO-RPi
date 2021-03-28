@@ -50,59 +50,102 @@ Current file: CommandFirmware.asm
 00C516  1  8D D7 C0      sta OutputFlags
 00C519  1               
 00C519  1               Start:
-00C519  1               ; Put command firmware here
-00C519  1               ;
-00C519  1               ;
-00C519  1               ;
-00C519  1  60            rts
-00C51A  1               
-00C51A  1               
-00C51A  1               SendByte:
-00C51A  1  48            pha
-00C51B  1               waitWrite:
-00C51B  1  AD DB C0      lda InputFlags
-00C51E  1  2A            rol
-00C51F  1  2A            rol
-00C520  1  B0 F9         bcs waitWrite
-00C522  1  68            pla
-00C523  1  8D DD C0      sta OutputByte
-00C526  1  A9 0E         lda #$0e ; set bit 0 low to indicate write started
-00C528  1  8D D7 C0      sta OutputFlags
-00C52B  1               finishWrite:
-00C52B  1  AD DB C0      lda InputFlags
-00C52E  1  2A            rol
-00C52F  1  2A            rol
-00C530  1  90 F9         bcc finishWrite
-00C532  1  A9 0F         lda #$0f
-00C534  1  8D D7 C0      sta OutputFlags
+00C519  1  A5 33         lda $33
+00C51B  1  48            pha
+00C51C  1  A9 A4         lda #$a4
+00C51E  1  85 33         sta $33
+00C520  1               GetCommand:
+00C520  1  20 6A FD      jsr $fd6a
+00C523  1  AD 00 02      lda $0200
+00C526  1  C9 8D         cmp #$8d ;stop when return found
+00C528  1  F0 06         beq ExitApp
+00C52A  1  20 38 C5      jsr DumpOutput
+00C52D  1  18            clc
+00C52E  1  90 F0         bcc GetCommand
+00C530  1               ExitApp:
+00C530  1  68            pla
+00C531  1  85 33         sta $33
+00C533  1  A9 00         lda #$00
+00C535  1  84 34         sty $34
 00C537  1  60            rts
 00C538  1               
-00C538  1               GetByte:
-00C538  1  A9 0D         lda #$0d ;set read flag low
-00C53A  1  8D D7 C0      sta OutputFlags
-00C53D  1               waitRead:
-00C53D  1  AD DB C0      lda InputFlags
-00C540  1  2A            rol
-00C541  1  B0 FA         bcs waitRead
-00C543  1  AD DE C0      lda InputByte
-00C546  1  48            pha
-00C547  1  A9 0F         lda #$0f ;set all flags high
-00C549  1  8D D7 C0      sta OutputFlags
-00C54C  1               finishRead:
-00C54C  1  AD DB C0      lda InputFlags
-00C54F  1  2A            rol
-00C550  1  90 FA         bcc finishRead
-00C552  1  68            pla
-00C553  1               end:
-00C553  1  60            rts
-00C554  1               
-00C554  1  00 00 00 00  .repeat	251-<end
-00C558  1  00 00 00 00  
-00C55C  1  00 00 00 00  
+00C538  1               DumpOutput:
+00C538  1  A2 50         ldx #$50
+00C53A  1  A9 05         lda #$05 ;send command 5 = exec
+00C53C  1  20 63 C5      jsr SendByte
+00C53F  1  A0 00         ldy #$00
+00C541  1               getInput:
+00C541  1  B9 00 02      lda $0200,y
+00C544  1  C9 8D         cmp #$8d
+00C546  1  F0 08         beq sendNullTerminator
+00C548  1  29 7F         and #$7f
+00C54A  1  20 63 C5      jsr SendByte
+00C54D  1  C8            iny
+00C54E  1  D0 F1         bne getInput
+00C550  1               sendNullTerminator:
+00C550  1  A9 00         lda #$00
+00C552  1  20 63 C5      jsr SendByte
+00C555  1               getOutput:
+00C555  1  20 81 C5      jsr GetByte
+00C558  1  C9 00         cmp #$00
+00C55A  1  F0 06         beq endOutput
+00C55C  1  20 ED FD      jsr $fded
+00C55F  1  18            clc
+00C560  1  90 F3         bcc getOutput
+00C562  1               endOutput:
+00C562  1  60            rts
+00C563  1               
+00C563  1               SendByte:
+00C563  1  48            pha
+00C564  1               waitWrite:
+00C564  1  AD DB C0      lda InputFlags
+00C567  1  2A            rol
+00C568  1  2A            rol
+00C569  1  B0 F9         bcs waitWrite
+00C56B  1  68            pla
+00C56C  1  8D DD C0      sta OutputByte
+00C56F  1  A9 0E         lda #$0e ; set bit 0 low to indicate write started
+00C571  1  8D D7 C0      sta OutputFlags
+00C574  1               finishWrite:
+00C574  1  AD DB C0      lda InputFlags
+00C577  1  2A            rol
+00C578  1  2A            rol
+00C579  1  90 F9         bcc finishWrite
+00C57B  1  A9 0F         lda #$0f
+00C57D  1  8D D7 C0      sta OutputFlags
+00C580  1  60            rts
+00C581  1               
+00C581  1               GetByte:
+00C581  1  A9 0D         lda #$0d ;set read flag low
+00C583  1  8D D7 C0      sta OutputFlags
+00C586  1               waitRead:
+00C586  1  AD DB C0      lda InputFlags
+00C589  1  2A            rol
+00C58A  1  B0 FA         bcs waitRead
+00C58C  1  AD DE C0      lda InputByte
+00C58F  1  48            pha
+00C590  1  A9 0F         lda #$0f ;set all flags high
+00C592  1  8D D7 C0      sta OutputFlags
+00C595  1               finishRead:
+00C595  1  AD DB C0      lda InputFlags
+00C598  1  2A            rol
+00C599  1  90 FA         bcc finishRead
+00C59B  1  68            pla
+00C59C  1               end:
+00C59C  1  60            rts
+00C59D  1               
+00C59D  1  00 00 00 00  .repeat	251-<end
+00C5A1  1  00 00 00 00  
+00C5A5  1  00 00 00 00  
 00C5FC  1               .byte 0
 00C5FC  1               .endrepeat
 00C5FC  1  00 00        .byte      0,0     ;0000 blocks = check status
 00C5FE  1  07           .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
 00C5FF  1  14           .byte     DriverEntry&$00FF ;low byte of entry
 00C600  1               
+00C600  1               ;Translation of code written in mini-assembler on Apple //e
+00C600  1               ;Currently only works if card is in slot 5
 00C600  1               
+00C600  1                .org $1000
+001000  1               
+001000  1               

@@ -46,6 +46,7 @@ DriverEntry:
  sta OutputFlags
 
 Start:
+ jsr $c300 ;enable 80 columns
  lda $33
  pha
  lda #$a4
@@ -53,17 +54,11 @@ Start:
 GetCommand:
  jsr $fd67
  lda $0200
- cmp #$8d ;stop when return found
- beq ExitApp
+ cmp #$8d ;skip when return found
+ beq GetCommand
  jsr DumpOutput
  clc
  bcc GetCommand
-ExitApp:
- pla
- sta $33
- lda #$00
- sty $34
- rts
 
 DumpOutput:
  lda #$05 ;send command 5 = exec

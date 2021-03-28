@@ -11,38 +11,46 @@ IOError = $27
 NoDevice = $28
 WriteProtect = $2B
 
-InputByte = $c08e
-OutputByte = $c08d
-InputFlags = $c08b
-OutputFlags = $c087
+InputByte = $c08e+SLOT*$10
+OutputByte = $c08d+SLOT*$10
+InputFlags = $c08b+SLOT*$10
+OutputFlags = $c087+SLOT*$10
+
 ReadBlockCommand = $01
 WriteBlockCommand = $02
 GetTimeCommand = $03
-NibbleStorage = $1d
+ChangeDriveCommand = $04
+ExecCommand = $05
+LoadFileCommand = $06
+SaveFileCommand = $07
 
- .org STARTSLOT
+ .org SLOT*$100 + $C000
 ;ID bytes for booting and drive detection
  cpx #$20    ;ID bytes for ProDOS and the
  cpx #$00    ; Apple Autostart ROM
  cpx #$03    ;
- cpx #$3C    ;this one for older II's
+
+ ldx #SLOT*$10
+ stx $2b
+ stx Unit 
+
+;force EPROM to second page on boot
+ lda #$3f ;set all flags high and page 3 of EPROM for menu
+PageJump:
+ sta OutputFlags
+ jmp Start ;this jump is only called if coming in from PageJump with A=$0f
+
+;entry points for ProDOS
+DriverEntry:
+ lda #$0f ;set all flags high and page 0 of EPROM
+ sta OutputFlags
+ jmp Driver
 
 ;load first two blocks and execute to boot
-Boot:
+Start:
  lda     #$01    ;set read command
  sta     Command
  
- jsr $ff58
- tsx
- lda $0100,x
- asl
- asl
- asl
- asl
- sta $2b
- sta Unit 
- tax
-
  lda     #$00    ;block 0
  sta     BlockLo
  sta     BlockHi
@@ -53,7 +61,6 @@ Boot:
 
  jmp     $801    ;execute the block
 
-;;
 ; ProDOS Driver code
 ; First check that this is the right drive
 Driver: 
@@ -136,36 +143,36 @@ write256:
 SendByte:
  pha 
 waitWrite: 
- lda InputFlags,x
+ lda InputFlags
  rol
  rol 
  bcs waitWrite
  pla
- sta OutputByte,x
+ sta OutputByte
  lda #$0e ; set bit 0 low to indicate write started
- sta OutputFlags,x 
+ sta OutputFlags
 finishWrite:
- lda InputFlags,x
+ lda InputFlags
  rol
  rol
  bcc finishWrite
  lda #$0f
- sta OutputFlags,x
+ sta OutputFlags
  rts
 
 GetByte:
  lda #$0d ;set read flag low
- sta OutputFlags,x
+ sta OutputFlags
 waitRead:
- lda InputFlags,x
+ lda InputFlags
  rol
  bcs waitRead
- lda InputByte,x
+ lda InputByte
  pha
  lda #$0f ;set all flags high
- sta OutputFlags,x
+ sta OutputFlags
 finishRead:
- lda InputFlags,x
+ lda InputFlags
  rol
  bcc finishRead
  pla
@@ -177,5 +184,5 @@ end:
 .endrepeat
 .byte      0,0     ;0000 blocks = check status
 .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
-.byte     Driver&$00FF ;low byte of entry
+.byte     DriverEntry&$00FF ;low byte of entry
 

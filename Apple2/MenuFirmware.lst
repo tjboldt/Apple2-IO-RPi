@@ -1,0 +1,114 @@
+ca65 V2.18 - N/A
+Main file   : MenuFirmware.asm
+Current file: MenuFirmware.asm
+
+000000r 1               ;ProDOS Zero Page
+000000r 1               Command = $42 ;ProDOS Command
+000000r 1               Unit = $43 ;ProDOS unit (SDDD0000)
+000000r 1               BufferLo = $44
+000000r 1               BufferHi = $45
+000000r 1               BlockLo = $46
+000000r 1               BlockHi = $47
+000000r 1               
+000000r 1               ; ProDOS Error Codes
+000000r 1               IOError = $27
+000000r 1               NoDevice = $28
+000000r 1               WriteProtect = $2B
+000000r 1               
+000000r 1               InputByte = $c08e+SLOT*$10
+000000r 1               OutputByte = $c08d+SLOT*$10
+000000r 1               InputFlags = $c08b+SLOT*$10
+000000r 1               OutputFlags = $c087+SLOT*$10
+000000r 1               
+000000r 1               ReadBlockCommand = $01
+000000r 1               WriteBlockCommand = $02
+000000r 1               GetTimeCommand = $03
+000000r 1               ChangeDriveCommand = $04
+000000r 1               ExecCommand = $05
+000000r 1               LoadFileCommand = $06
+000000r 1               SaveFileCommand = $07
+000000r 1               
+000000r 1                .org SLOT*$100 + $C000
+00C500  1               ;ID bytes for booting and drive detection
+00C500  1  E0 20         cpx #$20    ;ID bytes for ProDOS and the
+00C502  1  E0 00         cpx #$00    ; Apple Autostart ROM
+00C504  1  E0 03         cpx #$03    ;
+00C506  1               
+00C506  1  A2 50         ldx #SLOT*$10
+00C508  1  86 2B         stx $2b
+00C50A  1  86 43         stx Unit
+00C50C  1               
+00C50C  1               ;force EPROM to second page on boot
+00C50C  1  A9 3F         lda #$3f ;set all flags high and page 1 of EPROMi
+00C50E  1               PageJump:
+00C50E  1  8D D7 C0      sta OutputFlags
+00C511  1  4C 19 C5      jmp Start
+00C514  1               
+00C514  1               ;entry points for ProDOS
+00C514  1               DriverEntry:
+00C514  1  A9 0F         lda #$0f ;set all flags high and page 0 of EPROM
+00C516  1  8D D7 C0      sta OutputFlags
+00C519  1               ;since the firmware page changes to 0, this falls through to the driver
+00C519  1               
+00C519  1               Start:
+00C519  1  A9 F0         lda #$f0	;restore COUT after PR# called
+00C51B  1  85 36         sta $36
+00C51D  1  A9 FD         lda #$fd
+00C51F  1  85 37         sta $37
+00C521  1  20 58 FC      jsr $fc58	;clear screen and show menu options
+00C524  1  A0 00         ldy #$00
+00C526  1               PrintString:
+00C526  1  B9 42 C5      lda Text,y
+00C529  1  F0 08         beq GetChar
+00C52B  1  09 80         ora #$80
+00C52D  1  20 ED FD      jsr $fded
+00C530  1  C8            iny
+00C531  1  D0 F3         bne PrintString
+00C533  1               
+00C533  1               GetChar:
+00C533  1  20 1B FD      jsr $fd1b
+00C536  1  38            sec	;subtract ascii "1" to get 0 - 3 from "1" to "4"
+00C537  1  E9 B1         sbc #$b1
+00C539  1  0A            asl	;put in top nibble as EPROM page
+00C53A  1  0A            asl
+00C53B  1  0A            asl
+00C53C  1  0A            asl
+00C53D  1  09 0F         ora #$0f ;set all flags high
+00C53F  1  4C 0E C5      jmp PageJump
+00C542  1               
+00C542  1               Text:
+00C542  1               
+00C542  1  41 70 70 6C  .byte	"Apple2-IO-RPi",$8d
+00C546  1  65 32 2D 49  
+00C54A  1  4F 2D 52 50  
+00C550  1  28 63 29 32  .byte	"(c)2020-2021 Terence J. Boldt",$8d,$8d
+00C554  1  30 32 30 2D  
+00C558  1  32 30 32 31  
+00C56F  1  31 2E 20 42  .byte	"1. Boot",$8d
+00C573  1  6F 6F 74 8D  
+00C577  1  32 2E 20 46  .byte	"2. File Access",$8d
+00C57B  1  69 6C 65 20  
+00C57F  1  41 63 63 65  
+00C586  1  33 2E 20 43  .byte	"3. Command Line",$8d,$8d
+00C58A  1  6F 6D 6D 61  
+00C58E  1  6E 64 20 4C  
+00C597  1  4D 61 79 20  .byte	"May take 45 seconds for RPi to start",$8d
+00C59B  1  74 61 6B 65  
+00C59F  1  20 34 35 20  
+00C5BC  1  61 66 74 65  .byte	"after intial power-on...",$00
+00C5C0  1  72 20 69 6E  
+00C5C4  1  74 69 61 6C  
+00C5D5  1               
+00C5D5  1               end:
+00C5D5  1  60            rts
+00C5D6  1               
+00C5D6  1  00 00 00 00  .repeat	251-<end
+00C5DA  1  00 00 00 00  
+00C5DE  1  00 00 00 00  
+00C5FC  1               .byte 0
+00C5FC  1               .endrepeat
+00C5FC  1  00 00        .byte      0,0     ;0000 blocks = check status
+00C5FE  1  07           .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
+00C5FF  1  14           .byte     DriverEntry&$00FF ;low byte of entry
+00C600  1               
+00C600  1               

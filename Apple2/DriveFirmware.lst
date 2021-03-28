@@ -1,0 +1,195 @@
+ca65 V2.18 - N/A
+Main file   : DriveFirmware.asm
+Current file: DriveFirmware.asm
+
+000000r 1               ;ProDOS Zero Page
+000000r 1               Command = $42 ;ProDOS Command
+000000r 1               Unit = $43 ;ProDOS unit (SDDD0000)
+000000r 1               BufferLo = $44
+000000r 1               BufferHi = $45
+000000r 1               BlockLo = $46
+000000r 1               BlockHi = $47
+000000r 1               
+000000r 1               ; ProDOS Error Codes
+000000r 1               IOError = $27
+000000r 1               NoDevice = $28
+000000r 1               WriteProtect = $2B
+000000r 1               
+000000r 1               InputByte = $c08e+SLOT*$10
+000000r 1               OutputByte = $c08d+SLOT*$10
+000000r 1               InputFlags = $c08b+SLOT*$10
+000000r 1               OutputFlags = $c087+SLOT*$10
+000000r 1               
+000000r 1               ReadBlockCommand = $01
+000000r 1               WriteBlockCommand = $02
+000000r 1               GetTimeCommand = $03
+000000r 1               ChangeDriveCommand = $04
+000000r 1               ExecCommand = $05
+000000r 1               LoadFileCommand = $06
+000000r 1               SaveFileCommand = $07
+000000r 1               
+000000r 1                .org SLOT*$100 + $C000
+00C500  1               ;ID bytes for booting and drive detection
+00C500  1  E0 20         cpx #$20    ;ID bytes for ProDOS and the
+00C502  1  E0 00         cpx #$00    ; Apple Autostart ROM
+00C504  1  E0 03         cpx #$03    ;
+00C506  1               
+00C506  1  A2 50         ldx #SLOT*$10
+00C508  1  86 2B         stx $2b
+00C50A  1  86 43         stx Unit
+00C50C  1               
+00C50C  1               ;force EPROM to second page on boot
+00C50C  1  A9 3F         lda #$3f ;set all flags high and page 3 of EPROM for menu
+00C50E  1               PageJump:
+00C50E  1  8D D7 C0      sta OutputFlags
+00C511  1  4C 1C C5      jmp Start ;this jump is only called if coming in from PageJump with A=$0f
+00C514  1               
+00C514  1               ;entry points for ProDOS
+00C514  1               DriverEntry:
+00C514  1  A9 0F         lda #$0f ;set all flags high and page 0 of EPROM
+00C516  1  8D D7 C0      sta OutputFlags
+00C519  1  4C 32 C5      jmp Driver
+00C51C  1               
+00C51C  1               ;load first two blocks and execute to boot
+00C51C  1               Start:
+00C51C  1  A9 01         lda     #$01    ;set read command
+00C51E  1  85 42         sta     Command
+00C520  1               
+00C520  1  A9 00         lda     #$00    ;block 0
+00C522  1  85 46         sta     BlockLo
+00C524  1  85 47         sta     BlockHi
+00C526  1  85 44         sta     BufferLo   ;buffer at $800
+00C528  1  A9 08         lda     #$08
+00C52A  1  85 45         sta     BufferHi
+00C52C  1  20 32 C5      jsr     Driver  ;get the block
+00C52F  1               
+00C52F  1  4C 01 08      jmp     $801    ;execute the block
+00C532  1               
+00C532  1               ; ProDOS Driver code
+00C532  1               ; First check that this is the right drive
+00C532  1               Driver:
+00C532  1  A6 43         ldx Unit
+00C534  1  A5 42         lda Command; Check which command is being requested
+00C536  1  F0 0C         beq GetStatus ;0 = Status command
+00C538  1  C9 01         cmp #ReadBlockCommand
+00C53A  1  F0 10         beq ReadBlock
+00C53C  1  C9 02         cmp #WriteBlockCommand
+00C53E  1  F0 46         beq WriteBlock
+00C540  1  38            sec ;set carry as we don't support any other commands
+00C541  1  A9 53         lda #$53 ;Invalid parameter error
+00C543  1  60            rts
+00C544  1               
+00C544  1               ; ProDOS Status Command Handler
+00C544  1               GetStatus:
+00C544  1  A2 FF         ldx #$ff ;low byte number of blocks
+00C546  1  A0 FF         ldy #$ff ;high byte number of blocks
+00C548  1  A9 00         lda #$0 ;zero accumulator and clear carry for success
+00C54A  1  18            clc
+00C54B  1  60            rts
+00C54C  1               
+00C54C  1               ; ProDOS Read Block Command
+00C54C  1               ReadBlock:
+00C54C  1  A0 00         ldy #$00 ;Get the current time on each block read for now
+00C54E  1  A9 03         lda #GetTimeCommand
+00C550  1  20 AE C5      jsr SendByte
+00C553  1               getTimeByte:
+00C553  1  20 CC C5      jsr GetByte
+00C556  1  99 90 BF      sta $bf90,y
+00C559  1  C8            iny
+00C55A  1  C0 04         cpy #$04
+00C55C  1  D0 F5         bne getTimeByte
+00C55E  1  A9 01         lda #ReadBlockCommand ;read the block after setting the clock
+00C560  1  20 AE C5      jsr SendByte
+00C563  1  A5 46         lda BlockLo
+00C565  1  20 AE C5      jsr SendByte
+00C568  1  A5 47         lda BlockHi
+00C56A  1  20 AE C5      jsr SendByte
+00C56D  1  A0 00         ldy #$0
+00C56F  1  20 7D C5      jsr read256
+00C572  1  E6 45         inc BufferHi
+00C574  1  20 7D C5      jsr read256
+00C577  1  C6 45         dec BufferHi
+00C579  1  A9 00         lda #$0 ;zero accumulator and clear carry for success
+00C57B  1  18            clc
+00C57C  1  60            rts
+00C57D  1               
+00C57D  1               read256:
+00C57D  1  20 CC C5      jsr GetByte
+00C580  1  91 44         sta (BufferLo),y
+00C582  1  C8            iny
+00C583  1  D0 F8         bne read256
+00C585  1  60            rts
+00C586  1               
+00C586  1               ; ProDOS Write Block Command
+00C586  1               WriteBlock:
+00C586  1  A9 02         lda #WriteBlockCommand
+00C588  1  20 AE C5      jsr SendByte
+00C58B  1  A5 46         lda BlockLo
+00C58D  1  20 AE C5      jsr SendByte
+00C590  1  A5 47         lda BlockHi
+00C592  1  20 AE C5      jsr SendByte
+00C595  1  A0 00         ldy #$0
+00C597  1  20 A5 C5      jsr write256
+00C59A  1  E6 45         inc BufferHi
+00C59C  1  20 A5 C5      jsr write256
+00C59F  1  C6 45         dec BufferHi
+00C5A1  1  A9 00         lda #$0 ;zero accumulator and clear carry for success
+00C5A3  1  18            clc
+00C5A4  1  60            rts
+00C5A5  1               
+00C5A5  1               write256:
+00C5A5  1  B1 44         lda (BufferLo),y
+00C5A7  1  20 AE C5      jsr SendByte
+00C5AA  1  C8            iny
+00C5AB  1  D0 F8         bne write256
+00C5AD  1  60            rts
+00C5AE  1               
+00C5AE  1               SendByte:
+00C5AE  1  48            pha
+00C5AF  1               waitWrite:
+00C5AF  1  AD DB C0      lda InputFlags
+00C5B2  1  2A            rol
+00C5B3  1  2A            rol
+00C5B4  1  B0 F9         bcs waitWrite
+00C5B6  1  68            pla
+00C5B7  1  8D DD C0      sta OutputByte
+00C5BA  1  A9 0E         lda #$0e ; set bit 0 low to indicate write started
+00C5BC  1  8D D7 C0      sta OutputFlags
+00C5BF  1               finishWrite:
+00C5BF  1  AD DB C0      lda InputFlags
+00C5C2  1  2A            rol
+00C5C3  1  2A            rol
+00C5C4  1  90 F9         bcc finishWrite
+00C5C6  1  A9 0F         lda #$0f
+00C5C8  1  8D D7 C0      sta OutputFlags
+00C5CB  1  60            rts
+00C5CC  1               
+00C5CC  1               GetByte:
+00C5CC  1  A9 0D         lda #$0d ;set read flag low
+00C5CE  1  8D D7 C0      sta OutputFlags
+00C5D1  1               waitRead:
+00C5D1  1  AD DB C0      lda InputFlags
+00C5D4  1  2A            rol
+00C5D5  1  B0 FA         bcs waitRead
+00C5D7  1  AD DE C0      lda InputByte
+00C5DA  1  48            pha
+00C5DB  1  A9 0F         lda #$0f ;set all flags high
+00C5DD  1  8D D7 C0      sta OutputFlags
+00C5E0  1               finishRead:
+00C5E0  1  AD DB C0      lda InputFlags
+00C5E3  1  2A            rol
+00C5E4  1  90 FA         bcc finishRead
+00C5E6  1  68            pla
+00C5E7  1               end:
+00C5E7  1  60            rts
+00C5E8  1               
+00C5E8  1  00 00 00 00  .repeat	251-<end
+00C5EC  1  00 00 00 00  
+00C5F0  1  00 00 00 00  
+00C5FC  1               .byte 0
+00C5FC  1               .endrepeat
+00C5FC  1  00 00        .byte      0,0     ;0000 blocks = check status
+00C5FE  1  07           .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
+00C5FF  1  14           .byte     DriverEntry&$00FF ;low byte of entry
+00C600  1               
+00C600  1               

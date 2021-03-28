@@ -78,7 +78,9 @@ Text:
 .byte	"(c)2020-2021 Terence J. Boldt",$8d,$8d
 .byte	"1. Boot",$8d
 .byte	"2. File Access",$8d
-.byte	"3. Command Line",$8d,$00
+.byte	"3. Command Line",$8d,$8d
+.byte	"May take 45 seconds for RPi to start",$8d
+.byte	"after intial power-on...",$00
 
 end:
  rts

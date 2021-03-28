@@ -89,16 +89,22 @@ Current file: MenuFirmware.asm
 00C577  1  32 2E 20 46  .byte	"2. File Access",$8d
 00C57B  1  69 6C 65 20  
 00C57F  1  41 63 63 65  
-00C586  1  33 2E 20 43  .byte	"3. Command Line",$8d,$00
+00C586  1  33 2E 20 43  .byte	"3. Command Line",$8d,$8d
 00C58A  1  6F 6D 6D 61  
 00C58E  1  6E 64 20 4C  
-00C597  1               
-00C597  1               end:
-00C597  1  60            rts
-00C598  1               
-00C598  1  00 00 00 00  .repeat	251-<end
-00C59C  1  00 00 00 00  
-00C5A0  1  00 00 00 00  
+00C597  1  4D 61 79 20  .byte	"May take 45 seconds for RPi to start",$8d
+00C59B  1  74 61 6B 65  
+00C59F  1  20 34 35 20  
+00C5BC  1  61 66 74 65  .byte	"after intial power-on...",$00
+00C5C0  1  72 20 69 6E  
+00C5C4  1  74 69 61 6C  
+00C5D5  1               
+00C5D5  1               end:
+00C5D5  1  60            rts
+00C5D6  1               
+00C5D6  1  00 00 00 00  .repeat	251-<end
+00C5DA  1  00 00 00 00  
+00C5DE  1  00 00 00 00  
 00C5FC  1               .byte 0
 00C5FC  1               .endrepeat
 00C5FC  1  00 00        .byte      0,0     ;0000 blocks = check status

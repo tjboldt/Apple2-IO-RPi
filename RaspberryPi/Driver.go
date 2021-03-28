@@ -50,6 +50,8 @@ const SaveFileCommand = 7
 
 var debug bool = false
 
+var workingDirectory string = "/home"
+
 func main() {
 	host.Init()
 
@@ -132,7 +134,18 @@ func handleExecCommand() {
 	fmt.Printf("Reading command to execute...\n")
 	linuxCommand, err := readString()
 	fmt.Printf("Command to run: %s\n", linuxCommand)
+	if strings.HasPrefix(linuxCommand, "cd /") {
+		workingDirectory = strings.Replace(linuxCommand, "cd ", "", 1)
+		writeString("Working directory set")
+		return
+	}
+	if strings.HasPrefix(linuxCommand, "cd ") {
+		workingDirectory = workingDirectory + "/" + strings.Replace(linuxCommand, "cd ", "", 1)
+		writeString("Working directory set")
+		return
+	}
 	cmd := exec.Command("bash", "-c", linuxCommand)
+	cmd.Dir = workingDirectory
 	cmdOut, err := cmd.Output()
 	if err != nil {
 		fmt.Printf("Failed to execute command\n")

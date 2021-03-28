@@ -29,7 +29,7 @@ This is an early stage project. Currently four prototype revisions have been ass
 17. Proxy VNC connection, rendering as Apple II compatible graphics
 
 ## Setup
-1. Have PCBs made from the gerber and drill files in the Hardware folder
+1. Have PCBs made from the gerber and drill files in the Hardware folder or email me for a board
 2. Solder chips, header and capacitors in place
 3. Attach Raspberry Pi Zero W facing outward from the card
 4. Install Raspberry Pi OS on microSD card https://www.raspberrypi.org/software/
@@ -45,8 +45,7 @@ This is an early stage project. Currently four prototype revisions have been ass
 14. go get
 15. go build
 16. ./Apple2-IO-RPi Apple2-IO-RPi.hdv
-18. Setup the Driver as a service or to autostart via cronjob (crontab -e then add the line @reboot /usr/pi/Apple2-IO-RPi /usr/pi/Apple2-IO-RPi.hdv > /usr/pi/Apple2-IO-RPi.hdv
+18. Setup the Driver as a service or to autostart via cronjob (crontab -e then add the line @reboot /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-Rpi /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.hdv > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log)
 
 ## Similar Project
-If you prefer having Apple II peripherals control a Raspberry Pi rather than simply using the Raspberry Pi to provide storage, network access and processing to the Apple II, have a look at David Schmenk's excellent [Apple2Pi](https://github.com/dschmenk/apple2pi) project.  
-
+If you prefer having Apple II peripherals control a Raspberry Pi rather than simply using the Raspberry Pi to provide storage, network access and processing to the Apple II, have a look at David Schmenk's excellent [Apple2Pi](https://github.com/dschmenk/apple2pi) project. 

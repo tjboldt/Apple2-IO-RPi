@@ -45,6 +45,8 @@ const WriteBlockCommand = 2
 const GetTimeCommand = 3
 const ChangeDriveCommand = 4
 const ExecCommand = 5
+const LoadFileCommand = 6
+const SaveFileCommand = 7
 
 var debug bool = false
 

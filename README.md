@@ -32,18 +32,20 @@ This is an early stage project. Currently four prototype revisions have been ass
 1. Have PCBs made from the gerber and drill files in the Hardware folder
 2. Solder chips, header and capacitors in place
 3. Attach Raspberry Pi Zero W facing outward from the card
-4. Install Raspberry Pi OS on microSD card
-5. Configure wifi in boot/wpa_supplicant.conf
+4. Install Raspberry Pi OS on microSD card https://www.raspberrypi.org/software/
+5. Configure wifi in boot/wpa_supplicant.conf https://howtoraspberrypi.com/how-to-raspberry-pi-headless-setup/
 6. Add empty ssh file boot (for ssh access over wifi)
 7. Put microSD card in the RPi
 8. Install the expansion card into the Apple II
 9. Power on the Apple II
 10. Update firmware with utility (not written yet) or use EPROM programmer
-11. Install Git and Go on the RPi over ssh
-12. go build Driver.go
-13. Copy a ProDOS hard drive image onto the RPi
-14. ./Driver HARDDRIVE.hdv
-15. Setup the Driver as a service or to autostart via cronjob
+11. sudo apt install git golang
+12. git clone https://github.com/tjboldt/Apple2-IO-RPi.git
+13. cd Apple2-IO-RPi
+14. go get
+15. go build
+16. ./Apple2-IO-RPi Apple2-IO-RPi.hdv
+18. Setup the Driver as a service or to autostart via cronjob (crontab -e then add the line @reboot /usr/pi/Apple2-IO-RPi /usr/pi/Apple2-IO-RPi.hdv > /usr/pi/Apple2-IO-RPi.hdv
 
 ## Similar Project
 If you prefer having Apple II peripherals control a Raspberry Pi rather than simply using the Raspberry Pi to provide storage, network access and processing to the Apple II, have a look at David Schmenk's excellent [Apple2Pi](https://github.com/dschmenk/apple2pi) project.  

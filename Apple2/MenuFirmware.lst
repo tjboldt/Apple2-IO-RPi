@@ -66,7 +66,7 @@ Current file: MenuFirmware.asm
 00C531  1  D0 F3         bne PrintString
 00C533  1               
 00C533  1               GetChar:
-00C533  1  20 1B FD      jsr $fd1b
+00C533  1  20 0C FD      jsr $fd0c
 00C536  1  38            sec	;subtract ascii "1" to get 0 - 3 from "1" to "4"
 00C537  1  E9 B1         sbc #$b1
 00C539  1  0A            asl	;put in top nibble as EPROM page
@@ -81,30 +81,32 @@ Current file: MenuFirmware.asm
 00C542  1  41 70 70 6C  .byte	"Apple2-IO-RPi",$8d
 00C546  1  65 32 2D 49  
 00C54A  1  4F 2D 52 50  
-00C550  1  28 63 29 32  .byte	"(c)2020-2021 Terence J. Boldt",$8d,$8d
+00C550  1  28 63 29 32  .byte	"(c)2020-2021 Terence J. Boldt",$8d
 00C554  1  30 32 30 2D  
 00C558  1  32 30 32 31  
+00C56E  1  8D           .byte   $8d
 00C56F  1  31 2E 20 42  .byte	"1. Boot",$8d
 00C573  1  6F 6F 74 8D  
-00C577  1  32 2E 20 46  .byte	"2. File Access",$8d
-00C57B  1  69 6C 65 20  
-00C57F  1  41 63 63 65  
-00C586  1  33 2E 20 43  .byte	"3. Command Line",$8d,$8d
-00C58A  1  6F 6D 6D 61  
-00C58E  1  6E 64 20 4C  
-00C597  1  4D 61 79 20  .byte	"May take 45 seconds for RPi to start",$8d
-00C59B  1  74 61 6B 65  
-00C59F  1  20 34 35 20  
-00C5BC  1  61 66 74 65  .byte	"after intial power-on...",$00
-00C5C0  1  72 20 69 6E  
-00C5C4  1  74 69 61 6C  
-00C5D5  1               
-00C5D5  1               end:
-00C5D5  1  60            rts
-00C5D6  1               
-00C5D6  1  00 00 00 00  .repeat	251-<end
-00C5DA  1  00 00 00 00  
-00C5DE  1  00 00 00 00  
+00C577  1  32 2E 20 43  .byte	"2. Command Line",$8d
+00C57B  1  6F 6D 6D 61  
+00C57F  1  6E 64 20 4C  
+00C587  1  33 2E 20 46  .byte	"3. File Access [NOT IMPLEMENTED]",$8d
+00C58B  1  69 6C 65 20  
+00C58F  1  41 63 63 65  
+00C5A8  1  8D           .byte   $8d
+00C5A9  1  4D 61 79 20  .byte	"May take 45 seconds for RPi to start",$8d
+00C5AD  1  74 61 6B 65  
+00C5B1  1  20 34 35 20  
+00C5CE  1  61 66 74 65  .byte	"after intial power-on...",$00
+00C5D2  1  72 20 69 6E  
+00C5D6  1  74 69 61 6C  
+00C5E7  1               
+00C5E7  1               end:
+00C5E7  1  60            rts
+00C5E8  1               
+00C5E8  1  00 00 00 00  .repeat	251-<end
+00C5EC  1  00 00 00 00  
+00C5F0  1  00 00 00 00  
 00C5FC  1               .byte 0
 00C5FC  1               .endrepeat
 00C5FC  1  00 00        .byte      0,0     ;0000 blocks = check status

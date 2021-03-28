@@ -62,7 +62,7 @@ PrintString:
  bne PrintString
 
 GetChar: 
- jsr $fd1b
+ jsr $fd0c
  sec	;subtract ascii "1" to get 0 - 3 from "1" to "4"
  sbc #$b1
  asl	;put in top nibble as EPROM page 
@@ -75,10 +75,12 @@ GetChar:
 Text:
 
 .byte	"Apple2-IO-RPi",$8d
-.byte	"(c)2020-2021 Terence J. Boldt",$8d,$8d
+.byte	"(c)2020-2021 Terence J. Boldt",$8d
+.byte   $8d
 .byte	"1. Boot",$8d
-.byte	"2. File Access",$8d
-.byte	"3. Command Line",$8d,$8d
+.byte	"2. Command Line",$8d
+.byte	"3. File Access [NOT IMPLEMENTED]",$8d
+.byte   $8d
 .byte	"May take 45 seconds for RPi to start",$8d
 .byte	"after intial power-on...",$00
 

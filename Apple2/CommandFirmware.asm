@@ -51,7 +51,7 @@ Start:
  lda #$a4
  sta $33
 GetCommand:
- jsr $fd6a
+ jsr $fd67
  lda $0200
  cmp #$8d ;stop when return found
  beq ExitApp
@@ -66,7 +66,6 @@ ExitApp:
  rts
 
 DumpOutput:
- ldx #$50
  lda #$05 ;send command 5 = exec
  jsr SendByte
  ldy #$00
@@ -100,19 +99,19 @@ waitWrite:
  bcs waitWrite
  pla
  sta OutputByte
- lda #$0e ; set bit 0 low to indicate write started
+ lda #$1e ; set bit 0 low to indicate write started
  sta OutputFlags 
 finishWrite:
  lda InputFlags
  rol
  rol
  bcc finishWrite
- lda #$0f
+ lda #$1f
  sta OutputFlags
  rts
 
 GetByte:
- lda #$0d ;set read flag low
+ lda #$1d ;set read flag low
  sta OutputFlags
 waitRead:
  lda InputFlags
@@ -120,7 +119,7 @@ waitRead:
  bcs waitRead
  lda InputByte
  pha
- lda #$0f ;set all flags high
+ lda #$1f ;set all flags high
  sta OutputFlags
 finishRead:
  lda InputFlags

@@ -14,16 +14,19 @@ This is an early stage project. Currently four prototype revisions have been ass
 2. DONE - Create firmware to make the card a bootable device
 3. DONE - Fix board with updated second prototype PCB
 4. DONE - Add ProDOS clock support
-5. WORKING - Add simple RPi command execution (does not keep context between commands yet)
+5. DONE - Add simple RPi command execution (does not keep context between commands yet)
 6. DONE - Create new schematic/PCB with faster data transfera
 7. DONE - Add hardware support for in-system firmware updates
-8. Add firmware update software
-9. Add proper ProDOS clock driver (currently just directly sets values on block reads)
-10. Add directory context to RPi command execution 
-11. Add full terminal emulation 
-12. Add support for direct file read/write without drive image
-13. Add web service call support
-14. Proxy VNC connection, rendering as Apple II compatible graphics
+8. DONE - Add multi-page firmware support
+9. DONE - Add boot menu
+10. DONE - Add RPi command in firmware
+11. Add firmware update software
+12. Add proper ProDOS clock driver (currently just directly sets values on block reads)
+13. Add directory context to RPi command execution 
+14. Add full terminal emulation 
+15. Add support for direct file read/write without drive image
+16. Add web service call support
+17. Proxy VNC connection, rendering as Apple II compatible graphics
 
 ## Setup
 1. Have PCBs made from the gerber and drill files in the Hardware folder

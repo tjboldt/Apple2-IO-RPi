@@ -51,7 +51,7 @@ Start:
 ;
 ;
 ;
-
+ rts
 
 SendByte:
  pha 

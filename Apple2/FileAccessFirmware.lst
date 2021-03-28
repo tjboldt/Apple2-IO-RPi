@@ -1,4 +1,4 @@
-ca65 V2.19 - Git 59c58ac
+ca65 V2.18 - N/A
 Main file   : FileAccessFirmware.asm
 Current file: FileAccessFirmware.asm
 
@@ -55,50 +55,50 @@ Current file: FileAccessFirmware.asm
 00C519  1               ;
 00C519  1               ;
 00C519  1               ;
-00C519  1               
-00C519  1               
-00C519  1               SendByte:
-00C519  1  48            pha
-00C51A  1               waitWrite:
-00C51A  1  AD DB C0      lda InputFlags
-00C51D  1  2A            rol
+00C519  1  60            rts
+00C51A  1               
+00C51A  1               SendByte:
+00C51A  1  48            pha
+00C51B  1               waitWrite:
+00C51B  1  AD DB C0      lda InputFlags
 00C51E  1  2A            rol
-00C51F  1  B0 F9         bcs waitWrite
-00C521  1  68            pla
-00C522  1  8D DD C0      sta OutputByte
-00C525  1  A9 0E         lda #$0e ; set bit 0 low to indicate write started
-00C527  1  8D D7 C0      sta OutputFlags
-00C52A  1               finishWrite:
-00C52A  1  AD DB C0      lda InputFlags
-00C52D  1  2A            rol
+00C51F  1  2A            rol
+00C520  1  B0 F9         bcs waitWrite
+00C522  1  68            pla
+00C523  1  8D DD C0      sta OutputByte
+00C526  1  A9 0E         lda #$0e ; set bit 0 low to indicate write started
+00C528  1  8D D7 C0      sta OutputFlags
+00C52B  1               finishWrite:
+00C52B  1  AD DB C0      lda InputFlags
 00C52E  1  2A            rol
-00C52F  1  90 F9         bcc finishWrite
-00C531  1  A9 0F         lda #$0f
-00C533  1  8D D7 C0      sta OutputFlags
-00C536  1  60            rts
-00C537  1               
-00C537  1               GetByte:
-00C537  1  A9 0D         lda #$0d ;set read flag low
-00C539  1  8D D7 C0      sta OutputFlags
-00C53C  1               waitRead:
-00C53C  1  AD DB C0      lda InputFlags
-00C53F  1  2A            rol
-00C540  1  B0 FA         bcs waitRead
-00C542  1  AD DE C0      lda InputByte
-00C545  1  48            pha
-00C546  1  A9 0F         lda #$0f ;set all flags high
-00C548  1  8D D7 C0      sta OutputFlags
-00C54B  1               finishRead:
-00C54B  1  AD DB C0      lda InputFlags
-00C54E  1  2A            rol
-00C54F  1  90 FA         bcc finishRead
-00C551  1  68            pla
-00C552  1               end:
-00C552  1  60            rts
-00C553  1               
-00C553  1  00 00 00 00  .repeat	251-<end
-00C557  1  00 00 00 00  
-00C55B  1  00 00 00 00  
+00C52F  1  2A            rol
+00C530  1  90 F9         bcc finishWrite
+00C532  1  A9 0F         lda #$0f
+00C534  1  8D D7 C0      sta OutputFlags
+00C537  1  60            rts
+00C538  1               
+00C538  1               GetByte:
+00C538  1  A9 0D         lda #$0d ;set read flag low
+00C53A  1  8D D7 C0      sta OutputFlags
+00C53D  1               waitRead:
+00C53D  1  AD DB C0      lda InputFlags
+00C540  1  2A            rol
+00C541  1  B0 FA         bcs waitRead
+00C543  1  AD DE C0      lda InputByte
+00C546  1  48            pha
+00C547  1  A9 0F         lda #$0f ;set all flags high
+00C549  1  8D D7 C0      sta OutputFlags
+00C54C  1               finishRead:
+00C54C  1  AD DB C0      lda InputFlags
+00C54F  1  2A            rol
+00C550  1  90 FA         bcc finishRead
+00C552  1  68            pla
+00C553  1               end:
+00C553  1  60            rts
+00C554  1               
+00C554  1  00 00 00 00  .repeat	251-<end
+00C558  1  00 00 00 00  
+00C55C  1  00 00 00 00  
 00C5FC  1               .byte 0
 00C5FC  1               .endrepeat
 00C5FC  1  00 00        .byte      0,0     ;0000 blocks = check status

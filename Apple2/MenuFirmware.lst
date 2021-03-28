@@ -1,4 +1,4 @@
-ca65 V2.19 - Git 59c58ac
+ca65 V2.18 - N/A
 Main file   : MenuFirmware.asm
 Current file: MenuFirmware.asm
 
@@ -51,50 +51,54 @@ Current file: MenuFirmware.asm
 00C519  1               ;since the firmware page changes to 0, this falls through to the driver
 00C519  1               
 00C519  1               Start:
-00C519  1  20 58 FC      jsr $fc58
-00C51C  1  A0 00         ldy #$00
-00C51E  1               PrintString:
-00C51E  1  B9 3A C5      lda Text,y
-00C521  1  F0 08         beq GetChar
-00C523  1  09 80         ora #$80
-00C525  1  20 ED FD      jsr $fded
-00C528  1  C8            iny
-00C529  1  D0 F3         bne PrintString
-00C52B  1               
-00C52B  1               GetChar:
-00C52B  1  20 1B FD      jsr $fd1b
-00C52E  1  38            sec	;subtract ascii "1" to get 0 - 3 from "1" to "4"
-00C52F  1  E9 B1         sbc #$b1
-00C531  1  0A            asl	;put in top nibble as EPROM page
-00C532  1  0A            asl
-00C533  1  0A            asl
-00C534  1  0A            asl
-00C535  1  09 0F         ora #$0f ;set all flags high
-00C537  1  4C 0E C5      jmp PageJump
-00C53A  1               
-00C53A  1               Text:
-00C53A  1               
-00C53A  1  41 70 70 6C  .byte	"Apple2-IO-RPi",$8d
-00C53E  1  65 32 2D 49  
-00C542  1  4F 2D 52 50  
-00C548  1  28 63 29 32  .byte	"(c)2020-2021 Terence J. Boldt",$8d,$8d
-00C54C  1  30 32 30 2D  
-00C550  1  32 30 32 31  
-00C567  1  31 2E 20 42  .byte	"1. Boot",$8d
-00C56B  1  6F 6F 74 8D  
-00C56F  1  32 2E 20 46  .byte	"2. File Access",$8d
-00C573  1  69 6C 65 20  
-00C577  1  41 63 63 65  
-00C57E  1  33 2E 20 43  .byte	"3. Command Line",$8d,$00
-00C582  1  6F 6D 6D 61  
-00C586  1  6E 64 20 4C  
-00C58F  1               
-00C58F  1               end:
-00C58F  1  60            rts
-00C590  1               
-00C590  1  00 00 00 00  .repeat	251-<end
-00C594  1  00 00 00 00  
-00C598  1  00 00 00 00  
+00C519  1  A9 F0         lda #$f0	;restore COUT after PR# called
+00C51B  1  85 36         sta $36
+00C51D  1  A9 FD         lda #$fd
+00C51F  1  85 37         sta $37
+00C521  1  20 58 FC      jsr $fc58	;clear screen and show menu options
+00C524  1  A0 00         ldy #$00
+00C526  1               PrintString:
+00C526  1  B9 42 C5      lda Text,y
+00C529  1  F0 08         beq GetChar
+00C52B  1  09 80         ora #$80
+00C52D  1  20 ED FD      jsr $fded
+00C530  1  C8            iny
+00C531  1  D0 F3         bne PrintString
+00C533  1               
+00C533  1               GetChar:
+00C533  1  20 1B FD      jsr $fd1b
+00C536  1  38            sec	;subtract ascii "1" to get 0 - 3 from "1" to "4"
+00C537  1  E9 B1         sbc #$b1
+00C539  1  0A            asl	;put in top nibble as EPROM page
+00C53A  1  0A            asl
+00C53B  1  0A            asl
+00C53C  1  0A            asl
+00C53D  1  09 0F         ora #$0f ;set all flags high
+00C53F  1  4C 0E C5      jmp PageJump
+00C542  1               
+00C542  1               Text:
+00C542  1               
+00C542  1  41 70 70 6C  .byte	"Apple2-IO-RPi",$8d
+00C546  1  65 32 2D 49  
+00C54A  1  4F 2D 52 50  
+00C550  1  28 63 29 32  .byte	"(c)2020-2021 Terence J. Boldt",$8d,$8d
+00C554  1  30 32 30 2D  
+00C558  1  32 30 32 31  
+00C56F  1  31 2E 20 42  .byte	"1. Boot",$8d
+00C573  1  6F 6F 74 8D  
+00C577  1  32 2E 20 46  .byte	"2. File Access",$8d
+00C57B  1  69 6C 65 20  
+00C57F  1  41 63 63 65  
+00C586  1  33 2E 20 43  .byte	"3. Command Line",$8d,$00
+00C58A  1  6F 6D 6D 61  
+00C58E  1  6E 64 20 4C  
+00C597  1               
+00C597  1               end:
+00C597  1  60            rts
+00C598  1               
+00C598  1  00 00 00 00  .repeat	251-<end
+00C59C  1  00 00 00 00  
+00C5A0  1  00 00 00 00  
 00C5FC  1               .byte 0
 00C5FC  1               .endrepeat
 00C5FC  1  00 00        .byte      0,0     ;0000 blocks = check status

@@ -46,11 +46,11 @@ DriverEntry:
  sta OutputFlags
 
 Start:
-
 ; Put command firmware here
 ;
 ;
 ;
+ rts
 
 
 SendByte:

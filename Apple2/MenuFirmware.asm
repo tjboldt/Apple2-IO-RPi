@@ -47,7 +47,11 @@ DriverEntry:
 ;since the firmware page changes to 0, this falls through to the driver
 
 Start:
- jsr $fc58
+ lda #$f0	;restore COUT after PR# called
+ sta $36
+ lda #$fd
+ sta $37
+ jsr $fc58	;clear screen and show menu options
  ldy #$00
 PrintString:
  lda Text,y

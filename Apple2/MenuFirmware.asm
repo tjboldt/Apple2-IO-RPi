@@ -35,7 +35,7 @@ SaveFileCommand = $07
  stx Unit 
 
 ;force EPROM to second page on boot
- lda #$1f ;set all flags high and page 1 of EPROMi
+ lda #$3f ;set all flags high and page 1 of EPROMi
 PageJump:
  sta OutputFlags
  jmp Start
@@ -51,8 +51,8 @@ Start:
  ldy #$00
 PrintString:
  lda Text,y
- ora #$80
  beq GetChar
+ ora #$80
  jsr $fded
  iny
  bne PrintString
@@ -70,9 +70,11 @@ GetChar:
 
 Text:
 
+.byte	"Apple2-IO-RPi",$8d
+.byte	"(c)2020-2021 Terence J. Boldt",$8d,$8d
 .byte	"1. Boot",$8d
 .byte	"2. File Access",$8d
-.byte	"3. Command Line",$8d
+.byte	"3. Command Line",$8d,$00
 
 end:
  rts

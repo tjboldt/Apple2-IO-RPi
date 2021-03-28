@@ -39,7 +39,7 @@ Current file: CommandFirmware.asm
 00C50A  1  86 43         stx Unit
 00C50C  1               
 00C50C  1               ;force EPROM to second page on boot
-00C50C  1  A9 1F         lda #$1f ;set all flags high and page 3 of EPROM for menu
+00C50C  1  A9 3F         lda #$3f ;set all flags high and page 3 of EPROM for menu
 00C50E  1               PageJump:
 00C50E  1  8D D7 C0      sta OutputFlags
 00C511  1  4C 19 C5      jmp Start ;this jump is only called if coming in from PageJump with A=$2f

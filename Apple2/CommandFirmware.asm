@@ -35,7 +35,7 @@ SaveFileCommand = $07
  stx Unit 
 
 ;force EPROM to second page on boot
- lda #$1f ;set all flags high and page 3 of EPROM for menu
+ lda #$3f ;set all flags high and page 3 of EPROM for menu
 PageJump:
  sta OutputFlags
  jmp Start ;this jump is only called if coming in from PageJump with A=$2f

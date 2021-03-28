@@ -39,7 +39,7 @@ Current file: MenuFirmware.asm
 00C50A  1  86 43         stx Unit
 00C50C  1               
 00C50C  1               ;force EPROM to second page on boot
-00C50C  1  A9 1F         lda #$1f ;set all flags high and page 1 of EPROMi
+00C50C  1  A9 3F         lda #$3f ;set all flags high and page 1 of EPROMi
 00C50E  1               PageJump:
 00C50E  1  8D D7 C0      sta OutputFlags
 00C511  1  4C 19 C5      jmp Start
@@ -55,8 +55,8 @@ Current file: MenuFirmware.asm
 00C51C  1  A0 00         ldy #$00
 00C51E  1               PrintString:
 00C51E  1  B9 3A C5      lda Text,y
-00C521  1  09 80         ora #$80
-00C523  1  F0 06         beq GetChar
+00C521  1  F0 08         beq GetChar
+00C523  1  09 80         ora #$80
 00C525  1  20 ED FD      jsr $fded
 00C528  1  C8            iny
 00C529  1  D0 F3         bne PrintString
@@ -74,21 +74,27 @@ Current file: MenuFirmware.asm
 00C53A  1               
 00C53A  1               Text:
 00C53A  1               
-00C53A  1  31 2E 20 42  .byte	"1. Boot",$8d
-00C53E  1  6F 6F 74 8D  
-00C542  1  32 2E 20 46  .byte	"2. File Access",$8d
-00C546  1  69 6C 65 20  
-00C54A  1  41 63 63 65  
-00C551  1  33 2E 20 43  .byte	"3. Command Line",$8d
-00C555  1  6F 6D 6D 61  
-00C559  1  6E 64 20 4C  
-00C561  1               
-00C561  1               end:
-00C561  1  60            rts
-00C562  1               
-00C562  1  00 00 00 00  .repeat	251-<end
-00C566  1  00 00 00 00  
-00C56A  1  00 00 00 00  
+00C53A  1  41 70 70 6C  .byte	"Apple2-IO-RPi",$8d
+00C53E  1  65 32 2D 49  
+00C542  1  4F 2D 52 50  
+00C548  1  28 63 29 32  .byte	"(c)2020-2021 Terence J. Boldt",$8d,$8d
+00C54C  1  30 32 30 2D  
+00C550  1  32 30 32 31  
+00C567  1  31 2E 20 42  .byte	"1. Boot",$8d
+00C56B  1  6F 6F 74 8D  
+00C56F  1  32 2E 20 46  .byte	"2. File Access",$8d
+00C573  1  69 6C 65 20  
+00C577  1  41 63 63 65  
+00C57E  1  33 2E 20 43  .byte	"3. Command Line",$8d,$00
+00C582  1  6F 6D 6D 61  
+00C586  1  6E 64 20 4C  
+00C58F  1               
+00C58F  1               end:
+00C58F  1  60            rts
+00C590  1               
+00C590  1  00 00 00 00  .repeat	251-<end
+00C594  1  00 00 00 00  
+00C598  1  00 00 00 00  
 00C5FC  1               .byte 0
 00C5FC  1               .endrepeat
 00C5FC  1  00 00        .byte      0,0     ;0000 blocks = check status

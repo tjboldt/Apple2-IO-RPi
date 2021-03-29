@@ -4,22 +4,23 @@ Apple II expansion card using a Raspberry Pi for I/O
 ![Image of Board](/Hardware/Apple2IORPi.jpg)
 
 ## Purpose
-The purpose of this project is to provide I/O for an Apple II series 8 bit computer via a Raspberry Pi Zero W which is powered by the Apple II expansion bus. This includes using attached RPi Zero W for it's storage, network and processor to provide new functionality for the Apple II.
+The purpose of this project is to provide I/O for an Apple II series 8 bit computer via a Raspberry Pi Zero W which is powered by the Apple II expansion bus. This includes using the attached RPi Zero W for it's storage, network and processor to provide new functionality for the Apple II.
 
 ## Project Status
 So far, this is a project and not a finished product. The current prototype is on the fourth revision and a few have been assembled and tested. It is now possible for the Apple II to boot from and write to a virutal hard drive image stored on the RPi in any slot and execute simple commands on the RPi via the Apple II. The code has no error handling or tests yet and is incomplete.
 
 ## Roadmap
-1. Wifi setup tool
+1. Detect when RPi is in a ready state
 2. Help in command line
-3. Software on default image to get firmware updates
-4. Proper ProDOS clock driver (currently just directly sets values on block reads)
-5. Support for direct file read/write without drive image
-6. Image conversion on download
-7. Web service call support
-8. Full terminal emulation
-9. Remote code execution 
-10. Proxy VNC connection, rendering as Apple II compatible graphics
+3. Wifi setup tool
+4. Software on default image to get firmware updates
+5. Proper ProDOS clock driver (currently just directly sets values on block reads)
+6. Support for direct file read/write without drive image
+7. Image conversion on download
+8. Web service call support
+9. Full terminal emulation
+10. Remote code execution 
+11. Proxy VNC connection, rendering as Apple II compatible graphics
 
 ## Setup
 1. Have PCBs made from the gerber and drill files in the Hardware folder or email me for a blank or fully assembled board

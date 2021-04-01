@@ -29,111 +29,134 @@ Current file: CommandFirmware.asm
 000000r 1               SaveFileCommand = $07
 000000r 1               
 000000r 1                .org SLOT*$100 + $C000
-00C500  1               ;ID bytes for booting and drive detection
-00C500  1  E0 20         cpx #$20    ;ID bytes for ProDOS and the
-00C502  1  E0 00         cpx #$00    ; Apple Autostart ROM
-00C504  1  E0 03         cpx #$03    ;
-00C506  1               
-00C506  1  A2 50         ldx #SLOT*$10
-00C508  1  86 2B         stx $2b
-00C50A  1  86 43         stx Unit
-00C50C  1               
-00C50C  1               ;force EPROM to second page on boot
-00C50C  1  A9 3F         lda #$3f ;set all flags high and page 3 of EPROM for menu
-00C50E  1               PageJump:
-00C50E  1  8D D7 C0      sta OutputFlags
-00C511  1  4C 19 C5      jmp Start ;this jump is only called if coming in from PageJump with A=$2f
-00C514  1               
-00C514  1               ;entry points for ProDOS
-00C514  1               DriverEntry:
-00C514  1  A9 0F         lda #$0f ;set all flags high and page 0 of EPROM
-00C516  1  8D D7 C0      sta OutputFlags
-00C519  1               
-00C519  1               Start:
-00C519  1  20 00 C3      jsr $c300 ;enable 80 columns
-00C51C  1  A5 33         lda $33
-00C51E  1  48            pha
-00C51F  1  A9 A4         lda #$a4
-00C521  1  85 33         sta $33
-00C523  1               GetCommand:
-00C523  1  20 67 FD      jsr $fd67
-00C526  1  AD 00 02      lda $0200
-00C529  1  C9 8D         cmp #$8d ;skip when return found
-00C52B  1  F0 F6         beq GetCommand
-00C52D  1  20 33 C5      jsr DumpOutput
-00C530  1  18            clc
-00C531  1  90 F0         bcc GetCommand
-00C533  1               
-00C533  1               DumpOutput:
-00C533  1  A9 05         lda #$05 ;send command 5 = exec
-00C535  1  20 5C C5      jsr SendByte
-00C538  1  A0 00         ldy #$00
-00C53A  1               getInput:
-00C53A  1  B9 00 02      lda $0200,y
-00C53D  1  C9 8D         cmp #$8d
-00C53F  1  F0 08         beq sendNullTerminator
-00C541  1  29 7F         and #$7f
-00C543  1  20 5C C5      jsr SendByte
-00C546  1  C8            iny
-00C547  1  D0 F1         bne getInput
-00C549  1               sendNullTerminator:
-00C549  1  A9 00         lda #$00
-00C54B  1  20 5C C5      jsr SendByte
-00C54E  1               getOutput:
-00C54E  1  20 7A C5      jsr GetByte
-00C551  1  C9 00         cmp #$00
-00C553  1  F0 06         beq endOutput
-00C555  1  20 ED FD      jsr $fded
-00C558  1  18            clc
-00C559  1  90 F3         bcc getOutput
-00C55B  1               endOutput:
-00C55B  1  60            rts
-00C55C  1               
-00C55C  1               SendByte:
-00C55C  1  48            pha
-00C55D  1               waitWrite:
-00C55D  1  AD DB C0      lda InputFlags
-00C560  1  2A            rol
-00C561  1  2A            rol
-00C562  1  B0 F9         bcs waitWrite
-00C564  1  68            pla
-00C565  1  8D DD C0      sta OutputByte
-00C568  1  A9 1E         lda #$1e ; set bit 0 low to indicate write started
-00C56A  1  8D D7 C0      sta OutputFlags
-00C56D  1               finishWrite:
-00C56D  1  AD DB C0      lda InputFlags
-00C570  1  2A            rol
-00C571  1  2A            rol
-00C572  1  90 F9         bcc finishWrite
-00C574  1  A9 1F         lda #$1f
-00C576  1  8D D7 C0      sta OutputFlags
-00C579  1  60            rts
-00C57A  1               
-00C57A  1               GetByte:
-00C57A  1  A9 1D         lda #$1d ;set read flag low
-00C57C  1  8D D7 C0      sta OutputFlags
-00C57F  1               waitRead:
-00C57F  1  AD DB C0      lda InputFlags
-00C582  1  2A            rol
-00C583  1  B0 FA         bcs waitRead
-00C585  1  AD DE C0      lda InputByte
-00C588  1  48            pha
-00C589  1  A9 1F         lda #$1f ;set all flags high
-00C58B  1  8D D7 C0      sta OutputFlags
-00C58E  1               finishRead:
-00C58E  1  AD DB C0      lda InputFlags
-00C591  1  2A            rol
-00C592  1  90 FA         bcc finishRead
-00C594  1  68            pla
-00C595  1               end:
-00C595  1  60            rts
-00C596  1               
-00C596  1  00 00 00 00  .repeat	251-<end
-00C59A  1  00 00 00 00  
-00C59E  1  00 00 00 00  
-00C5FC  1               .byte 0
-00C5FC  1               .endrepeat
-00C5FC  1  00 00        .byte      0,0     ;0000 blocks = check status
-00C5FE  1  07           .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
-00C5FF  1  14           .byte     DriverEntry&$00FF ;low byte of entry
-00C5FF  1               
+00C700  1               ;ID bytes for booting and drive detection
+00C700  1  E0 20         cpx #$20    ;ID bytes for ProDOS and the
+00C702  1  E0 00         cpx #$00    ; Apple Autostart ROM
+00C704  1  E0 03         cpx #$03    ;
+00C706  1               
+00C706  1  A2 70         ldx #SLOT*$10
+00C708  1  86 2B         stx $2b
+00C70A  1  86 43         stx Unit
+00C70C  1               
+00C70C  1               ;force EPROM to second page on boot
+00C70C  1  A9 3F         lda #$3f ;set all flags high and page 3 of EPROM for menu
+00C70E  1               PageJump:
+00C70E  1  8D F7 C0      sta OutputFlags
+00C711  1  4C 19 C7      jmp Start ;this jump is only called if coming in from PageJump with A=$2f
+00C714  1               
+00C714  1               ;entry points for ProDOS
+00C714  1               DriverEntry:
+00C714  1  A9 0F         lda #$0f ;set all flags high and page 0 of EPROM
+00C716  1  8D F7 C0      sta OutputFlags
+00C719  1               
+00C719  1               Start:
+00C719  1  20 00 C3      jsr $c300 ;enable 80 columns
+00C71C  1  A5 33         lda $33
+00C71E  1  48            pha
+00C71F  1  A9 A4         lda #$a4
+00C721  1  85 33         sta $33
+00C723  1               GetCommand:
+00C723  1  20 67 FD      jsr $fd67
+00C726  1  AD 00 02      lda $0200
+00C729  1  C9 8D         cmp #$8d ;skip when return found
+00C72B  1  F0 F6         beq GetCommand
+00C72D  1  20 33 C7      jsr DumpOutput
+00C730  1  18            clc
+00C731  1  90 F0         bcc GetCommand
+00C733  1               
+00C733  1               DumpOutput:
+00C733  1  A9 05         lda #$05 ;send command 5 = exec
+00C735  1  20 5C C7      jsr SendByte
+00C738  1  A0 00         ldy #$00
+00C73A  1               getInput:
+00C73A  1  B9 00 02      lda $0200,y
+00C73D  1  C9 8D         cmp #$8d
+00C73F  1  F0 08         beq sendNullTerminator
+00C741  1  29 7F         and #$7f
+00C743  1  20 5C C7      jsr SendByte
+00C746  1  C8            iny
+00C747  1  D0 F1         bne getInput
+00C749  1               sendNullTerminator:
+00C749  1  A9 00         lda #$00
+00C74B  1  20 5C C7      jsr SendByte
+00C74E  1               getOutput:
+00C74E  1  20 7A C7      jsr GetByte
+00C751  1  C9 00         cmp #$00
+00C753  1  F0 06         beq endOutput
+00C755  1  20 ED FD      jsr $fded
+00C758  1  18            clc
+00C759  1  90 F3         bcc getOutput
+00C75B  1               endOutput:
+00C75B  1  60            rts
+00C75C  1               
+00C75C  1               SendByte:
+00C75C  1  48            pha
+00C75D  1               waitWrite:
+00C75D  1  AD FB C0      lda InputFlags
+00C760  1  2A            rol
+00C761  1  2A            rol
+00C762  1  B0 F9         bcs waitWrite
+00C764  1  68            pla
+00C765  1  8D FD C0      sta OutputByte
+00C768  1  A9 1E         lda #$1e ; set bit 0 low to indicate write started
+00C76A  1  8D F7 C0      sta OutputFlags
+00C76D  1               finishWrite:
+00C76D  1  AD FB C0      lda InputFlags
+00C770  1  2A            rol
+00C771  1  2A            rol
+00C772  1  90 F9         bcc finishWrite
+00C774  1  A9 1F         lda #$1f
+00C776  1  8D F7 C0      sta OutputFlags
+00C779  1  60            rts
+00C77A  1               
+00C77A  1               GetByte:
+00C77A  1  A9 1D         lda #$1d ;set read flag low
+00C77C  1  8D F7 C0      sta OutputFlags
+00C77F  1               waitRead:
+00C77F  1  AD FB C0      lda InputFlags
+00C782  1  2A            rol
+00C783  1  B0 FA         bcs waitRead
+00C785  1  AD FE C0      lda InputByte
+00C788  1  48            pha
+00C789  1  A9 1F         lda #$1f ;set all flags high
+00C78B  1  8D F7 C0      sta OutputFlags
+00C78E  1               finishRead:
+00C78E  1  AD FB C0      lda InputFlags
+00C791  1  2A            rol
+00C792  1  90 FA         bcc finishRead
+00C794  1  68            pla
+00C795  1               end:
+00C795  1  60            rts
+00C796  1               
+00C796  1  00 00 00 00  .repeat	251-<end
+00C79A  1  00 00 00 00  
+00C79E  1  00 00 00 00  
+00C7A2  1  00 00 00 00  
+00C7A6  1  00 00 00 00  
+00C7AA  1  00 00 00 00  
+00C7AE  1  00 00 00 00  
+00C7B2  1  00 00 00 00  
+00C7B6  1  00 00 00 00  
+00C7BA  1  00 00 00 00  
+00C7BE  1  00 00 00 00  
+00C7C2  1  00 00 00 00  
+00C7C6  1  00 00 00 00  
+00C7CA  1  00 00 00 00  
+00C7CE  1  00 00 00 00  
+00C7D2  1  00 00 00 00  
+00C7D6  1  00 00 00 00  
+00C7DA  1  00 00 00 00  
+00C7DE  1  00 00 00 00  
+00C7E2  1  00 00 00 00  
+00C7E6  1  00 00 00 00  
+00C7EA  1  00 00 00 00  
+00C7EE  1  00 00 00 00  
+00C7F2  1  00 00 00 00  
+00C7F6  1  00 00 00 00  
+00C7FA  1  00 00        
+00C7FC  1               .byte 0
+00C7FC  1               .endrepeat
+00C7FC  1  00 00        .byte      0,0     ;0000 blocks = check status
+00C7FE  1  07           .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
+00C7FF  1  14           .byte     DriverEntry&$00FF ;low byte of entry
+00C7FF  1               

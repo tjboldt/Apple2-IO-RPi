@@ -136,10 +136,4 @@ Current file: CommandFirmware.asm
 00C5FC  1  00 00        .byte      0,0     ;0000 blocks = check status
 00C5FE  1  07           .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
 00C5FF  1  14           .byte     DriverEntry&$00FF ;low byte of entry
-00C600  1               
-00C600  1               ;Translation of code written in mini-assembler on Apple //e
-00C600  1               ;Currently only works if card is in slot 5
-00C600  1               
-00C600  1                .org $1000
-001000  1               
-001000  1               
+00C5FF  1               

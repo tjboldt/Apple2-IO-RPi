@@ -49,9 +49,6 @@ cat \
 DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
 > Firmware_AT28C64B_EEPROM.bin
 
-ca65 Rpi.Command.asm -o Rpi.Command.o
-ld65 Rpi.Command.o -o Rpi.Command.bin -t none
-
 rm *.o
 rm DriveFirmware.bin
 rm MenuFirmware.bin

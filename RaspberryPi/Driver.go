@@ -89,6 +89,8 @@ func main() {
 				handleGetTimeCommand()
 			case ExecCommand:
 				handleExecCommand()
+			case LoadFileCommand:
+				handleLoadFileCommand()
 			}
 		}
 	}
@@ -144,6 +146,12 @@ func handleExecCommand() {
 		writeString("Working directory set")
 		return
 	}
+        if linuxCommand == "a2help" {
+		writeString("This is a pseudo shell. Each command is executed as a process. The cd command is\n" +
+                            "intercepted and sets the working directory for the next command. Running\n" +
+                            "commands that do not exit will hang. For example, do not use ping without a -c 1\n" +
+                            "or something else to limit its output.\n")
+	}
 	cmd := exec.Command("bash", "-c", linuxCommand)
 	cmd.Dir = workingDirectory
 	cmdOut, err := cmd.Output()
@@ -195,6 +203,42 @@ func handleGetTimeCommand() {
 	writeByte(bf92)
 	writeByte(bf93)
 	fmt.Printf("Send time complete\n")
+}
+
+func handleLoadFileCommand() {
+	fileName, _ := readString()
+
+	file, err := os.OpenFile(fileName, os.O_RDWR, 0755)
+        if err != nil {
+                fmt.Printf("ERROR: %s\n", err.Error())
+                writeByte(0)
+		writeByte(0)
+		return 
+        }
+
+	fileInfo, _ := file.Stat()
+	fileSize := int(fileInfo.Size())
+
+	fmt.Printf("FileSize: %d\n", fileSize)
+
+	fileSizeHigh := byte(fileSize >> 8)
+	fileSizeLow := byte(fileSize & 255)
+
+	writeByte(fileSizeLow)
+	writeByte(fileSizeHigh)
+
+        buffer := make([]byte, fileSize)
+
+        fmt.Printf("Read file %s SizeHigh: %d SizeLow: %d\n", fileName, fileSizeHigh, fileSizeLow)
+
+        file.Read(buffer)
+
+	for i := 0; i < fileSize; i++ {
+		err := writeByte(buffer[i])
+		if err != nil {
+			return
+		}
+	}
 }
 
 func readBlock(buffer []byte) error {

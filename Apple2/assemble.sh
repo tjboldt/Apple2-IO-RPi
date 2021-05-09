@@ -44,10 +44,10 @@ DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
 DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
 DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
 DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
-> Firmware_27256_EPROM.bin
+> 27256.bin
 cat \
 DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
-> Firmware_AT28C64B_EEPROM.bin
+> AT28C64B.bin
 
 rm *.o
 rm DriveFirmware.bin

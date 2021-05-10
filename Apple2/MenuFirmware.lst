@@ -97,38 +97,38 @@ Current file: MenuFirmware.asm
 00C77B  1  6F 6D 6D 61  
 00C77F  1  6E 64 20 4C  
 00C783  1  69 6E 65 8D  
-00C787  1  33 2E 20 46  .byte	"3. File Access [NOT IMPLEMENTED]",$8d
-00C78B  1  69 6C 65 20  
-00C78F  1  41 63 63 65  
-00C793  1  73 73 20 5B  
-00C797  1  4E 4F 54 20  
-00C79B  1  49 4D 50 4C  
-00C79F  1  45 4D 45 4E  
-00C7A3  1  54 45 44 5D  
-00C7A7  1  8D           
-00C7A8  1  8D           .byte   $8d
-00C7A9  1  4D 61 79 20  .byte	"May take 45 seconds for RPi to start",$8d
-00C7AD  1  74 61 6B 65  
-00C7B1  1  20 34 35 20  
-00C7B5  1  73 65 63 6F  
-00C7B9  1  6E 64 73 20  
-00C7BD  1  66 6F 72 20  
-00C7C1  1  52 50 69 20  
-00C7C5  1  74 6F 20 73  
-00C7C9  1  74 61 72 74  
-00C7CD  1  8D           
-00C7CE  1  61 66 74 65  .byte	"after intial power-on...",$00
-00C7D2  1  72 20 69 6E  
-00C7D6  1  74 69 61 6C  
-00C7DA  1  20 70 6F 77  
-00C7DE  1  65 72 2D 6F  
-00C7E2  1  6E 2E 2E 2E  
-00C7E6  1  00           
-00C7E7  1               
-00C7E7  1               end:
-00C7E7  1  60            rts
-00C7E8  1               
-00C7E8  1  00 00 00 00  .repeat	251-<end
+00C787  1  33 2E 20 4C  .byte	"3. Load File",$8d
+00C78B  1  6F 61 64 20  
+00C78F  1  46 69 6C 65  
+00C793  1  8D           
+00C794  1  8D           .byte   $8d
+00C795  1  4D 61 79 20  .byte	"May take 45 seconds for RPi to start",$8d
+00C799  1  74 61 6B 65  
+00C79D  1  20 34 35 20  
+00C7A1  1  73 65 63 6F  
+00C7A5  1  6E 64 73 20  
+00C7A9  1  66 6F 72 20  
+00C7AD  1  52 50 69 20  
+00C7B1  1  74 6F 20 73  
+00C7B5  1  74 61 72 74  
+00C7B9  1  8D           
+00C7BA  1  61 66 74 65  .byte	"after intial power-on...",$00
+00C7BE  1  72 20 69 6E  
+00C7C2  1  74 69 61 6C  
+00C7C6  1  20 70 6F 77  
+00C7CA  1  65 72 2D 6F  
+00C7CE  1  6E 2E 2E 2E  
+00C7D2  1  00           
+00C7D3  1               
+00C7D3  1               end:
+00C7D3  1  60            rts
+00C7D4  1               
+00C7D4  1  00 00 00 00  .repeat	251-<end
+00C7D8  1  00 00 00 00  
+00C7DC  1  00 00 00 00  
+00C7E0  1  00 00 00 00  
+00C7E4  1  00 00 00 00  
+00C7E8  1  00 00 00 00  
 00C7EC  1  00 00 00 00  
 00C7F0  1  00 00 00 00  
 00C7F4  1  00 00 00 00  

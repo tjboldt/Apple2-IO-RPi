@@ -46,12 +46,60 @@ DriverEntry:
  sta OutputFlags
 
 Start:
+ lda #$a4
+ sta $33
 
-; Put command firmware here
-;
-;
-;
- rts
+GetFilename:
+ jsr $fd67
+
+LoadFile:
+ lda #$00
+ sta BufferLo
+ lda #$20
+ sta BufferHi
+ lda #$06 ; send command 6 = load
+ jsr SendByte
+ ldy #$00
+sendFilename:
+ lda $0200,y
+ cmp #$8d
+ beq sendNullTerminator
+ and #$7f
+ jsr SendByte
+ iny
+ bne sendFilename 
+sendNullTerminator:
+ lda #$00
+ jsr SendByte
+  
+ jsr GetByte
+ sta BlockLo ; not really a block, just using the memory space
+ jsr GetByte
+ sta BlockHi
+NextPage:
+ lda BlockHi
+ beq ReadFinalPage
+ ldy #$00
+NextByte:
+ jsr GetByte
+ sta (BufferLo),y
+ iny
+ bne NextByte
+ inc BufferHi
+ dec BlockHi
+ bne NextPage
+ReadFinalPage:
+ lda BlockLo
+ beq ExitToMonitor
+ ldy #$00
+NextByteFinal:
+ jsr GetByte
+ sta (BufferLo),y
+ iny
+ cpy BlockLo
+ bne NextByteFinal
+ExitToMonitor:
+ jsr $ff59 
 
 SendByte:
  pha 
@@ -62,19 +110,19 @@ waitWrite:
  bcs waitWrite
  pla
  sta OutputByte
- lda #$0e ; set bit 0 low to indicate write started
+ lda #$2e ; set bit 0 low to indicate write started
  sta OutputFlags 
 finishWrite:
  lda InputFlags
  rol
  rol
  bcc finishWrite
- lda #$0f
+ lda #$2f
  sta OutputFlags
  rts
 
 GetByte:
- lda #$0d ;set read flag low
+ lda #$2d ;set read flag low
  sta OutputFlags
 waitRead:
  lda InputFlags
@@ -82,7 +130,7 @@ waitRead:
  bcs waitRead
  lda InputByte
  pha
- lda #$0f ;set all flags high
+ lda #$2f ;set all flags high
  sta OutputFlags
 finishRead:
  lda InputFlags

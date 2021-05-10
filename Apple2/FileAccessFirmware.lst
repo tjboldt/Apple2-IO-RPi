@@ -50,94 +50,120 @@ Current file: FileAccessFirmware.asm
 00C716  1  8D F7 C0      sta OutputFlags
 00C719  1               
 00C719  1               Start:
-00C719  1               
-00C719  1               ; Put command firmware here
-00C719  1               ;
-00C719  1               ;
-00C719  1               ;
-00C719  1  60            rts
-00C71A  1               
-00C71A  1               SendByte:
-00C71A  1  48            pha
-00C71B  1               waitWrite:
-00C71B  1  AD FB C0      lda InputFlags
-00C71E  1  2A            rol
-00C71F  1  2A            rol
-00C720  1  B0 F9         bcs waitWrite
-00C722  1  68            pla
-00C723  1  8D FD C0      sta OutputByte
-00C726  1  A9 0E         lda #$0e ; set bit 0 low to indicate write started
-00C728  1  8D F7 C0      sta OutputFlags
-00C72B  1               finishWrite:
-00C72B  1  AD FB C0      lda InputFlags
-00C72E  1  2A            rol
-00C72F  1  2A            rol
-00C730  1  90 F9         bcc finishWrite
-00C732  1  A9 0F         lda #$0f
-00C734  1  8D F7 C0      sta OutputFlags
-00C737  1  60            rts
-00C738  1               
-00C738  1               GetByte:
-00C738  1  A9 0D         lda #$0d ;set read flag low
-00C73A  1  8D F7 C0      sta OutputFlags
-00C73D  1               waitRead:
-00C73D  1  AD FB C0      lda InputFlags
-00C740  1  2A            rol
-00C741  1  B0 FA         bcs waitRead
-00C743  1  AD FE C0      lda InputByte
-00C746  1  48            pha
-00C747  1  A9 0F         lda #$0f ;set all flags high
-00C749  1  8D F7 C0      sta OutputFlags
-00C74C  1               finishRead:
-00C74C  1  AD FB C0      lda InputFlags
-00C74F  1  2A            rol
-00C750  1  90 FA         bcc finishRead
-00C752  1  68            pla
-00C753  1               end:
-00C753  1  60            rts
-00C754  1               
-00C754  1  00 00 00 00  .repeat	251-<end
-00C758  1  00 00 00 00  
-00C75C  1  00 00 00 00  
-00C760  1  00 00 00 00  
-00C764  1  00 00 00 00  
-00C768  1  00 00 00 00  
-00C76C  1  00 00 00 00  
-00C770  1  00 00 00 00  
-00C774  1  00 00 00 00  
-00C778  1  00 00 00 00  
-00C77C  1  00 00 00 00  
-00C780  1  00 00 00 00  
-00C784  1  00 00 00 00  
-00C788  1  00 00 00 00  
-00C78C  1  00 00 00 00  
-00C790  1  00 00 00 00  
-00C794  1  00 00 00 00  
-00C798  1  00 00 00 00  
-00C79C  1  00 00 00 00  
-00C7A0  1  00 00 00 00  
-00C7A4  1  00 00 00 00  
-00C7A8  1  00 00 00 00  
-00C7AC  1  00 00 00 00  
-00C7B0  1  00 00 00 00  
-00C7B4  1  00 00 00 00  
-00C7B8  1  00 00 00 00  
-00C7BC  1  00 00 00 00  
-00C7C0  1  00 00 00 00  
-00C7C4  1  00 00 00 00  
-00C7C8  1  00 00 00 00  
-00C7CC  1  00 00 00 00  
-00C7D0  1  00 00 00 00  
-00C7D4  1  00 00 00 00  
-00C7D8  1  00 00 00 00  
-00C7DC  1  00 00 00 00  
-00C7E0  1  00 00 00 00  
-00C7E4  1  00 00 00 00  
-00C7E8  1  00 00 00 00  
-00C7EC  1  00 00 00 00  
-00C7F0  1  00 00 00 00  
-00C7F4  1  00 00 00 00  
-00C7F8  1  00 00 00 00  
+00C719  1  A9 A4         lda #$a4
+00C71B  1  85 33         sta $33
+00C71D  1               
+00C71D  1               GetFilename:
+00C71D  1  20 67 FD      jsr $fd67
+00C720  1               
+00C720  1               LoadFile:
+00C720  1  A9 00         lda #$00
+00C722  1  85 44         sta BufferLo
+00C724  1  A9 20         lda #$20
+00C726  1  85 45         sta BufferHi
+00C728  1  A9 06         lda #$06 ; send command 6 = load
+00C72A  1  20 74 C7      jsr SendByte
+00C72D  1  A0 00         ldy #$00
+00C72F  1               sendFilename:
+00C72F  1  B9 00 02      lda $0200,y
+00C732  1  C9 8D         cmp #$8d
+00C734  1  F0 08         beq sendNullTerminator
+00C736  1  29 7F         and #$7f
+00C738  1  20 74 C7      jsr SendByte
+00C73B  1  C8            iny
+00C73C  1  D0 F1         bne sendFilename
+00C73E  1               sendNullTerminator:
+00C73E  1  A9 00         lda #$00
+00C740  1  20 74 C7      jsr SendByte
+00C743  1               
+00C743  1  20 92 C7      jsr GetByte
+00C746  1  85 46         sta BlockLo ; not really a block, just using the memory space
+00C748  1  20 92 C7      jsr GetByte
+00C74B  1  85 47         sta BlockHi
+00C74D  1               NextPage:
+00C74D  1  A5 47         lda BlockHi
+00C74F  1  F0 10         beq ReadFinalPage
+00C751  1  A0 00         ldy #$00
+00C753  1               NextByte:
+00C753  1  20 92 C7      jsr GetByte
+00C756  1  91 44         sta (BufferLo),y
+00C758  1  C8            iny
+00C759  1  D0 F8         bne NextByte
+00C75B  1  E6 45         inc BufferHi
+00C75D  1  C6 47         dec BlockHi
+00C75F  1  D0 EC         bne NextPage
+00C761  1               ReadFinalPage:
+00C761  1  A5 46         lda BlockLo
+00C763  1  F0 0C         beq ExitToMonitor
+00C765  1  A0 00         ldy #$00
+00C767  1               NextByteFinal:
+00C767  1  20 92 C7      jsr GetByte
+00C76A  1  91 44         sta (BufferLo),y
+00C76C  1  C8            iny
+00C76D  1  C4 46         cpy BlockLo
+00C76F  1  D0 F6         bne NextByteFinal
+00C771  1               ExitToMonitor:
+00C771  1  20 59 FF      jsr $ff59
+00C774  1               
+00C774  1               SendByte:
+00C774  1  48            pha
+00C775  1               waitWrite:
+00C775  1  AD FB C0      lda InputFlags
+00C778  1  2A            rol
+00C779  1  2A            rol
+00C77A  1  B0 F9         bcs waitWrite
+00C77C  1  68            pla
+00C77D  1  8D FD C0      sta OutputByte
+00C780  1  A9 2E         lda #$2e ; set bit 0 low to indicate write started
+00C782  1  8D F7 C0      sta OutputFlags
+00C785  1               finishWrite:
+00C785  1  AD FB C0      lda InputFlags
+00C788  1  2A            rol
+00C789  1  2A            rol
+00C78A  1  90 F9         bcc finishWrite
+00C78C  1  A9 2F         lda #$2f
+00C78E  1  8D F7 C0      sta OutputFlags
+00C791  1  60            rts
+00C792  1               
+00C792  1               GetByte:
+00C792  1  A9 2D         lda #$2d ;set read flag low
+00C794  1  8D F7 C0      sta OutputFlags
+00C797  1               waitRead:
+00C797  1  AD FB C0      lda InputFlags
+00C79A  1  2A            rol
+00C79B  1  B0 FA         bcs waitRead
+00C79D  1  AD FE C0      lda InputByte
+00C7A0  1  48            pha
+00C7A1  1  A9 2F         lda #$2f ;set all flags high
+00C7A3  1  8D F7 C0      sta OutputFlags
+00C7A6  1               finishRead:
+00C7A6  1  AD FB C0      lda InputFlags
+00C7A9  1  2A            rol
+00C7AA  1  90 FA         bcc finishRead
+00C7AC  1  68            pla
+00C7AD  1               end:
+00C7AD  1  60            rts
+00C7AE  1               
+00C7AE  1  00 00 00 00  .repeat	251-<end
+00C7B2  1  00 00 00 00  
+00C7B6  1  00 00 00 00  
+00C7BA  1  00 00 00 00  
+00C7BE  1  00 00 00 00  
+00C7C2  1  00 00 00 00  
+00C7C6  1  00 00 00 00  
+00C7CA  1  00 00 00 00  
+00C7CE  1  00 00 00 00  
+00C7D2  1  00 00 00 00  
+00C7D6  1  00 00 00 00  
+00C7DA  1  00 00 00 00  
+00C7DE  1  00 00 00 00  
+00C7E2  1  00 00 00 00  
+00C7E6  1  00 00 00 00  
+00C7EA  1  00 00 00 00  
+00C7EE  1  00 00 00 00  
+00C7F2  1  00 00 00 00  
+00C7F6  1  00 00 00 00  
+00C7FA  1  00 00        
 00C7FC  1               .byte 0
 00C7FC  1               .endrepeat
 00C7FC  1  00 00        .byte      0,0     ;0000 blocks = check status

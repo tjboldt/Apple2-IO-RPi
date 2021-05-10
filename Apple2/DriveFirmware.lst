@@ -72,9 +72,9 @@ Current file: DriveFirmware.asm
 00C734  1  A5 42         lda Command; Check which command is being requested
 00C736  1  F0 0C         beq GetStatus ;0 = Status command
 00C738  1  C9 01         cmp #ReadBlockCommand
-00C73A  1  F0 10         beq ReadBlock
+00C73A  1  F0 10         beq ReadBlockAndSetTime
 00C73C  1  C9 02         cmp #WriteBlockCommand
-00C73E  1  F0 46         beq WriteBlock
+00C73E  1  F0 50         beq WriteBlock
 00C740  1  38            sec ;set carry as we don't support any other commands
 00C741  1  A9 53         lda #$53 ;Invalid parameter error
 00C743  1  60            rts
@@ -88,106 +88,110 @@ Current file: DriveFirmware.asm
 00C74B  1  60            rts
 00C74C  1               
 00C74C  1               ; ProDOS Read Block Command
-00C74C  1               ReadBlock:
-00C74C  1  A0 00         ldy #$00 ;Get the current time on each block read for now
-00C74E  1  A9 03         lda #GetTimeCommand
-00C750  1  20 AE C7      jsr SendByte
-00C753  1               getTimeByte:
-00C753  1  20 CC C7      jsr GetByte
-00C756  1  99 90 BF      sta $bf90,y
-00C759  1  C8            iny
-00C75A  1  C0 04         cpy #$04
-00C75C  1  D0 F5         bne getTimeByte
-00C75E  1  A9 01         lda #ReadBlockCommand ;read the block after setting the clock
-00C760  1  20 AE C7      jsr SendByte
-00C763  1  A5 46         lda BlockLo
-00C765  1  20 AE C7      jsr SendByte
-00C768  1  A5 47         lda BlockHi
-00C76A  1  20 AE C7      jsr SendByte
-00C76D  1  A0 00         ldy #$0
-00C76F  1  20 7D C7      jsr read256
-00C772  1  E6 45         inc BufferHi
-00C774  1  20 7D C7      jsr read256
-00C777  1  C6 45         dec BufferHi
-00C779  1  A9 00         lda #$0 ;zero accumulator and clear carry for success
-00C77B  1  18            clc
-00C77C  1  60            rts
-00C77D  1               
-00C77D  1               read256:
-00C77D  1  20 CC C7      jsr GetByte
-00C780  1  91 44         sta (BufferLo),y
-00C782  1  C8            iny
-00C783  1  D0 F8         bne read256
-00C785  1  60            rts
-00C786  1               
-00C786  1               ; ProDOS Write Block Command
-00C786  1               WriteBlock:
-00C786  1  A9 02         lda #WriteBlockCommand
-00C788  1  20 AE C7      jsr SendByte
-00C78B  1  A5 46         lda BlockLo
-00C78D  1  20 AE C7      jsr SendByte
-00C790  1  A5 47         lda BlockHi
-00C792  1  20 AE C7      jsr SendByte
-00C795  1  A0 00         ldy #$0
-00C797  1  20 A5 C7      jsr write256
-00C79A  1  E6 45         inc BufferHi
-00C79C  1  20 A5 C7      jsr write256
-00C79F  1  C6 45         dec BufferHi
-00C7A1  1  A9 00         lda #$0 ;zero accumulator and clear carry for success
-00C7A3  1  18            clc
-00C7A4  1  60            rts
-00C7A5  1               
-00C7A5  1               write256:
-00C7A5  1  B1 44         lda (BufferLo),y
-00C7A7  1  20 AE C7      jsr SendByte
-00C7AA  1  C8            iny
-00C7AB  1  D0 F8         bne write256
-00C7AD  1  60            rts
-00C7AE  1               
-00C7AE  1               SendByte:
-00C7AE  1  48            pha
-00C7AF  1               waitWrite:
-00C7AF  1  AD FB C0      lda InputFlags
-00C7B2  1  2A            rol
-00C7B3  1  2A            rol
-00C7B4  1  B0 F9         bcs waitWrite
-00C7B6  1  68            pla
-00C7B7  1  8D FD C0      sta OutputByte
-00C7BA  1  A9 0E         lda #$0e ; set bit 0 low to indicate write started
-00C7BC  1  8D F7 C0      sta OutputFlags
-00C7BF  1               finishWrite:
-00C7BF  1  AD FB C0      lda InputFlags
-00C7C2  1  2A            rol
-00C7C3  1  2A            rol
-00C7C4  1  90 F9         bcc finishWrite
-00C7C6  1  A9 0F         lda #$0f
-00C7C8  1  8D F7 C0      sta OutputFlags
-00C7CB  1  60            rts
-00C7CC  1               
-00C7CC  1               GetByte:
-00C7CC  1  A9 0D         lda #$0d ;set read flag low
-00C7CE  1  8D F7 C0      sta OutputFlags
-00C7D1  1               waitRead:
-00C7D1  1  AD FB C0      lda InputFlags
-00C7D4  1  2A            rol
-00C7D5  1  B0 FA         bcs waitRead
-00C7D7  1  AD FE C0      lda InputByte
-00C7DA  1  48            pha
-00C7DB  1  A9 0F         lda #$0f ;set all flags high
-00C7DD  1  8D F7 C0      sta OutputFlags
-00C7E0  1               finishRead:
-00C7E0  1  AD FB C0      lda InputFlags
-00C7E3  1  2A            rol
-00C7E4  1  90 FA         bcc finishRead
-00C7E6  1  68            pla
-00C7E7  1               end:
-00C7E7  1  60            rts
-00C7E8  1               
-00C7E8  1  00 00 00 00  .repeat	251-<end
-00C7EC  1  00 00 00 00  
-00C7F0  1  00 00 00 00  
-00C7F4  1  00 00 00 00  
-00C7F8  1  00 00 00 00  
+00C74C  1               ReadBlockAndSetTime:
+00C74C  1  A5 47         lda BlockHi ; only get the time if block 0002
+00C74E  1  D0 18         bne readBlock
+00C750  1  A5 46         lda BlockLo
+00C752  1  C9 02         cmp #$02
+00C754  1  D0 12         bne readBlock
+00C756  1  A0 00         ldy #$00 ;Get the current time on each block read for now
+00C758  1  A9 03         lda #GetTimeCommand
+00C75A  1  20 B8 C7      jsr SendByte
+00C75D  1               getTimeByte:
+00C75D  1  20 D6 C7      jsr GetByte
+00C760  1  99 90 BF      sta $bf90,y
+00C763  1  C8            iny
+00C764  1  C0 04         cpy #$04
+00C766  1  D0 F5         bne getTimeByte
+00C768  1               readBlock:
+00C768  1  A9 01         lda #ReadBlockCommand ;read the block after setting the clock
+00C76A  1  20 B8 C7      jsr SendByte
+00C76D  1  A5 46         lda BlockLo
+00C76F  1  20 B8 C7      jsr SendByte
+00C772  1  A5 47         lda BlockHi
+00C774  1  20 B8 C7      jsr SendByte
+00C777  1  A0 00         ldy #$0
+00C779  1  20 87 C7      jsr read256
+00C77C  1  E6 45         inc BufferHi
+00C77E  1  20 87 C7      jsr read256
+00C781  1  C6 45         dec BufferHi
+00C783  1  A9 00         lda #$0 ;zero accumulator and clear carry for success
+00C785  1  18            clc
+00C786  1  60            rts
+00C787  1               
+00C787  1               read256:
+00C787  1  20 D6 C7      jsr GetByte
+00C78A  1  91 44         sta (BufferLo),y
+00C78C  1  C8            iny
+00C78D  1  D0 F8         bne read256
+00C78F  1  60            rts
+00C790  1               
+00C790  1               ; ProDOS Write Block Command
+00C790  1               WriteBlock:
+00C790  1  A9 02         lda #WriteBlockCommand
+00C792  1  20 B8 C7      jsr SendByte
+00C795  1  A5 46         lda BlockLo
+00C797  1  20 B8 C7      jsr SendByte
+00C79A  1  A5 47         lda BlockHi
+00C79C  1  20 B8 C7      jsr SendByte
+00C79F  1  A0 00         ldy #$0
+00C7A1  1  20 AF C7      jsr write256
+00C7A4  1  E6 45         inc BufferHi
+00C7A6  1  20 AF C7      jsr write256
+00C7A9  1  C6 45         dec BufferHi
+00C7AB  1  A9 00         lda #$0 ;zero accumulator and clear carry for success
+00C7AD  1  18            clc
+00C7AE  1  60            rts
+00C7AF  1               
+00C7AF  1               write256:
+00C7AF  1  B1 44         lda (BufferLo),y
+00C7B1  1  20 B8 C7      jsr SendByte
+00C7B4  1  C8            iny
+00C7B5  1  D0 F8         bne write256
+00C7B7  1  60            rts
+00C7B8  1               
+00C7B8  1               SendByte:
+00C7B8  1  48            pha
+00C7B9  1               waitWrite:
+00C7B9  1  AD FB C0      lda InputFlags
+00C7BC  1  2A            rol
+00C7BD  1  2A            rol
+00C7BE  1  B0 F9         bcs waitWrite
+00C7C0  1  68            pla
+00C7C1  1  8D FD C0      sta OutputByte
+00C7C4  1  A9 0E         lda #$0e ; set bit 0 low to indicate write started
+00C7C6  1  8D F7 C0      sta OutputFlags
+00C7C9  1               finishWrite:
+00C7C9  1  AD FB C0      lda InputFlags
+00C7CC  1  2A            rol
+00C7CD  1  2A            rol
+00C7CE  1  90 F9         bcc finishWrite
+00C7D0  1  A9 0F         lda #$0f
+00C7D2  1  8D F7 C0      sta OutputFlags
+00C7D5  1  60            rts
+00C7D6  1               
+00C7D6  1               GetByte:
+00C7D6  1  A9 0D         lda #$0d ;set read flag low
+00C7D8  1  8D F7 C0      sta OutputFlags
+00C7DB  1               waitRead:
+00C7DB  1  AD FB C0      lda InputFlags
+00C7DE  1  2A            rol
+00C7DF  1  B0 FA         bcs waitRead
+00C7E1  1  AD FE C0      lda InputByte
+00C7E4  1  48            pha
+00C7E5  1  A9 0F         lda #$0f ;set all flags high
+00C7E7  1  8D F7 C0      sta OutputFlags
+00C7EA  1               finishRead:
+00C7EA  1  AD FB C0      lda InputFlags
+00C7ED  1  2A            rol
+00C7EE  1  90 FA         bcc finishRead
+00C7F0  1  68            pla
+00C7F1  1               end:
+00C7F1  1  60            rts
+00C7F2  1               
+00C7F2  1  00 00 00 00  .repeat	251-<end
+00C7F6  1  00 00 00 00  
+00C7FA  1  00 00        
 00C7FC  1               .byte 0
 00C7FC  1               .endrepeat
 00C7FC  1  00 00        .byte      0,0     ;0000 blocks = check status

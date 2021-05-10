@@ -79,7 +79,7 @@ Text:
 .byte   $8d
 .byte	"1. Boot",$8d
 .byte	"2. Command Line",$8d
-.byte	"3. File Access [NOT IMPLEMENTED]",$8d
+.byte	"3. Load File",$8d
 .byte   $8d
 .byte	"May take 45 seconds for RPi to start",$8d
 .byte	"after intial power-on...",$00

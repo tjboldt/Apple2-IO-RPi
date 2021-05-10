@@ -68,7 +68,7 @@ Driver:
  lda Command; Check which command is being requested
  beq GetStatus ;0 = Status command
  cmp #ReadBlockCommand
- beq ReadBlock
+ beq ReadBlockAndSetTime
  cmp #WriteBlockCommand
  beq WriteBlock
  sec ;set carry as we don't support any other commands
@@ -84,7 +84,12 @@ GetStatus:
  rts
 
 ; ProDOS Read Block Command
-ReadBlock: 
+ReadBlockAndSetTime: 
+ lda BlockHi ; only get the time if block 0002
+ bne readBlock
+ lda BlockLo
+ cmp #$02
+ bne readBlock
  ldy #$00 ;Get the current time on each block read for now
  lda #GetTimeCommand
  jsr SendByte
@@ -94,6 +99,7 @@ getTimeByte:
  iny
  cpy #$04
  bne getTimeByte
+readBlock:
  lda #ReadBlockCommand ;read the block after setting the clock
  jsr SendByte
  lda BlockLo

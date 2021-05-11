@@ -47,6 +47,20 @@ DriverEntry:
 
 Start:
  jsr $c300 ;enable 80 columns
+ lda #$05 ;execute command
+ jsr SendByte
+ ldy #$00
+sendHelp:
+ lda HelpCommand,y
+ beq endSendHelp
+ jsr SendByte
+ iny
+ bne sendHelp
+endSendHelp:
+ lda #$00
+ jsr SendByte
+ jsr DumpOutput
+
  lda $33
  pha
  lda #$a4
@@ -56,11 +70,11 @@ GetCommand:
  lda $0200
  cmp #$8d ;skip when return found
  beq GetCommand
- jsr DumpOutput
+ jsr SendCommand
  clc
  bcc GetCommand
 
-DumpOutput:
+SendCommand:
  lda #$05 ;send command 5 = exec
  jsr SendByte
  ldy #$00
@@ -75,15 +89,18 @@ getInput:
 sendNullTerminator:
  lda #$00
  jsr SendByte
-getOutput:
+DumpOutput:
  jsr GetByte
  cmp #$00
  beq endOutput
  jsr $fded
  clc
- bcc getOutput
+ bcc DumpOutput
 endOutput:
  rts
+
+HelpCommand:
+ .byte "a2help",$00
 
 SendByte:
  pha 

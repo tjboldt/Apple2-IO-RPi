@@ -51,109 +51,119 @@ Current file: CommandFirmware.asm
 00C719  1               
 00C719  1               Start:
 00C719  1  20 00 C3      jsr $c300 ;enable 80 columns
-00C71C  1  A5 33         lda $33
-00C71E  1  48            pha
-00C71F  1  A9 A4         lda #$a4
-00C721  1  85 33         sta $33
-00C723  1               GetCommand:
-00C723  1  20 67 FD      jsr $fd67
-00C726  1  AD 00 02      lda $0200
-00C729  1  C9 8D         cmp #$8d ;skip when return found
-00C72B  1  F0 F6         beq GetCommand
-00C72D  1  20 33 C7      jsr DumpOutput
-00C730  1  18            clc
-00C731  1  90 F0         bcc GetCommand
-00C733  1               
-00C733  1               DumpOutput:
-00C733  1  A9 05         lda #$05 ;send command 5 = exec
-00C735  1  20 5C C7      jsr SendByte
-00C738  1  A0 00         ldy #$00
-00C73A  1               getInput:
-00C73A  1  B9 00 02      lda $0200,y
-00C73D  1  C9 8D         cmp #$8d
-00C73F  1  F0 08         beq sendNullTerminator
-00C741  1  29 7F         and #$7f
-00C743  1  20 5C C7      jsr SendByte
-00C746  1  C8            iny
-00C747  1  D0 F1         bne getInput
-00C749  1               sendNullTerminator:
-00C749  1  A9 00         lda #$00
-00C74B  1  20 5C C7      jsr SendByte
-00C74E  1               getOutput:
-00C74E  1  20 7A C7      jsr GetByte
-00C751  1  C9 00         cmp #$00
-00C753  1  F0 06         beq endOutput
-00C755  1  20 ED FD      jsr $fded
-00C758  1  18            clc
-00C759  1  90 F3         bcc getOutput
-00C75B  1               endOutput:
-00C75B  1  60            rts
-00C75C  1               
-00C75C  1               SendByte:
-00C75C  1  48            pha
-00C75D  1               waitWrite:
-00C75D  1  AD FB C0      lda InputFlags
-00C760  1  2A            rol
-00C761  1  2A            rol
-00C762  1  B0 F9         bcs waitWrite
-00C764  1  68            pla
-00C765  1  8D FD C0      sta OutputByte
-00C768  1  A9 1E         lda #$1e ; set bit 0 low to indicate write started
-00C76A  1  8D F7 C0      sta OutputFlags
-00C76D  1               finishWrite:
-00C76D  1  AD FB C0      lda InputFlags
-00C770  1  2A            rol
-00C771  1  2A            rol
-00C772  1  90 F9         bcc finishWrite
-00C774  1  A9 1F         lda #$1f
-00C776  1  8D F7 C0      sta OutputFlags
-00C779  1  60            rts
-00C77A  1               
-00C77A  1               GetByte:
-00C77A  1  A9 1D         lda #$1d ;set read flag low
-00C77C  1  8D F7 C0      sta OutputFlags
-00C77F  1               waitRead:
-00C77F  1  AD FB C0      lda InputFlags
+00C71C  1  A9 05         lda #$05 ;execute command
+00C71E  1  20 7D C7      jsr SendByte
+00C721  1  A0 00         ldy #$00
+00C723  1               sendHelp:
+00C723  1  B9 76 C7      lda HelpCommand,y
+00C726  1  F0 06         beq endSendHelp
+00C728  1  20 7D C7      jsr SendByte
+00C72B  1  C8            iny
+00C72C  1  D0 F5         bne sendHelp
+00C72E  1               endSendHelp:
+00C72E  1  A9 00         lda #$00
+00C730  1  20 7D C7      jsr SendByte
+00C733  1  20 68 C7      jsr DumpOutput
+00C736  1               
+00C736  1  A5 33         lda $33
+00C738  1  48            pha
+00C739  1  A9 A4         lda #$a4
+00C73B  1  85 33         sta $33
+00C73D  1               GetCommand:
+00C73D  1  20 67 FD      jsr $fd67
+00C740  1  AD 00 02      lda $0200
+00C743  1  C9 8D         cmp #$8d ;skip when return found
+00C745  1  F0 F6         beq GetCommand
+00C747  1  20 4D C7      jsr SendCommand
+00C74A  1  18            clc
+00C74B  1  90 F0         bcc GetCommand
+00C74D  1               
+00C74D  1               SendCommand:
+00C74D  1  A9 05         lda #$05 ;send command 5 = exec
+00C74F  1  20 7D C7      jsr SendByte
+00C752  1  A0 00         ldy #$00
+00C754  1               getInput:
+00C754  1  B9 00 02      lda $0200,y
+00C757  1  C9 8D         cmp #$8d
+00C759  1  F0 08         beq sendNullTerminator
+00C75B  1  29 7F         and #$7f
+00C75D  1  20 7D C7      jsr SendByte
+00C760  1  C8            iny
+00C761  1  D0 F1         bne getInput
+00C763  1               sendNullTerminator:
+00C763  1  A9 00         lda #$00
+00C765  1  20 7D C7      jsr SendByte
+00C768  1               DumpOutput:
+00C768  1  20 9B C7      jsr GetByte
+00C76B  1  C9 00         cmp #$00
+00C76D  1  F0 06         beq endOutput
+00C76F  1  20 ED FD      jsr $fded
+00C772  1  18            clc
+00C773  1  90 F3         bcc DumpOutput
+00C775  1               endOutput:
+00C775  1  60            rts
+00C776  1               
+00C776  1               HelpCommand:
+00C776  1  61 32 68 65   .byte "a2help",$00
+00C77A  1  6C 70 00     
+00C77D  1               
+00C77D  1               SendByte:
+00C77D  1  48            pha
+00C77E  1               waitWrite:
+00C77E  1  AD FB C0      lda InputFlags
+00C781  1  2A            rol
 00C782  1  2A            rol
-00C783  1  B0 FA         bcs waitRead
-00C785  1  AD FE C0      lda InputByte
-00C788  1  48            pha
-00C789  1  A9 1F         lda #$1f ;set all flags high
+00C783  1  B0 F9         bcs waitWrite
+00C785  1  68            pla
+00C786  1  8D FD C0      sta OutputByte
+00C789  1  A9 1E         lda #$1e ; set bit 0 low to indicate write started
 00C78B  1  8D F7 C0      sta OutputFlags
-00C78E  1               finishRead:
+00C78E  1               finishWrite:
 00C78E  1  AD FB C0      lda InputFlags
 00C791  1  2A            rol
-00C792  1  90 FA         bcc finishRead
-00C794  1  68            pla
-00C795  1               end:
-00C795  1  60            rts
-00C796  1               
-00C796  1  00 00 00 00  .repeat	251-<end
-00C79A  1  00 00 00 00  
-00C79E  1  00 00 00 00  
-00C7A2  1  00 00 00 00  
-00C7A6  1  00 00 00 00  
-00C7AA  1  00 00 00 00  
-00C7AE  1  00 00 00 00  
-00C7B2  1  00 00 00 00  
-00C7B6  1  00 00 00 00  
-00C7BA  1  00 00 00 00  
-00C7BE  1  00 00 00 00  
-00C7C2  1  00 00 00 00  
-00C7C6  1  00 00 00 00  
-00C7CA  1  00 00 00 00  
-00C7CE  1  00 00 00 00  
-00C7D2  1  00 00 00 00  
-00C7D6  1  00 00 00 00  
-00C7DA  1  00 00 00 00  
-00C7DE  1  00 00 00 00  
-00C7E2  1  00 00 00 00  
-00C7E6  1  00 00 00 00  
-00C7EA  1  00 00 00 00  
-00C7EE  1  00 00 00 00  
-00C7F2  1  00 00 00 00  
-00C7F6  1  00 00 00 00  
-00C7FA  1  00 00        
+00C792  1  2A            rol
+00C793  1  90 F9         bcc finishWrite
+00C795  1  A9 1F         lda #$1f
+00C797  1  8D F7 C0      sta OutputFlags
+00C79A  1  60            rts
+00C79B  1               
+00C79B  1               GetByte:
+00C79B  1  A9 1D         lda #$1d ;set read flag low
+00C79D  1  8D F7 C0      sta OutputFlags
+00C7A0  1               waitRead:
+00C7A0  1  AD FB C0      lda InputFlags
+00C7A3  1  2A            rol
+00C7A4  1  B0 FA         bcs waitRead
+00C7A6  1  AD FE C0      lda InputByte
+00C7A9  1  48            pha
+00C7AA  1  A9 1F         lda #$1f ;set all flags high
+00C7AC  1  8D F7 C0      sta OutputFlags
+00C7AF  1               finishRead:
+00C7AF  1  AD FB C0      lda InputFlags
+00C7B2  1  2A            rol
+00C7B3  1  90 FA         bcc finishRead
+00C7B5  1  68            pla
+00C7B6  1               end:
+00C7B6  1  60            rts
+00C7B7  1               
+00C7B7  1  00 00 00 00  .repeat	251-<end
+00C7BB  1  00 00 00 00  
+00C7BF  1  00 00 00 00  
+00C7C3  1  00 00 00 00  
+00C7C7  1  00 00 00 00  
+00C7CB  1  00 00 00 00  
+00C7CF  1  00 00 00 00  
+00C7D3  1  00 00 00 00  
+00C7D7  1  00 00 00 00  
+00C7DB  1  00 00 00 00  
+00C7DF  1  00 00 00 00  
+00C7E3  1  00 00 00 00  
+00C7E7  1  00 00 00 00  
+00C7EB  1  00 00 00 00  
+00C7EF  1  00 00 00 00  
+00C7F3  1  00 00 00 00  
+00C7F7  1  00 00 00 00  
+00C7FB  1  00           
 00C7FC  1               .byte 0
 00C7FC  1               .endrepeat
 00C7FC  1  00 00        .byte      0,0     ;0000 blocks = check status

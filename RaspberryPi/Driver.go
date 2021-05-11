@@ -147,10 +147,12 @@ func handleExecCommand() {
 		return
 	}
         if linuxCommand == "a2help" {
-		writeString("This is a pseudo shell. Each command is executed as a process. The cd command is\n" +
-                            "intercepted and sets the working directory for the next command. Running\n" +
-                            "commands that do not exit will hang. For example, do not use ping without a -c 1\n" +
-                            "or something else to limit its output.\n")
+		writeString("\r" +
+                            "This is a pseudo shell. Each command is executed as a process. The cd command\r" +
+                            "is intercepted and sets the working directory for the next command. Running\r" +
+                            "commands that do not exit will hang. For example, do not use ping without a\r" +
+                            "way to limit output like -c 1.\r\r")
+		return
 	}
 	cmd := exec.Command("bash", "-c", linuxCommand)
 	cmd.Dir = workingDirectory

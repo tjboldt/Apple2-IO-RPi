@@ -11,16 +11,14 @@ So far, this is a project and not a finished product. The current prototype is o
 
 ## Roadmap
 1. Detect when RPi is in a ready state
-2. Help in command line
-3. Wifi setup tool
-4. Software on default image to get firmware updates
-5. Proper ProDOS clock driver (currently just directly sets values on block reads)
-6. Support for direct file read/write without drive image
-7. Image conversion on download
-8. Web service call support
-9. Full terminal emulation
-10. Remote code execution 
-11. Proxy VNC connection, rendering as Apple II compatible graphics
+2. Wifi setup tool
+3. Proper ProDOS clock driver (currently just directly sets values on block reads)
+4. Support for direct file read/write without drive image
+5. Image conversion on download
+6. Web service call support
+7. Full terminal emulation
+8. Remote code execution 
+9. Proxy VNC connection, rendering as Apple II compatible graphics
 
 ## Setup
 1. Have PCBs made from the gerber and drill files in the Hardware folder or email me for a blank or fully assembled board

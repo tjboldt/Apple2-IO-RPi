@@ -8,7 +8,7 @@
  900  HOME 
  1000  FOR PG = 0 TO 3
  1004  PRINT : PRINT 
- 1005  PRINT "Writing page "PG" to slot "SL"
+ 1005  PRINT "Writing page "PG" to slot "SL
  1006  PRINT "_______________________________________"
  1007  PRINT "_______________________________________";
  1008  HTAB 1

@@ -60,10 +60,11 @@ func ExecCommand() {
 		}
 		ssid := params[2]
 		psk := params[3]
-		linuxCommand = "sudo printf \"country=ca\\nupdate_config=1\\nctrl_interface=/var/run/wpa_supplicant\\n\\nnetwork={\\n  scan_ssid=1\\n  ssid=\\\"%s\\\"\n  psk=\\\"%s\\\"\\n}\\n\" " +
+		linuxCommand = "printf \"country=ca\\nupdate_config=1\\nctrl_interface=/var/run/wpa_supplicant\\n\\nnetwork={\\n  scan_ssid=1\\n  ssid=\\\"%s\\\"\n  psk=\\\"%s\\\"\\n}\\n\" " +
 		ssid + " " +
 		psk + " " +
-		" > /etc/wpa_supplicant/wpa_supplicant.conf; " +
+		" > /tmp/wpa_supplicant.conf; " +
+		"sudo mv /tmp/wpa_supplicant.conf /etc/wpa_supplicant/; " +
 		"sudo wpa_cli -i wlan0 reconfigure"
 	}
 	cmd := exec.Command("bash", "-c", linuxCommand)

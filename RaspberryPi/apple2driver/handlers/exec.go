@@ -42,6 +42,30 @@ func ExecCommand() {
 			"\r")
 		return
 	}
+	if linuxCommand == "a2wifi" {
+		a2io.WriteString("\r" +
+			"Usage: a2wifi list\r" +
+			"       a2wifi select SSID PASSWORD\r" +
+			"\r")
+		return
+	}
+	if linuxCommand == "a2wifi list" {
+		linuxCommand = "sudo iwlist wlan0 scanning | grep ESSID | sed s/.*ESSID://g | sed s/\\\"//g"
+	}
+	if strings.HasPrefix(linuxCommand, "a2wifi select") {
+		params := strings.Fields(linuxCommand)
+		if (len(params) != 4) {
+			a2io.WriteString("\rIncorrect number of parameters. Usage: a2wifi select SSID PASSWORD\r\r")
+			return
+		}
+		ssid := params[2]
+		psk := params[3]
+		linuxCommand = "sudo printf \"country=ca\\nupdate_config=1\\nctrl_interface=/var/run/wpa_supplicant\\n\\nnetwork={\\n  scan_ssid=1\\n  ssid=\\\"%s\\\"\n  psk=\\\"%s\\\"\\n}\\n\" " +
+		ssid + " " +
+		psk + " " +
+		" > /etc/wpa_supplicant/wpa_supplicant.conf; " +
+		"sudo wpa_cli -i wlan0 reconfigure"
+	}
 	cmd := exec.Command("bash", "-c", linuxCommand)
 	cmd.Dir = workingDirectory
 	cmdOut, err := cmd.Output()

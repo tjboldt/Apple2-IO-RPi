@@ -55,11 +55,27 @@ Start:
  ldy #$00
 PrintString:
  lda Text,y
- beq GetChar
+ beq WaitForRPi
  ora #$80
  jsr $fded
  iny
  bne PrintString
+
+WaitForRPi:
+ lda InputFlags
+ rol
+ bcs OK
+ lda #$ff
+ jsr $fca8
+ lda #$ae
+ jsr $fded
+ jmp WaitForRPi
+
+OK:
+ lda #$cf
+ jsr $fded
+ lda #$cb
+ jsr $fded
 
 GetChar: 
  jsr $fd0c

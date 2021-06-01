@@ -35,7 +35,7 @@ So far, this is a project and not a finished product. The current prototype is o
 7. Put microSD card in the RPi
 8. Install the expansion card into the Apple II
 9. Power on the Apple II
-10. Update firmware with utility (not written yet) or use EPROM programmer
+10. Update firmware with utility (can be found on Apple2-IO-RPi.hdv drive image) or use EPROM programmer
 11. sudo apt install git golang
 12. git clone https://github.com/tjboldt/Apple2-IO-RPi.git
 13. cd Apple2-IO-RPi/RaspberryPi/apple2driver
@@ -47,12 +47,13 @@ So far, this is a project and not a finished product. The current prototype is o
 ## Update
 1. Restart Apple II
 2. Select run command
-3. git pull
-4. Restart Apple II
-5. Select boot
-6. -UPDATE.FIRMWARE
-7. Enter slot number the card is in
-8. Wait for firmware update to complete all four pages
+3. cd /home/pi/Apple2-IO-RPi
+4. git pull
+5. Restart Apple II
+6. Select boot
+7. -UPDATE.FIRMWARE
+8. Enter slot number the card is in
+9. Wait for firmware update to complete all four pages
 
 ## Similar Project
 If you prefer having Apple II peripherals control a Raspberry Pi rather than simply using the Raspberry Pi to provide storage, network access and processing to the Apple II, have a look at David Schmenk's excellent [Apple2Pi](https://github.com/dschmenk/apple2pi) project. 

@@ -26,8 +26,14 @@ func LoadFileCommand() {
 	fileSizeHigh := byte(fileSize >> 8)
 	fileSizeLow := byte(fileSize & 255)
 
-	a2io.WriteByte(fileSizeLow)
-	a2io.WriteByte(fileSizeHigh)
+	err = a2io.WriteByte(fileSizeLow)
+	if err != nil {
+		return
+	}
+	err = a2io.WriteByte(fileSizeHigh)
+	if err != nil {
+		return
+	}
 
 	buffer := make([]byte, fileSize)
 

@@ -23,6 +23,7 @@ ChangeDriveCommand = $04
 ExecCommand = $05
 LoadFileCommand = $06
 SaveFileCommand = $07
+MenuCommand = $08
 
  .org SLOT*$100 + $C000
 ;ID bytes for booting and drive detection
@@ -72,10 +73,18 @@ WaitForRPi:
  jmp WaitForRPi
 
 OK:
- lda #$cf
+ jsr $fc58 ;clear screen
+
+ lda #MenuCommand ;request menu text from RPi
+ jsr SendByte
+
+DumpOutput:
+ jsr GetByte
+ cmp #$00
+ beq GetChar
  jsr $fded
- lda #$cb
- jsr $fded
+ clc
+ bcc DumpOutput
 
 GetChar: 
  jsr $fd0c
@@ -93,16 +102,47 @@ Text:
 .byte	"Apple2-IO-RPi",$8d
 .byte	"(c)2020-2021 Terence J. Boldt",$8d
 .byte   $8d
-.byte	"1. Boot",$8d
-.byte	"2. Command Line",$8d
-.byte	"3. Load File",$8d
-.byte   $8d
-.byte	"May take 45 seconds for RPi to start",$8d
-.byte	"after intial power-on...",$00
+.byte	"Waiting for RPi...",$00
 
-end:
+SendByte:
+ pha 
+waitWrite: 
+ lda InputFlags
+ rol
+ rol 
+ bcs waitWrite
+ pla
+ sta OutputByte
+ lda #$3e ; set bit 0 low to indicate write started
+ sta OutputFlags 
+finishWrite:
+ lda InputFlags
+ rol
+ rol
+ bcc finishWrite
+ lda #$3f
+ sta OutputFlags
  rts
 
+GetByte:
+ lda #$3d ;set read flag low
+ sta OutputFlags
+waitRead:
+ lda InputFlags
+ rol
+ bcs waitRead
+ lda InputByte
+ pha
+ lda #$3f ;set all flags high
+ sta OutputFlags
+finishRead:
+ lda InputFlags
+ rol
+ bcc finishRead
+ pla
+end:
+ rts
+ 
 .repeat	251-<end
 .byte 0
 .endrepeat

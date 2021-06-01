@@ -1,4 +1,4 @@
-ca65 V2.19 - Git 59c58acb
+ca65 V2.17 - Raspbian 2.17-1
 Main file   : MenuFirmware.asm
 Current file: MenuFirmware.asm
 
@@ -27,6 +27,7 @@ Current file: MenuFirmware.asm
 000000r 1               ExecCommand = $05
 000000r 1               LoadFileCommand = $06
 000000r 1               SaveFileCommand = $07
+000000r 1               MenuCommand = $08
 000000r 1               
 000000r 1                .org SLOT*$100 + $C000
 00C700  1               ;ID bytes for booting and drive detection
@@ -58,7 +59,7 @@ Current file: MenuFirmware.asm
 00C721  1  20 58 FC      jsr $fc58	;clear screen and show menu options
 00C724  1  A0 00         ldy #$00
 00C726  1               PrintString:
-00C726  1  B9 5F C7      lda Text,y
+00C726  1  B9 6A C7      lda Text,y
 00C729  1  F0 08         beq WaitForRPi
 00C72B  1  09 80         ora #$80
 00C72D  1  20 ED FD      jsr $fded
@@ -76,72 +77,96 @@ Current file: MenuFirmware.asm
 00C743  1  4C 33 C7      jmp WaitForRPi
 00C746  1               
 00C746  1               OK:
-00C746  1  A9 CF         lda #$cf
-00C748  1  20 ED FD      jsr $fded
-00C74B  1  A9 CB         lda #$cb
-00C74D  1  20 ED FD      jsr $fded
-00C750  1               
-00C750  1               GetChar:
-00C750  1  20 0C FD      jsr $fd0c
-00C753  1  38            sec	;subtract ascii "1" to get 0 - 3 from "1" to "4"
-00C754  1  E9 B1         sbc #$b1
-00C756  1  0A            asl	;put in top nibble as EPROM page
-00C757  1  0A            asl
-00C758  1  0A            asl
-00C759  1  0A            asl
-00C75A  1  09 0F         ora #$0f ;set all flags high
-00C75C  1  4C 0E C7      jmp PageJump
-00C75F  1               
-00C75F  1               Text:
-00C75F  1               
-00C75F  1  41 70 70 6C  .byte	"Apple2-IO-RPi",$8d
-00C763  1  65 32 2D 49  
-00C767  1  4F 2D 52 50  
-00C76B  1  69 8D        
-00C76D  1  28 63 29 32  .byte	"(c)2020-2021 Terence J. Boldt",$8d
-00C771  1  30 32 30 2D  
-00C775  1  32 30 32 31  
-00C779  1  20 54 65 72  
-00C77D  1  65 6E 63 65  
-00C781  1  20 4A 2E 20  
-00C785  1  42 6F 6C 64  
-00C789  1  74 8D        
-00C78B  1  8D           .byte   $8d
-00C78C  1  31 2E 20 42  .byte	"1. Boot",$8d
-00C790  1  6F 6F 74 8D  
-00C794  1  32 2E 20 43  .byte	"2. Command Line",$8d
-00C798  1  6F 6D 6D 61  
-00C79C  1  6E 64 20 4C  
-00C7A0  1  69 6E 65 8D  
-00C7A4  1  33 2E 20 4C  .byte	"3. Load File",$8d
-00C7A8  1  6F 61 64 20  
-00C7AC  1  46 69 6C 65  
-00C7B0  1  8D           
-00C7B1  1  8D           .byte   $8d
-00C7B2  1  4D 61 79 20  .byte	"May take 45 seconds for RPi to start",$8d
-00C7B6  1  74 61 6B 65  
-00C7BA  1  20 34 35 20  
-00C7BE  1  73 65 63 6F  
-00C7C2  1  6E 64 73 20  
-00C7C6  1  66 6F 72 20  
-00C7CA  1  52 50 69 20  
-00C7CE  1  74 6F 20 73  
-00C7D2  1  74 61 72 74  
-00C7D6  1  8D           
-00C7D7  1  61 66 74 65  .byte	"after intial power-on...",$00
-00C7DB  1  72 20 69 6E  
-00C7DF  1  74 69 61 6C  
-00C7E3  1  20 70 6F 77  
-00C7E7  1  65 72 2D 6F  
-00C7EB  1  6E 2E 2E 2E  
-00C7EF  1  00           
-00C7F0  1               
-00C7F0  1               end:
-00C7F0  1  60            rts
-00C7F1  1               
-00C7F1  1  00 00 00 00  .repeat	251-<end
-00C7F5  1  00 00 00 00  
-00C7F9  1  00 00 00     
+00C746  1  20 58 FC      jsr $fc58 ;clear screen
+00C749  1               
+00C749  1  A9 08         lda #MenuCommand ;request menu text from RPi
+00C74B  1  20 AA C7      jsr SendByte
+00C74E  1               
+00C74E  1               DumpOutput:
+00C74E  1  20 C8 C7      jsr GetByte
+00C751  1  C9 00         cmp #$00
+00C753  1  F0 06         beq GetChar
+00C755  1  20 ED FD      jsr $fded
+00C758  1  18            clc
+00C759  1  90 F3         bcc DumpOutput
+00C75B  1               
+00C75B  1               GetChar:
+00C75B  1  20 0C FD      jsr $fd0c
+00C75E  1  38            sec	;subtract ascii "1" to get 0 - 3 from "1" to "4"
+00C75F  1  E9 B1         sbc #$b1
+00C761  1  0A            asl	;put in top nibble as EPROM page
+00C762  1  0A            asl
+00C763  1  0A            asl
+00C764  1  0A            asl
+00C765  1  09 0F         ora #$0f ;set all flags high
+00C767  1  4C 0E C7      jmp PageJump
+00C76A  1               
+00C76A  1               Text:
+00C76A  1               
+00C76A  1  41 70 70 6C  .byte	"Apple2-IO-RPi",$8d
+00C76E  1  65 32 2D 49  
+00C772  1  4F 2D 52 50  
+00C776  1  69 8D        
+00C778  1  28 63 29 32  .byte	"(c)2020-2021 Terence J. Boldt",$8d
+00C77C  1  30 32 30 2D  
+00C780  1  32 30 32 31  
+00C784  1  20 54 65 72  
+00C788  1  65 6E 63 65  
+00C78C  1  20 4A 2E 20  
+00C790  1  42 6F 6C 64  
+00C794  1  74 8D        
+00C796  1  8D           .byte   $8d
+00C797  1  57 61 69 74  .byte	"Waiting for RPi...",$00
+00C79B  1  69 6E 67 20  
+00C79F  1  66 6F 72 20  
+00C7A3  1  52 50 69 2E  
+00C7A7  1  2E 2E 00     
+00C7AA  1               
+00C7AA  1               SendByte:
+00C7AA  1  48            pha
+00C7AB  1               waitWrite:
+00C7AB  1  AD FB C0      lda InputFlags
+00C7AE  1  2A            rol
+00C7AF  1  2A            rol
+00C7B0  1  B0 F9         bcs waitWrite
+00C7B2  1  68            pla
+00C7B3  1  8D FD C0      sta OutputByte
+00C7B6  1  A9 3E         lda #$3e ; set bit 0 low to indicate write started
+00C7B8  1  8D F7 C0      sta OutputFlags
+00C7BB  1               finishWrite:
+00C7BB  1  AD FB C0      lda InputFlags
+00C7BE  1  2A            rol
+00C7BF  1  2A            rol
+00C7C0  1  90 F9         bcc finishWrite
+00C7C2  1  A9 3F         lda #$3f
+00C7C4  1  8D F7 C0      sta OutputFlags
+00C7C7  1  60            rts
+00C7C8  1               
+00C7C8  1               GetByte:
+00C7C8  1  A9 3D         lda #$3d ;set read flag low
+00C7CA  1  8D F7 C0      sta OutputFlags
+00C7CD  1               waitRead:
+00C7CD  1  AD FB C0      lda InputFlags
+00C7D0  1  2A            rol
+00C7D1  1  B0 FA         bcs waitRead
+00C7D3  1  AD FE C0      lda InputByte
+00C7D6  1  48            pha
+00C7D7  1  A9 3F         lda #$3f ;set all flags high
+00C7D9  1  8D F7 C0      sta OutputFlags
+00C7DC  1               finishRead:
+00C7DC  1  AD FB C0      lda InputFlags
+00C7DF  1  2A            rol
+00C7E0  1  90 FA         bcc finishRead
+00C7E2  1  68            pla
+00C7E3  1               end:
+00C7E3  1  60            rts
+00C7E4  1               
+00C7E4  1  00 00 00 00  .repeat	251-<end
+00C7E8  1  00 00 00 00  
+00C7EC  1  00 00 00 00  
+00C7F0  1  00 00 00 00  
+00C7F4  1  00 00 00 00  
+00C7F8  1  00 00 00 00  
 00C7FC  1               .byte 0
 00C7FC  1               .endrepeat
 00C7FC  1  00 00        .byte      0,0     ;0000 blocks = check status

@@ -15,6 +15,7 @@ const ChangeDriveCommand = 4
 const ExecCommand = 5
 const LoadFileCommand = 6
 const SaveFileCommand = 7
+const MenuCommand = 8
 
 func main() {
 	a2io.InitGpio()
@@ -43,6 +44,8 @@ func main() {
 				handlers.ExecCommand()
 			case LoadFileCommand:
 				handlers.LoadFileCommand()
+			case MenuCommand:
+				handlers.MenuCommand()
 			}
 		}
 	}

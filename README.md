@@ -9,16 +9,21 @@ The purpose of this project is to provide I/O for an Apple II series 8 bit compu
 ## Project Status
 So far, this is a project and not a finished product. The current prototype is on the fourth revision and a few have been assembled and tested. It is now possible for the Apple II to boot from and write to a virutal hard drive image stored on the RPi in any slot and execute simple commands on the RPi via the Apple II. The code has no error handling or tests yet and is incomplete.
 
+## Features
+1. Boot menu which waits for RPi to be ready
+2. ProDOS bootable drive from image stored on RPi
+3. Execute Linux commands on the RPi from the Apple II
+4. Load binary files directly from the RPi to the II
+5. Update Apple II firmware in place from image on RPi
+
 ## Roadmap
-1. Detect when RPi is in a ready state
-2. Wifi setup tool
-3. Proper ProDOS clock driver (currently just directly sets values on block reads)
-4. Support for direct file read/write without drive image
-5. Image conversion on download
-6. Web service call support
-7. Full terminal emulation
-8. Remote code execution 
-9. Proxy VNC connection, rendering as Apple II compatible graphics
+1. Proper ProDOS clock driver (currently just directly sets values on block reads)
+2. Support for direct file read/write without drive image
+3. Image conversion on download
+4. Web service call support
+5. Full terminal emulation
+6. Remote code execution 
+7. Proxy VNC connection, rendering as Apple II compatible graphics
 
 ## Setup
 1. Have PCBs made from the gerber and drill files in the Hardware folder or email me for a blank or fully assembled board
@@ -38,6 +43,16 @@ So far, this is a project and not a finished product. The current prototype is o
 15. go build
 16. ./apple2driver ../Apple2-IO-RPi.hdv
 18. Setup the Driver as a service or to autostart via cronjob (crontab -e then add the line @reboot /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.hdv > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log)
+
+## Update
+1. Restart Apple II
+2. Select run command
+3. git pull
+4. Restart Apple II
+5. Select boot
+6. -UPDATE.FIRMWARE
+7. Enter slot number the card is in
+8. Wait for firmware update to complete all four pages
 
 ## Similar Project
 If you prefer having Apple II peripherals control a Raspberry Pi rather than simply using the Raspberry Pi to provide storage, network access and processing to the Apple II, have a look at David Schmenk's excellent [Apple2Pi](https://github.com/dschmenk/apple2pi) project. 

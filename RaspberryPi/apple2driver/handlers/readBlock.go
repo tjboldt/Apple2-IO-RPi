@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
+	"github.com/tjboldt/ProDOS-Utilities/prodos"
 )
 
 var oldFirmware = false
@@ -31,13 +32,12 @@ func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
 		file = drive2
 	}
 
-	buffer := make([]byte, 512)
-	var block int64
-	block = int64(blockHigh)*256 + int64(blockLow)
+	var block int
+	block = int(blockHigh)*256 + int(blockLow)
 
 	fmt.Printf("Read block %d\n", block)
 
-	file.ReadAt(buffer, int64(block)*512)
+	buffer := prodos.ReadBlock(file, block)
 
 	err = a2io.WriteBlock(buffer)
 	if err == nil {

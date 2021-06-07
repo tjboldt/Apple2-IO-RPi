@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
+	"github.com/tjboldt/ProDOS-Utilities/prodos"
 )
 
 func WriteBlockCommand(drive1 *os.File, drive2 *os.File) {
@@ -29,13 +30,12 @@ func WriteBlockCommand(drive1 *os.File, drive2 *os.File) {
 	}
 
 	buffer := make([]byte, 512)
-	var block int64
-	block = int64(blockHigh)*256 + int64(blockLow)
+	var block int
+	block = int(blockHigh)*256 + int(blockLow)
 
 	fmt.Printf("Write block %d\n", block)
 
 	a2io.ReadBlock(buffer)
-	file.WriteAt(buffer, int64(block)*512)
-	file.Sync()
+	prodos.WriteBlock(file, block, buffer)
 	fmt.Printf("Write block completed\n")
 }

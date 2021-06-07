@@ -1,2 +1,4 @@
+github.com/tjboldt/ProDOS-Utilities v0.0.0-20210607001541-fa0e76cf84c0 h1:iH6+15jJQsUMv9yeC5m26qh8VdJeRmZiYGM1ZG4aLVI=
+github.com/tjboldt/ProDOS-Utilities v0.0.0-20210607001541-fa0e76cf84c0/go.mod h1:eBQRf0U+goRbBOxzFCwRW+FZmALC8dfYaqCwcqwzi74=
 periph.io/x/periph v3.6.8+incompatible h1:lki0ie6wHtvlilXhIkabdCUQMpb5QN4Fx33yNQdqnaA=
 periph.io/x/periph v3.6.8+incompatible/go.mod h1:EWr+FCIU2dBWz5/wSWeiIUJTriYv9v2j2ENBmgYyy7Y=

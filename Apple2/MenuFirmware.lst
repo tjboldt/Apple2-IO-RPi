@@ -59,7 +59,7 @@ Current file: MenuFirmware.asm
 00C721  1  20 58 FC      jsr $fc58	;clear screen and show menu options
 00C724  1  A0 00         ldy #$00
 00C726  1               PrintString:
-00C726  1  B9 6A C7      lda Text,y
+00C726  1  B9 B8 C7      lda Text,y
 00C729  1  F0 08         beq WaitForRPi
 00C72B  1  09 80         ora #$80
 00C72D  1  20 ED FD      jsr $fded
@@ -80,10 +80,10 @@ Current file: MenuFirmware.asm
 00C746  1  20 58 FC      jsr $fc58 ;clear screen
 00C749  1               
 00C749  1  A9 08         lda #MenuCommand ;request menu text from RPi
-00C74B  1  20 AA C7      jsr SendByte
+00C74B  1  20 6A C7      jsr SendByte
 00C74E  1               
 00C74E  1               DumpOutput:
-00C74E  1  20 C8 C7      jsr GetByte
+00C74E  1  20 88 C7      jsr GetByte
 00C751  1  C9 00         cmp #$00
 00C753  1  F0 06         beq GetChar
 00C755  1  20 ED FD      jsr $fded
@@ -101,74 +101,78 @@ Current file: MenuFirmware.asm
 00C765  1  09 0F         ora #$0f ;set all flags high
 00C767  1  4C 0E C7      jmp PageJump
 00C76A  1               
-00C76A  1               Text:
-00C76A  1               
-00C76A  1  41 70 70 6C  .byte	"Apple2-IO-RPi",$8d
-00C76E  1  65 32 2D 49  
-00C772  1  4F 2D 52 50  
-00C776  1  69 8D        
-00C778  1  28 63 29 32  .byte	"(c)2020-2021 Terence J. Boldt",$8d
-00C77C  1  30 32 30 2D  
-00C780  1  32 30 32 31  
-00C784  1  20 54 65 72  
-00C788  1  65 6E 63 65  
-00C78C  1  20 4A 2E 20  
-00C790  1  42 6F 6C 64  
-00C794  1  74 8D        
-00C796  1  8D           .byte   $8d
-00C797  1  57 61 69 74  .byte	"Waiting for RPi...",$00
-00C79B  1  69 6E 67 20  
-00C79F  1  66 6F 72 20  
-00C7A3  1  52 50 69 2E  
-00C7A7  1  2E 2E 00     
-00C7AA  1               
-00C7AA  1               SendByte:
-00C7AA  1  48            pha
-00C7AB  1               waitWrite:
-00C7AB  1  AD FB C0      lda InputFlags
-00C7AE  1  2A            rol
-00C7AF  1  2A            rol
-00C7B0  1  B0 F9         bcs waitWrite
-00C7B2  1  68            pla
-00C7B3  1  8D FD C0      sta OutputByte
-00C7B6  1  A9 3E         lda #$3e ; set bit 0 low to indicate write started
-00C7B8  1  8D F7 C0      sta OutputFlags
-00C7BB  1               finishWrite:
-00C7BB  1  AD FB C0      lda InputFlags
-00C7BE  1  2A            rol
-00C7BF  1  2A            rol
-00C7C0  1  90 F9         bcc finishWrite
-00C7C2  1  A9 3F         lda #$3f
-00C7C4  1  8D F7 C0      sta OutputFlags
-00C7C7  1  60            rts
-00C7C8  1               
-00C7C8  1               GetByte:
-00C7C8  1  A9 3D         lda #$3d ;set read flag low
-00C7CA  1  8D F7 C0      sta OutputFlags
-00C7CD  1               waitRead:
-00C7CD  1  AD FB C0      lda InputFlags
-00C7D0  1  2A            rol
-00C7D1  1  B0 FA         bcs waitRead
-00C7D3  1  AD FE C0      lda InputByte
-00C7D6  1  48            pha
-00C7D7  1  A9 3F         lda #$3f ;set all flags high
-00C7D9  1  8D F7 C0      sta OutputFlags
-00C7DC  1               finishRead:
-00C7DC  1  AD FB C0      lda InputFlags
-00C7DF  1  2A            rol
-00C7E0  1  90 FA         bcc finishRead
-00C7E2  1  68            pla
-00C7E3  1               end:
-00C7E3  1  60            rts
-00C7E4  1               
-00C7E4  1  00 00 00 00  .repeat	251-<end
-00C7E8  1  00 00 00 00  
-00C7EC  1  00 00 00 00  
-00C7F0  1  00 00 00 00  
-00C7F4  1  00 00 00 00  
-00C7F8  1  00 00 00 00  
-00C7FC  1               .byte 0
-00C7FC  1               .endrepeat
+00C76A  1               SendByte:
+00C76A  1  48            pha
+00C76B  1               waitWrite:
+00C76B  1  AD FB C0      lda InputFlags
+00C76E  1  2A            rol
+00C76F  1  2A            rol
+00C770  1  B0 F9         bcs waitWrite
+00C772  1  68            pla
+00C773  1  8D FD C0      sta OutputByte
+00C776  1  A9 3E         lda #$3e ; set bit 0 low to indicate write started
+00C778  1  8D F7 C0      sta OutputFlags
+00C77B  1               finishWrite:
+00C77B  1  AD FB C0      lda InputFlags
+00C77E  1  2A            rol
+00C77F  1  2A            rol
+00C780  1  90 F9         bcc finishWrite
+00C782  1  A9 3F         lda #$3f
+00C784  1  8D F7 C0      sta OutputFlags
+00C787  1  60            rts
+00C788  1               
+00C788  1               GetByte:
+00C788  1  A9 3D         lda #$3d ;set read flag low
+00C78A  1  8D F7 C0      sta OutputFlags
+00C78D  1               waitRead:
+00C78D  1  AD FB C0      lda InputFlags
+00C790  1  2A            rol
+00C791  1  B0 FA         bcs waitRead
+00C793  1  AD FE C0      lda InputByte
+00C796  1  48            pha
+00C797  1  A9 3F         lda #$3f ;set all flags high
+00C799  1  8D F7 C0      sta OutputFlags
+00C79C  1               finishRead:
+00C79C  1  AD FB C0      lda InputFlags
+00C79F  1  2A            rol
+00C7A0  1  90 FA         bcc finishRead
+00C7A2  1  68            pla
+00C7A3  1               end:
+00C7A3  1  60            rts
+00C7A4  1               
+00C7A4  1  00 00 00 00  .repeat	183-<end
+00C7A8  1  00 00 00 00  
+00C7AC  1  00 00 00 00  
+00C7B0  1  00 00 00 00  
+00C7B4  1  00 00 00 00  
+00C7B8  1               .byte 0
+00C7B8  1               .endrepeat
+00C7B8  1               
+00C7B8  1               Text:
+00C7B8  1  41 70 70 6C  .byte	"Apple2-IO-RPi",$8d
+00C7BC  1  65 32 2D 49  
+00C7C0  1  4F 2D 52 50  
+00C7C4  1  69 8D        
+00C7C6  1  28 63 29 32  .byte	"(c)2020-2021 Terence J. Boldt",$8d
+00C7CA  1  30 32 30 2D  
+00C7CE  1  32 30 32 31  
+00C7D2  1  20 54 65 72  
+00C7D6  1  65 6E 63 65  
+00C7DA  1  20 4A 2E 20  
+00C7DE  1  42 6F 6C 64  
+00C7E2  1  74 8D        
+00C7E4  1  8D           .byte   $8d
+00C7E5  1  57 61 69 74  .byte	"Waiting for RPi...",$00
+00C7E9  1  69 6E 67 20  
+00C7ED  1  66 6F 72 20  
+00C7F1  1  52 50 69 2E  
+00C7F5  1  2E 2E 00     
+00C7F8  1               
+00C7F8  1  88           .byte <GetByte  ;all firmware pages have pointer to GetByte routine here
+00C7F9  1  C7           .byte >GetByte
+00C7FA  1  6A           .byte <SendByte ;all firmware pages have pointer to SendByte routine here
+00C7FB  1  C7           .byte >SendByte
+00C7FC  1               
 00C7FC  1  00 00        .byte      0,0     ;0000 blocks = check status
 00C7FE  1  07           .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
 00C7FF  1  14           .byte     DriverEntry&$00FF ;low byte of entry

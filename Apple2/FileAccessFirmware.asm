@@ -24,6 +24,9 @@ ExecCommand = $05
 LoadFileCommand = $06
 SaveFileCommand = $07
 
+InputString = $fd67
+Monitor = $ff59
+
  .org SLOT*$100 + $C000
 ;ID bytes for booting and drive detection
  cpx #$20    ;ID bytes for ProDOS and the
@@ -50,7 +53,7 @@ Start:
  sta $33
 
 GetFilename:
- jsr $fd67
+ jsr InputString
 
 LoadFile:
  lda #$00
@@ -99,7 +102,7 @@ NextByteFinal:
  cpy BlockLo
  bne NextByteFinal
 ExitToMonitor:
- jsr $ff59 
+ jsr Monitor 
 
 SendByte:
  pha 

@@ -1,4 +1,4 @@
-ca65 V2.17 - Raspbian 2.17-1
+ca65 V2.18 - N/A
 Main file   : MenuFirmware.asm
 Current file: MenuFirmware.asm
 
@@ -29,6 +29,11 @@ Current file: MenuFirmware.asm
 000000r 1               SaveFileCommand = $07
 000000r 1               MenuCommand = $08
 000000r 1               
+000000r 1               Wait = $fca8
+000000r 1               PrintChar = $fded
+000000r 1               Home = $fc58
+000000r 1               ReadChar = $fd0c
+000000r 1               
 000000r 1                .org SLOT*$100 + $C000
 00C700  1               ;ID bytes for booting and drive detection
 00C700  1  E0 20         cpx #$20    ;ID bytes for ProDOS and the
@@ -56,13 +61,13 @@ Current file: MenuFirmware.asm
 00C71B  1  85 36         sta $36
 00C71D  1  A9 FD         lda #$fd
 00C71F  1  85 37         sta $37
-00C721  1  20 58 FC      jsr $fc58	;clear screen and show menu options
+00C721  1  20 58 FC      jsr Home	;clear screen and show menu options
 00C724  1  A0 00         ldy #$00
 00C726  1               PrintString:
 00C726  1  B9 B8 C7      lda Text,y
 00C729  1  F0 08         beq WaitForRPi
 00C72B  1  09 80         ora #$80
-00C72D  1  20 ED FD      jsr $fded
+00C72D  1  20 ED FD      jsr PrintChar
 00C730  1  C8            iny
 00C731  1  D0 F3         bne PrintString
 00C733  1               
@@ -71,13 +76,13 @@ Current file: MenuFirmware.asm
 00C736  1  2A            rol
 00C737  1  B0 0D         bcs OK
 00C739  1  A9 FF         lda #$ff
-00C73B  1  20 A8 FC      jsr $fca8
-00C73E  1  A9 AE         lda #$ae
-00C740  1  20 ED FD      jsr $fded
+00C73B  1  20 A8 FC      jsr Wait
+00C73E  1  A9 2E         lda #'.'
+00C740  1  20 ED FD      jsr PrintChar
 00C743  1  4C 33 C7      jmp WaitForRPi
 00C746  1               
 00C746  1               OK:
-00C746  1  20 58 FC      jsr $fc58 ;clear screen
+00C746  1  20 58 FC      jsr Home ;clear screen
 00C749  1               
 00C749  1  A9 08         lda #MenuCommand ;request menu text from RPi
 00C74B  1  20 6A C7      jsr SendByte
@@ -86,12 +91,12 @@ Current file: MenuFirmware.asm
 00C74E  1  20 88 C7      jsr GetByte
 00C751  1  C9 00         cmp #$00
 00C753  1  F0 06         beq GetChar
-00C755  1  20 ED FD      jsr $fded
+00C755  1  20 ED FD      jsr PrintChar
 00C758  1  18            clc
 00C759  1  90 F3         bcc DumpOutput
 00C75B  1               
 00C75B  1               GetChar:
-00C75B  1  20 0C FD      jsr $fd0c
+00C75B  1  20 0C FD      jsr ReadChar
 00C75E  1  38            sec	;subtract ascii "1" to get 0 - 3 from "1" to "4"
 00C75F  1  E9 B1         sbc #$b1
 00C761  1  0A            asl	;put in top nibble as EPROM page

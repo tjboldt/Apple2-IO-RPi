@@ -24,6 +24,9 @@ ExecCommand = $05
 LoadFileCommand = $06
 SaveFileCommand = $07
 
+InputString = $fd67
+PrintChar = $fded
+
  .org SLOT*$100 + $C000
 ;ID bytes for booting and drive detection
  cpx #$20    ;ID bytes for ProDOS and the
@@ -66,7 +69,7 @@ endSendHelp:
  lda #$a4
  sta $33
 GetCommand:
- jsr $fd67
+ jsr InputString
  lda $0200
  cmp #$8d ;skip when return found
  beq GetCommand
@@ -93,7 +96,7 @@ DumpOutput:
  jsr GetByte
  cmp #$00
  beq endOutput
- jsr $fded
+ jsr PrintChar
  clc
  bcc DumpOutput
 endOutput:

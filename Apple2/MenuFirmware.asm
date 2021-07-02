@@ -25,6 +25,11 @@ LoadFileCommand = $06
 SaveFileCommand = $07
 MenuCommand = $08
 
+Wait = $fca8
+PrintChar = $fded
+Home = $fc58
+ReadChar = $fd0c
+
  .org SLOT*$100 + $C000
 ;ID bytes for booting and drive detection
  cpx #$20    ;ID bytes for ProDOS and the
@@ -52,13 +57,13 @@ Start:
  sta $36
  lda #$fd
  sta $37
- jsr $fc58	;clear screen and show menu options
+ jsr Home	;clear screen and show menu options
  ldy #$00
 PrintString:
  lda Text,y
  beq WaitForRPi
  ora #$80
- jsr $fded
+ jsr PrintChar
  iny
  bne PrintString
 
@@ -67,13 +72,13 @@ WaitForRPi:
  rol
  bcs OK
  lda #$ff
- jsr $fca8
- lda #$ae
- jsr $fded
+ jsr Wait
+ lda #'.'
+ jsr PrintChar
  jmp WaitForRPi
 
 OK:
- jsr $fc58 ;clear screen
+ jsr Home ;clear screen
 
  lda #MenuCommand ;request menu text from RPi
  jsr SendByte
@@ -82,12 +87,12 @@ DumpOutput:
  jsr GetByte
  cmp #$00
  beq GetChar
- jsr $fded
+ jsr PrintChar
  clc
  bcc DumpOutput
 
 GetChar: 
- jsr $fd0c
+ jsr ReadChar
  sec	;subtract ascii "1" to get 0 - 3 from "1" to "4"
  sbc #$b1
  asl	;put in top nibble as EPROM page 

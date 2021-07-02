@@ -1,4 +1,4 @@
-ca65 V2.17 - Raspbian 2.17-1
+ca65 V2.18 - N/A
 Main file   : FileAccessFirmware.asm
 Current file: FileAccessFirmware.asm
 
@@ -28,6 +28,9 @@ Current file: FileAccessFirmware.asm
 000000r 1               LoadFileCommand = $06
 000000r 1               SaveFileCommand = $07
 000000r 1               
+000000r 1               InputString = $fd67
+000000r 1               Monitor = $ff59
+000000r 1               
 000000r 1                .org SLOT*$100 + $C000
 00C700  1               ;ID bytes for booting and drive detection
 00C700  1  E0 20         cpx #$20    ;ID bytes for ProDOS and the
@@ -54,7 +57,7 @@ Current file: FileAccessFirmware.asm
 00C71B  1  85 33         sta $33
 00C71D  1               
 00C71D  1               GetFilename:
-00C71D  1  20 67 FD      jsr $fd67
+00C71D  1  20 67 FD      jsr InputString
 00C720  1               
 00C720  1               LoadFile:
 00C720  1  A9 00         lda #$00
@@ -103,7 +106,7 @@ Current file: FileAccessFirmware.asm
 00C76D  1  C4 46         cpy BlockLo
 00C76F  1  D0 F6         bne NextByteFinal
 00C771  1               ExitToMonitor:
-00C771  1  20 59 FF      jsr $ff59
+00C771  1  20 59 FF      jsr Monitor
 00C774  1               
 00C774  1               SendByte:
 00C774  1  48            pha

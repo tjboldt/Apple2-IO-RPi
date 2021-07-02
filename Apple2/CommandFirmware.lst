@@ -1,4 +1,4 @@
-ca65 V2.17 - Raspbian 2.17-1
+ca65 V2.18 - N/A
 Main file   : CommandFirmware.asm
 Current file: CommandFirmware.asm
 
@@ -27,6 +27,9 @@ Current file: CommandFirmware.asm
 000000r 1               ExecCommand = $05
 000000r 1               LoadFileCommand = $06
 000000r 1               SaveFileCommand = $07
+000000r 1               
+000000r 1               InputString = $fd67
+000000r 1               PrintChar = $fded
 000000r 1               
 000000r 1                .org SLOT*$100 + $C000
 00C700  1               ;ID bytes for booting and drive detection
@@ -70,7 +73,7 @@ Current file: CommandFirmware.asm
 00C739  1  A9 A4         lda #$a4
 00C73B  1  85 33         sta $33
 00C73D  1               GetCommand:
-00C73D  1  20 67 FD      jsr $fd67
+00C73D  1  20 67 FD      jsr InputString
 00C740  1  AD 00 02      lda $0200
 00C743  1  C9 8D         cmp #$8d ;skip when return found
 00C745  1  F0 F6         beq GetCommand
@@ -97,7 +100,7 @@ Current file: CommandFirmware.asm
 00C768  1  20 9B C7      jsr GetByte
 00C76B  1  C9 00         cmp #$00
 00C76D  1  F0 06         beq endOutput
-00C76F  1  20 ED FD      jsr $fded
+00C76F  1  20 ED FD      jsr PrintChar
 00C772  1  18            clc
 00C773  1  90 F3         bcc DumpOutput
 00C775  1               endOutput:

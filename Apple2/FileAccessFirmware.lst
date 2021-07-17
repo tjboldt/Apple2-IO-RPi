@@ -27,6 +27,7 @@ Current file: FileAccessFirmware.asm
 000000r 1               ExecCommand = $05
 000000r 1               LoadFileCommand = $06
 000000r 1               SaveFileCommand = $07
+000000r 1               MenuCommand = $08
 000000r 1               
 000000r 1               InputString = $fd67
 000000r 1               Monitor = $ff59

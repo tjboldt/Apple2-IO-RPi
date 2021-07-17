@@ -23,6 +23,7 @@ ChangeDriveCommand = $04
 ExecCommand = $05
 LoadFileCommand = $06
 SaveFileCommand = $07
+MenuCommand = $08
 
 InputString = $fd67
 Monitor = $ff59

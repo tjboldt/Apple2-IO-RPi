@@ -77,7 +77,7 @@ Current file: MenuFirmware.asm
 00C737  1  B0 0D         bcs OK
 00C739  1  A9 FF         lda #$ff
 00C73B  1  20 A8 FC      jsr Wait
-00C73E  1  A9 2E         lda #'.'
+00C73E  1  A9 AE         lda #'.'+$80
 00C740  1  20 ED FD      jsr PrintChar
 00C743  1  4C 33 C7      jmp WaitForRPi
 00C746  1               

@@ -73,7 +73,7 @@ WaitForRPi:
  bcs OK
  lda #$ff
  jsr Wait
- lda #'.'
+ lda #'.'+$80
  jsr PrintChar
  jmp WaitForRPi
 

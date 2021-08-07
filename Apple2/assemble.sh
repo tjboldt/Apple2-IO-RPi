@@ -41,12 +41,6 @@ ld65 FileAccessSlot0.o FileAccessSlot1.o FileAccessSlot2.o FileAccessSlot3.o Fil
 
 cat \
 DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
-DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
-DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
-DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
-> 27256.bin
-cat \
-DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
 > AT28C64B.bin
 
 rm *.o

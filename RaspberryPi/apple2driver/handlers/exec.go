@@ -50,6 +50,8 @@ func ExecCommand() {
 	}
 	if linuxCommand == "A2LOWER" {
 		forceLowercase = true
+		a2io.WriteString("All commands will be converted to lowercase\r")
+		return
 	}
 	if linuxCommand == "a2wifi" {
 		a2io.WriteString("\r" +

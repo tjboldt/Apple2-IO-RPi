@@ -9,6 +9,8 @@ import (
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
 )
 
+var forceLowercase = false
+
 func ExecCommand() {
 	workingDirectory, err := os.Getwd()
 	if err != nil {
@@ -18,6 +20,9 @@ func ExecCommand() {
 
 	fmt.Printf("Reading command to execute...\n")
 	linuxCommand, err := a2io.ReadString()
+	if forceLowercase {
+		linuxCommand = strings.ToLower(linuxCommand)
+	}
 	fmt.Printf("Command to run: %s\n", linuxCommand)
 	if strings.HasPrefix(linuxCommand, "cd ") {
 		workingDirectory = strings.Replace(linuxCommand, "cd ", "", 1)
@@ -39,8 +44,12 @@ func ExecCommand() {
 			"Built-in commands:\r" +
 			"a2help - display this message\r" +
 			"a2wifi - set up wifi\r" +
+			"A2LOWER - force lowercase for II+\r" +
 			"\r")
 		return
+	}
+	if linuxCommand == "A2LOWER" {
+		forceLowercase = true
 	}
 	if linuxCommand == "a2wifi" {
 		a2io.WriteString("\r" +
@@ -54,18 +63,18 @@ func ExecCommand() {
 	}
 	if strings.HasPrefix(linuxCommand, "a2wifi select") {
 		params := strings.Fields(linuxCommand)
-		if (len(params) != 4) {
+		if len(params) != 4 {
 			a2io.WriteString("\rIncorrect number of parameters. Usage: a2wifi select SSID PASSWORD\r\r")
 			return
 		}
 		ssid := params[2]
 		psk := params[3]
 		linuxCommand = "printf \"country=ca\\nupdate_config=1\\nctrl_interface=/var/run/wpa_supplicant\\n\\nnetwork={\\n  scan_ssid=1\\n  ssid=\\\"%s\\\"\n  psk=\\\"%s\\\"\\n}\\n\" " +
-		ssid + " " +
-		psk + " " +
-		" > /tmp/wpa_supplicant.conf; " +
-		"sudo mv /tmp/wpa_supplicant.conf /etc/wpa_supplicant/; " +
-		"sudo wpa_cli -i wlan0 reconfigure"
+			ssid + " " +
+			psk + " " +
+			" > /tmp/wpa_supplicant.conf; " +
+			"sudo mv /tmp/wpa_supplicant.conf /etc/wpa_supplicant/; " +
+			"sudo wpa_cli -i wlan0 reconfigure"
 	}
 	cmd := exec.Command("bash", "-c", linuxCommand)
 	cmd.Dir = workingDirectory

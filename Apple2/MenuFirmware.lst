@@ -64,7 +64,7 @@ Current file: MenuFirmware.asm
 00C721  1  20 58 FC      jsr Home	;clear screen and show menu options
 00C724  1  A0 00         ldy #$00
 00C726  1               PrintString:
-00C726  1  B9 B8 C7      lda Text,y
+00C726  1  B9 BC C7      lda Text,y
 00C729  1  F0 08         beq WaitForRPi
 00C72B  1  09 80         ora #$80
 00C72D  1  20 ED FD      jsr PrintChar
@@ -145,38 +145,34 @@ Current file: MenuFirmware.asm
 00C7A3  1               end:
 00C7A3  1  60            rts
 00C7A4  1               
-00C7A4  1  00 00 00 00  .repeat	183-<end
+00C7A4  1  00 00 00 00  .repeat	187-<end
 00C7A8  1  00 00 00 00  
 00C7AC  1  00 00 00 00  
 00C7B0  1  00 00 00 00  
 00C7B4  1  00 00 00 00  
-00C7B8  1               .byte 0
-00C7B8  1               .endrepeat
-00C7B8  1               
-00C7B8  1               Text:
-00C7B8  1  41 70 70 6C  .byte	"Apple2-IO-RPi",$8d
-00C7BC  1  65 32 2D 49  
-00C7C0  1  4F 2D 52 50  
-00C7C4  1  69 8D        
-00C7C6  1  28 63 29 32  .byte	"(c)2020-2021 Terence J. Boldt",$8d
-00C7CA  1  30 32 30 2D  
-00C7CE  1  32 30 32 31  
-00C7D2  1  20 54 65 72  
-00C7D6  1  65 6E 63 65  
-00C7DA  1  20 4A 2E 20  
-00C7DE  1  42 6F 6C 64  
-00C7E2  1  74 8D        
-00C7E4  1  8D           .byte   $8d
-00C7E5  1  57 61 69 74  .byte	"Waiting for RPi...",$00
-00C7E9  1  69 6E 67 20  
-00C7ED  1  66 6F 72 20  
-00C7F1  1  52 50 69 2E  
-00C7F5  1  2E 2E 00     
-00C7F8  1               
-00C7F8  1  88           .byte <GetByte  ;all firmware pages have pointer to GetByte routine here
-00C7F9  1  C7           .byte >GetByte
-00C7FA  1  6A           .byte <SendByte ;all firmware pages have pointer to SendByte routine here
-00C7FB  1  C7           .byte >SendByte
+00C7B8  1  00 00 00 00  
+00C7BC  1               .byte 0
+00C7BC  1               .endrepeat
+00C7BC  1               
+00C7BC  1               Text:
+00C7BC  1  41 70 70 6C  .byte	"Apple2-IO-RPi",$8d
+00C7C0  1  65 32 2D 49  
+00C7C4  1  4F 2D 52 50  
+00C7C8  1  69 8D        
+00C7CA  1  28 63 29 32  .byte	"(c)2020-2021 Terence J. Boldt",$8d
+00C7CE  1  30 32 30 2D  
+00C7D2  1  32 30 32 31  
+00C7D6  1  20 54 65 72  
+00C7DA  1  65 6E 63 65  
+00C7DE  1  20 4A 2E 20  
+00C7E2  1  42 6F 6C 64  
+00C7E6  1  74 8D        
+00C7E8  1  8D           .byte   $8d
+00C7E9  1  57 61 69 74  .byte	"Waiting for RPi...",$00
+00C7ED  1  69 6E 67 20  
+00C7F1  1  66 6F 72 20  
+00C7F5  1  52 50 69 2E  
+00C7F9  1  2E 2E 00     
 00C7FC  1               
 00C7FC  1  00 00        .byte      0,0     ;0000 blocks = check status
 00C7FE  1  07           .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)

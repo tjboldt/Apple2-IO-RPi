@@ -7,13 +7,21 @@ import (
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
 )
 
+var oldFirmware = false
+
 func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
 	blockLow, _ := a2io.ReadByte()
 	blockHigh, _ := a2io.ReadByte()
-	driveUnit, err := a2io.ReadByte()
+	var driveUnit byte = 0
+	var err error
 
-	if err != nil {
-		fmt.Printf("Drive unit not sent, assuming older firmware")
+	if !oldFirmware {
+		driveUnit, err = a2io.ReadByte()
+
+		if err != nil {
+			fmt.Printf("Drive unit not sent, assuming older firmware")
+			oldFirmware = true
+		}
 	}
 
 	file := drive1

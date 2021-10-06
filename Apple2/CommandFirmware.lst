@@ -150,7 +150,7 @@ Current file: CommandFirmware.asm
 00C7B6  1               end:
 00C7B6  1  60            rts
 00C7B7  1               
-00C7B7  1  00 00 00 00  .repeat	247-<end
+00C7B7  1  00 00 00 00  .repeat	251-<end
 00C7BB  1  00 00 00 00  
 00C7BF  1  00 00 00 00  
 00C7C3  1  00 00 00 00  
@@ -166,14 +166,10 @@ Current file: CommandFirmware.asm
 00C7EB  1  00 00 00 00  
 00C7EF  1  00 00 00 00  
 00C7F3  1  00 00 00 00  
-00C7F7  1  00           
-00C7F8  1               .byte 0
-00C7F8  1               .endrepeat
-00C7F8  1               
-00C7F8  1  9B           .byte <GetByte  ;all firmware pages have pointer to GetByte routine here
-00C7F9  1  C7           .byte >GetByte
-00C7FA  1  7D           .byte <SendByte ;all firmware pages have pointer to SendByte routine here
-00C7FB  1  C7           .byte >SendByte
+00C7F7  1  00 00 00 00  
+00C7FB  1  00           
+00C7FC  1               .byte 0
+00C7FC  1               .endrepeat
 00C7FC  1               
 00C7FC  1  00 00        .byte      0,0     ;0000 blocks = check status
 00C7FE  1  07           .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)

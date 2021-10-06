@@ -1,4 +1,4 @@
-ca65 V2.18 - N/A
+ca65 V2.17 - Raspbian 2.17-1
 Main file   : DriveFirmware.asm
 Current file: DriveFirmware.asm
 
@@ -199,7 +199,7 @@ Current file: DriveFirmware.asm
 00C7FC  1               .endrepeat
 00C7FC  1               
 00C7FC  1  00 00        .byte      0,0     ;0000 blocks = check status
-00C7FE  1  07           .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
+00C7FE  1  17           .byte      23       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
 00C7FF  1  14           .byte     DriverEntry&$00FF ;low byte of entry
 00C800  1               
 00C800  1               

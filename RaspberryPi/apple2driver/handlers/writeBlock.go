@@ -24,7 +24,7 @@ func WriteBlockCommand(drive1 *os.File, drive2 *os.File) {
 
 	file := drive1
 
-	if driveUnit >= 8 {
+	if driveUnit >= 128 {
 		file = drive2
 	}
 

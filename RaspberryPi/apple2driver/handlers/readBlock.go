@@ -17,6 +17,7 @@ func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
 
 	if !oldFirmware {
 		driveUnit, err = a2io.ReadByte()
+		fmt.Printf("Drive unit: %0X\n", driveUnit)
 
 		if err != nil {
 			fmt.Printf("Drive unit not sent, assuming older firmware")
@@ -26,7 +27,7 @@ func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
 
 	file := drive1
 
-	if driveUnit >= 8 {
+	if driveUnit >= 128 {
 		file = drive2
 	}
 

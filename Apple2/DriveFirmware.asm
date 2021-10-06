@@ -195,6 +195,6 @@ end:
 .endrepeat
 
 .byte      0,0     ;0000 blocks = check status
-.byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
+.byte      23       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
 .byte     DriverEntry&$00FF ;low byte of entry
 

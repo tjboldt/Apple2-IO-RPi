@@ -10,10 +10,16 @@ import (
 func WriteBlockCommand(drive1 *os.File, drive2 *os.File) {
 	blockLow, _ := a2io.ReadByte()
 	blockHigh, _ := a2io.ReadByte()
-	driveUnit, err := a2io.ReadByte()
 
-	if err != nil {
-		fmt.Printf("Drive unit not sent, assuming older firmware")
+	var driveUnit byte = 0
+	var err error
+
+	if !oldFirmware {
+		driveUnit, err = a2io.ReadByte()
+		if err != nil {
+			fmt.Printf("Drive unit not sent, assuming older firmware")
+			oldFirmware = true
+		}
 	}
 
 	file := drive1

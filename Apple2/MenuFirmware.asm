@@ -141,7 +141,7 @@ finishRead:
 end:
  rts
 
-.repeat	183-<end
+.repeat	187-<end
 .byte 0
 .endrepeat
 
@@ -150,11 +150,6 @@ Text:
 .byte	"(c)2020-2021 Terence J. Boldt",$8d
 .byte   $8d
 .byte	"Waiting for RPi...",$00
-
-.byte <GetByte  ;all firmware pages have pointer to GetByte routine here
-.byte >GetByte
-.byte <SendByte ;all firmware pages have pointer to SendByte routine here
-.byte >SendByte
 
 .byte      0,0     ;0000 blocks = check status
 .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)

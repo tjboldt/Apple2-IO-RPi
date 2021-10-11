@@ -84,7 +84,7 @@ So far, this is a project and not a finished product. The current prototype is o
 11. Enter slot number the card is in
 12. Wait for firmware update to complete all four pages
 
-### Additional steps if your were set up before October 11, 2021 to upgrade Golang and use new command line parameters for the service
+### Additional steps to upgrade Golang and use new command line parameters for the service (if you had set up before October 11, 2021)
 This must be done via ssh directly into the RPi:
 1. `sudo apt remove golang`
 2. `export GOLANG="$(curl https://golang.org/dl/|grep linux-armv6l|grep -v beta|head -1|awk -F\> {'print $3'}|awk -F\< {'print $1'})"`

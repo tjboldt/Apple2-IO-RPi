@@ -39,8 +39,9 @@ func ExecCommand() {
 		a2io.WriteString("\r" +
 			"This is a pseudo shell. Each command is executed as a process. The cd command\r" +
 			"is intercepted and sets the working directory for the next command. Running\r" +
-			"commands that do not exit will hang. For example, do not use ping without a\r" +
-			"way to limit output like -c 1.\r" +
+			"commands that do not exit on their own will not be able to be cancelled\r" +
+			"without resetting the Apple II. For example, do not use ping without a way to\r" +
+			"limit output like -c 1.\r" +
 			"\r" +
 			"Built-in commands:\r" +
 			"a2help - display this message\r" +

@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"bufio"
 
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
 )
@@ -80,17 +81,40 @@ func ExecCommand() {
 	}
 	cmd := exec.Command("bash", "-c", linuxCommand)
 	cmd.Dir = workingDirectory
-	cmdOut, err := cmd.Output()
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		fmt.Printf("Failed to execute command\n")
-		a2io.WriteString("Failed to execute command\r")
+		fmt.Printf("Failed to set stdout\n")
+		a2io.WriteString("Failed to set stdout\r")
 		return
 	}
-	fmt.Printf("Command output: %s\n", cmdOut)
-	apple2string := strings.Replace(string(cmdOut), "\n", "\r", -1)
-	err = a2io.WriteString(apple2string)
+	fmt.Printf("Command output:\n")
+	err = cmd.Start()
 	if err != nil {
-		fmt.Printf("Failed to send command output\n")
+		fmt.Printf("Failed to start command\n")
+		a2io.WriteString("Failed to start command\r")
 		return
 	}
+
+	reader := bufio.NewReader(stdout)
+
+	for err == nil {
+		var b byte
+		b, err = reader.ReadByte()
+		if err == nil {
+			fmt.Print(string(b))
+			if b == 10 { // convert LF to CR for Apple II compatiblity
+				b = 13
+			}
+			b |= 128
+			err = a2io.WriteByte(b)
+			if err != nil {
+				fmt.Printf("\nFailed to write byte\n")
+				cmd.Process.Kill()
+				return
+			}
+		}
+	}
+
+	cmd.Wait()
+	a2io.WriteByte(0)
 }

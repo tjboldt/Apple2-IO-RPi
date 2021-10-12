@@ -118,6 +118,7 @@ func ReadByte() (byte, error) {
 	// wait for the Apple II to write
 	for in_write.Read() == gpio.High {
 		if !in_write.WaitForEdge(edgeTimeout) {
+			out_read.Out(gpio.High)
 			return 0, errors.New("Timed out reading byte -- write stuck high\n")
 		}
 	}
@@ -238,6 +239,7 @@ func WriteByte(data byte) error {
 	//fmt.Printf("wait for the Apple II to finsih reading\n")
 	for in_read.Read() == gpio.Low {
 		if !in_read.WaitForEdge(edgeTimeout) {
+			out_write.Out(gpio.High)
 			return errors.New("Timed out writing byte -- read stuck low")
 		}
 	}

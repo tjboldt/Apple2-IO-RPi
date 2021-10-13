@@ -18,13 +18,15 @@ So far, this is a project and not a finished product. The current prototype is o
 6. Supports two drive images at the same time (Note: backward compatible with previous firmware but requires firmware update in order to work with two drives)
 
 ## Roadmap
-1. Proper ProDOS clock driver (currently just directly sets values on block reads)
-2. Support for direct file read/write without drive image
-3. Image conversion on download
-4. Web service call support
-5. Full terminal emulation
-6. Remote code execution 
-7. Proxy VNC connection, rendering as Apple II compatible graphics
+1. Extend BASIC.SYSTEM commands
+    1. RPI - Execute a single Linux command
+    2. SH - Open a Linux shell
+    3. WGET - Download and save to file 
+2. Proper ProDOS clock driver (currently just directly sets values on block reads)
+3. Bi-directional image conversion between common formats and HIRES
+4. Full terminal emulation
+5. Remote code execution 
+6. Proxy VNC connection, rendering as Apple II compatible graphics
 
 ## Setup starting from scratch
 1. Have PCBs made from the gerber and drill files in the Hardware folder or email me for a blank or fully assembled board

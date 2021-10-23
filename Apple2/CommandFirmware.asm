@@ -27,6 +27,9 @@ MenuCommand = $08
 
 InputString = $fd67
 PrintChar = $fded
+Keyboard = $c000
+ClearKeyboard = $c010
+Wait = $fca8
 
  .org SLOT*$100 + $C000
 ;ID bytes for booting and drive detection
@@ -79,6 +82,7 @@ GetCommand:
  bcc GetCommand
 
 SendCommand:
+ bit ClearKeyboard
  lda #$05 ;send command 5 = exec
  jsr SendByte
  ldy #$00
@@ -98,6 +102,12 @@ DumpOutput:
  cmp #$00
  beq endOutput
  jsr PrintChar
+ bit Keyboard ;check for keypress
+ bpl DumpOutput ;keep dumping output if no keypress
+ lda Keyboard ;send keypress to RPi
+ and #$7f
+ jsr SendByte
+ bit ClearKeyboard
  clc
  bcc DumpOutput
 endOutput:
@@ -132,7 +142,14 @@ GetByte:
 waitRead:
  lda InputFlags
  rol
- bcs waitRead
+ bcc readByte
+ bit Keyboard ;keypress will abort waiting to read
+ bpl waitRead
+ lda #$1f ;set all flags high and exit
+ sta OutputFlags
+ lda #$ff
+ rts 
+readByte:
  lda InputByte
  pha
  lda #$1f ;set all flags high

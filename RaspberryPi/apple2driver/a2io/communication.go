@@ -81,7 +81,7 @@ func InitGpio() {
 	out_bit1.Out(gpio.Low)
 	out_bit0.Out(gpio.Low)
 
-	edgeTimeout = time.Second * 5
+	edgeTimeout = time.Second
 }
 
 func ReadString() (string, error) {
@@ -176,9 +176,16 @@ func ReadByte() (byte, error) {
 }
 
 func WriteByte(data byte) error {
+	// check if the Apple II wants to send a byte to us first
+	if in_write.Read() == gpio.Low {
+		out_write.Out(gpio.High)
+		return errors.New("Can't write byte while byte is incoming")
+	}
+
 	// wait for the Apple II to be ready to read
 	for in_read.Read() == gpio.High {
 		if !in_read.WaitForEdge(edgeTimeout) {
+			out_write.Out(gpio.High)
 			return errors.New("Timed out writing byte -- read stuck high")
 		}
 	}

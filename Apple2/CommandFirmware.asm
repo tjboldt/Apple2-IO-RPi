@@ -107,6 +107,7 @@ skipOutput:
  bit Keyboard ;check for keypress
  bpl DumpOutput ;keep dumping output if no keypress
  lda Keyboard ;send keypress to RPi
+ jsr PrintChar
  and #$7f
  jsr SendByte
  bit ClearKeyboard

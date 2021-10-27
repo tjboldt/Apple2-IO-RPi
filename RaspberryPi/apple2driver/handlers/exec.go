@@ -64,6 +64,7 @@ func execCommand(linuxCommand string, workingDirectory string) {
 	cmd.Dir = workingDirectory
 	stdout, err := cmd.StdoutPipe()
 	stdin, err := cmd.StdinPipe()
+	stderr, err := cmd.StderrPipe()
 
 	if err != nil {
 		fmt.Printf("Failed to set stdout\n")
@@ -81,6 +82,7 @@ func execCommand(linuxCommand string, workingDirectory string) {
 	outputComplete := make(chan bool)
 	inputComplete := make(chan bool)
 	userCancelled := make(chan bool)
+	stderrComplete := make(chan bool)
 
 	if linuxCommand == "openssl" {
 		fmt.Printf("\nSending help command...\n")
@@ -88,7 +90,8 @@ func execCommand(linuxCommand string, workingDirectory string) {
 	}
 
 	go getStdin(stdin, outputComplete, inputComplete, userCancelled)
-	go getStdout(stdout, outputComplete, userCancelled)
+	go getStdout(stdout, outputComplete, userCancelled, stderrComplete)
+	go getStderr(stderr, userCancelled, stderrComplete)
 
 	for {
 		select {
@@ -107,23 +110,56 @@ func execCommand(linuxCommand string, workingDirectory string) {
 	}
 }
 
-func getStdout(stdout io.ReadCloser, done chan bool, userCancelled chan bool) {
+func getStdout(stdout io.ReadCloser, outputComplete chan bool, userCancelled chan bool, stderrComplete chan bool) {
+	stderrDone := false
+	stdoutDone := false
+
 	for {
 		select {
 		case <-userCancelled:
 			stdout.Close()
 			return
+		case <-stderrComplete:
+			stderrDone = true
+			if stdoutDone {
+				outputComplete <- true
+				return
+			}
 		default:
 			bb := make([]byte, 1)
 			n, err := stdout.Read(bb)
 			if err != nil {
 				stdout.Close()
-				done <- true
-				return
+				stdoutDone = true
+				if stderrDone {
+					outputComplete <- true
+					return
+				}
 			}
 			if n > 0 {
 				b := bb[0]
 				sendCharacter(b)
+			}
+		}
+	}
+}
+
+func getStderr(stderr io.ReadCloser, userCancelled chan bool, stderrComplete chan bool) {
+	for {
+		select {
+		case <-userCancelled:
+			stderr.Close()
+			return
+		default:
+			bb := make([]byte, 1)
+			n, err := stderr.Read(bb)
+			if err != nil {
+				stderr.Close()
+				stderrComplete <- true
+				return
+			}
+			if n > 0 {
+				sendCharacter(bb[0])
 			}
 		}
 	}

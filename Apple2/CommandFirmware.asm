@@ -99,9 +99,11 @@ sendNullTerminator:
  jsr SendByte
 DumpOutput:
  jsr GetByte
+ bcs skipOutput
  cmp #$00
  beq endOutput
  jsr PrintChar
+skipOutput:
  bit Keyboard ;check for keypress
  bpl DumpOutput ;keep dumping output if no keypress
  lda Keyboard ;send keypress to RPi
@@ -147,7 +149,7 @@ waitRead:
  bpl waitRead
  lda #$1f ;set all flags high and exit
  sta OutputFlags
- lda #$ff
+ sec ;failure
  rts 
 readByte:
  lda InputByte
@@ -159,6 +161,7 @@ finishRead:
  rol
  bcc finishRead
  pla
+ clc ;success
 end:
  rts
 

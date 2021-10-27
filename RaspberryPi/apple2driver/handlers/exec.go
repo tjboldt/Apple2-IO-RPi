@@ -116,18 +116,15 @@ func getStdout(stdout io.ReadCloser, done chan bool, userCancelled chan bool) {
 		default:
 			bb := make([]byte, 1)
 			n, err := stdout.Read(bb)
-			if err != nil || n == 0 {
+			if err != nil {
 				stdout.Close()
 				done <- true
 				return
 			}
-			b := bb[0]
-			fmt.Print(string(b))
-			if b == 10 { // convert LF to CR for Apple II compatiblity
-				b = 13
+			if n > 0 {
+				b := bb[0]
+				sendCharacter(b)
 			}
-			b |= 128
-			a2io.WriteByte(b)
 		}
 	}
 }
@@ -201,4 +198,18 @@ func a2wifiSelect(linuxCommand string) (string, error) {
 		"sudo mv /tmp/wpa_supplicant.conf /etc/wpa_supplicant/; " +
 		"sudo wpa_cli -i wlan0 reconfigure"
 	return linuxCommand, nil
+}
+
+func sendCharacter(b byte) {
+	fmt.Print(string(b))
+	if b == 10 { // convert LF to CR for Apple II compatiblity
+		b = 13
+	}
+	if b == 9 { // convert TAB to spaces
+		b = ' '
+		b += 128
+		a2io.WriteByte(b)
+	}
+	b |= 128
+	a2io.WriteByte(b)
 }

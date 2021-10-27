@@ -1,4 +1,4 @@
-ca65 V2.17 - Raspbian 2.17-1
+ca65 V2.18 - N/A
 Main file   : CommandFirmware.asm
 Current file: CommandFirmware.asm
 
@@ -59,17 +59,17 @@ Current file: CommandFirmware.asm
 00C719  1               Start:
 00C719  1  20 00 C3      jsr $c300 ;enable 80 columns
 00C71C  1  A9 05         lda #$05 ;execute command
-00C71E  1  20 90 C7      jsr SendByte
+00C71E  1  20 92 C7      jsr SendByte
 00C721  1  A0 00         ldy #$00
 00C723  1               sendHelp:
-00C723  1  B9 89 C7      lda HelpCommand,y
+00C723  1  B9 8B C7      lda HelpCommand,y
 00C726  1  F0 06         beq endSendHelp
-00C728  1  20 90 C7      jsr SendByte
+00C728  1  20 92 C7      jsr SendByte
 00C72B  1  C8            iny
 00C72C  1  D0 F5         bne sendHelp
 00C72E  1               endSendHelp:
 00C72E  1  A9 00         lda #$00
-00C730  1  20 90 C7      jsr SendByte
+00C730  1  20 92 C7      jsr SendByte
 00C733  1  20 6B C7      jsr DumpOutput
 00C736  1               
 00C736  1  A5 33         lda $33
@@ -88,95 +88,97 @@ Current file: CommandFirmware.asm
 00C74D  1               SendCommand:
 00C74D  1  2C 10 C0      bit ClearKeyboard
 00C750  1  A9 05         lda #$05 ;send command 5 = exec
-00C752  1  20 90 C7      jsr SendByte
+00C752  1  20 92 C7      jsr SendByte
 00C755  1  A0 00         ldy #$00
 00C757  1               getInput:
 00C757  1  B9 00 02      lda $0200,y
 00C75A  1  C9 8D         cmp #$8d
 00C75C  1  F0 08         beq sendNullTerminator
 00C75E  1  29 7F         and #$7f
-00C760  1  20 90 C7      jsr SendByte
+00C760  1  20 92 C7      jsr SendByte
 00C763  1  C8            iny
 00C764  1  D0 F1         bne getInput
 00C766  1               sendNullTerminator:
 00C766  1  A9 00         lda #$00
-00C768  1  20 90 C7      jsr SendByte
+00C768  1  20 92 C7      jsr SendByte
 00C76B  1               DumpOutput:
-00C76B  1  20 AE C7      jsr GetByte
-00C76E  1  C9 00         cmp #$00
-00C770  1  F0 16         beq endOutput
-00C772  1  20 ED FD      jsr PrintChar
-00C775  1  2C 00 C0      bit Keyboard ;check for keypress
-00C778  1  10 F1         bpl DumpOutput ;keep dumping output if no keypress
-00C77A  1  AD 00 C0      lda Keyboard ;send keypress to RPi
-00C77D  1  29 7F         and #$7f
-00C77F  1  20 90 C7      jsr SendByte
-00C782  1  2C 10 C0      bit ClearKeyboard
-00C785  1  18            clc
-00C786  1  90 E3         bcc DumpOutput
-00C788  1               endOutput:
-00C788  1  60            rts
-00C789  1               
-00C789  1               HelpCommand:
-00C789  1  61 32 68 65   .byte "a2help",$00
-00C78D  1  6C 70 00     
-00C790  1               
-00C790  1               SendByte:
-00C790  1  48            pha
-00C791  1               waitWrite:
-00C791  1  AD FB C0      lda InputFlags
-00C794  1  2A            rol
-00C795  1  2A            rol
-00C796  1  B0 F9         bcs waitWrite
-00C798  1  68            pla
-00C799  1  8D FD C0      sta OutputByte
-00C79C  1  A9 1E         lda #$1e ; set bit 0 low to indicate write started
-00C79E  1  8D F7 C0      sta OutputFlags
-00C7A1  1               finishWrite:
-00C7A1  1  AD FB C0      lda InputFlags
-00C7A4  1  2A            rol
-00C7A5  1  2A            rol
-00C7A6  1  90 F9         bcc finishWrite
-00C7A8  1  A9 1F         lda #$1f
-00C7AA  1  8D F7 C0      sta OutputFlags
-00C7AD  1  60            rts
-00C7AE  1               
-00C7AE  1               GetByte:
-00C7AE  1  A9 1D         lda #$1d ;set read flag low
-00C7B0  1  8D F7 C0      sta OutputFlags
-00C7B3  1               waitRead:
-00C7B3  1  AD FB C0      lda InputFlags
-00C7B6  1  2A            rol
-00C7B7  1  90 0D         bcc readByte
-00C7B9  1  2C 00 C0      bit Keyboard ;keypress will abort waiting to read
-00C7BC  1  10 F5         bpl waitRead
-00C7BE  1  A9 1F         lda #$1f ;set all flags high and exit
-00C7C0  1  8D F7 C0      sta OutputFlags
-00C7C3  1  A9 FF         lda #$ff
-00C7C5  1  60            rts
-00C7C6  1               readByte:
-00C7C6  1  AD FE C0      lda InputByte
-00C7C9  1  48            pha
-00C7CA  1  A9 1F         lda #$1f ;set all flags high
-00C7CC  1  8D F7 C0      sta OutputFlags
-00C7CF  1               finishRead:
-00C7CF  1  AD FB C0      lda InputFlags
-00C7D2  1  2A            rol
-00C7D3  1  90 FA         bcc finishRead
-00C7D5  1  68            pla
-00C7D6  1               end:
-00C7D6  1  60            rts
-00C7D7  1               
-00C7D7  1  00 00 00 00  .repeat	251-<end
-00C7DB  1  00 00 00 00  
-00C7DF  1  00 00 00 00  
-00C7E3  1  00 00 00 00  
-00C7E7  1  00 00 00 00  
-00C7EB  1  00 00 00 00  
-00C7EF  1  00 00 00 00  
-00C7F3  1  00 00 00 00  
-00C7F7  1  00 00 00 00  
-00C7FB  1  00           
+00C76B  1  20 B0 C7      jsr GetByte
+00C76E  1  B0 07         bcs skipOutput
+00C770  1  C9 00         cmp #$00
+00C772  1  F0 16         beq endOutput
+00C774  1  20 ED FD      jsr PrintChar
+00C777  1               skipOutput:
+00C777  1  2C 00 C0      bit Keyboard ;check for keypress
+00C77A  1  10 EF         bpl DumpOutput ;keep dumping output if no keypress
+00C77C  1  AD 00 C0      lda Keyboard ;send keypress to RPi
+00C77F  1  29 7F         and #$7f
+00C781  1  20 92 C7      jsr SendByte
+00C784  1  2C 10 C0      bit ClearKeyboard
+00C787  1  18            clc
+00C788  1  90 E1         bcc DumpOutput
+00C78A  1               endOutput:
+00C78A  1  60            rts
+00C78B  1               
+00C78B  1               HelpCommand:
+00C78B  1  61 32 68 65   .byte "a2help",$00
+00C78F  1  6C 70 00     
+00C792  1               
+00C792  1               SendByte:
+00C792  1  48            pha
+00C793  1               waitWrite:
+00C793  1  AD FB C0      lda InputFlags
+00C796  1  2A            rol
+00C797  1  2A            rol
+00C798  1  B0 F9         bcs waitWrite
+00C79A  1  68            pla
+00C79B  1  8D FD C0      sta OutputByte
+00C79E  1  A9 1E         lda #$1e ; set bit 0 low to indicate write started
+00C7A0  1  8D F7 C0      sta OutputFlags
+00C7A3  1               finishWrite:
+00C7A3  1  AD FB C0      lda InputFlags
+00C7A6  1  2A            rol
+00C7A7  1  2A            rol
+00C7A8  1  90 F9         bcc finishWrite
+00C7AA  1  A9 1F         lda #$1f
+00C7AC  1  8D F7 C0      sta OutputFlags
+00C7AF  1  60            rts
+00C7B0  1               
+00C7B0  1               GetByte:
+00C7B0  1  A9 1D         lda #$1d ;set read flag low
+00C7B2  1  8D F7 C0      sta OutputFlags
+00C7B5  1               waitRead:
+00C7B5  1  AD FB C0      lda InputFlags
+00C7B8  1  2A            rol
+00C7B9  1  90 0C         bcc readByte
+00C7BB  1  2C 00 C0      bit Keyboard ;keypress will abort waiting to read
+00C7BE  1  10 F5         bpl waitRead
+00C7C0  1  A9 1F         lda #$1f ;set all flags high and exit
+00C7C2  1  8D F7 C0      sta OutputFlags
+00C7C5  1  38            sec ;failure
+00C7C6  1  60            rts
+00C7C7  1               readByte:
+00C7C7  1  AD FE C0      lda InputByte
+00C7CA  1  48            pha
+00C7CB  1  A9 1F         lda #$1f ;set all flags high
+00C7CD  1  8D F7 C0      sta OutputFlags
+00C7D0  1               finishRead:
+00C7D0  1  AD FB C0      lda InputFlags
+00C7D3  1  2A            rol
+00C7D4  1  90 FA         bcc finishRead
+00C7D6  1  68            pla
+00C7D7  1  18            clc ;success
+00C7D8  1               end:
+00C7D8  1  60            rts
+00C7D9  1               
+00C7D9  1  00 00 00 00  .repeat	251-<end
+00C7DD  1  00 00 00 00  
+00C7E1  1  00 00 00 00  
+00C7E5  1  00 00 00 00  
+00C7E9  1  00 00 00 00  
+00C7ED  1  00 00 00 00  
+00C7F1  1  00 00 00 00  
+00C7F5  1  00 00 00 00  
+00C7F9  1  00 00 00     
 00C7FC  1               .byte 0
 00C7FC  1               .endrepeat
 00C7FC  1               

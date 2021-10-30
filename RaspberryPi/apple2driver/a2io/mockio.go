@@ -12,11 +12,11 @@ import (
 )
 
 type MockIoData struct {
-	BytesToRead  []byte
-	BytesWritten []byte
-	byteRead     int
-	byteWritten  int
-	ErrorToThrow error
+	BytesToRead        []byte
+	BytesWritten       []byte
+	NumberBytesRead    int
+	NumberBytesWritten int
+	ErrorToThrow       error
 }
 
 type MockIo struct {
@@ -28,51 +28,51 @@ func (mockIo MockIo) Init() {
 }
 
 func (mockIo MockIo) WriteByte(data byte) error {
-	mockIo.Data.BytesWritten[mockIo.Data.byteWritten] = data
-	mockIo.Data.byteWritten++
+	mockIo.Data.BytesWritten[mockIo.Data.NumberBytesWritten] = data
+	mockIo.Data.NumberBytesWritten++
 	return mockIo.Data.ErrorToThrow
 }
 
 func (mockIo MockIo) WriteString(outString string) error {
 	for i, b := range outString {
-		mockIo.Data.BytesWritten[i+mockIo.Data.byteWritten] = byte(b)
+		mockIo.Data.BytesWritten[i+mockIo.Data.NumberBytesWritten] = byte(b)
 	}
-	mockIo.Data.byteWritten += len(outString)
+	mockIo.Data.NumberBytesWritten += len(outString)
 	return mockIo.Data.ErrorToThrow
 }
 
 func (mockIo MockIo) WriteBlock(buffer []byte) error {
 	for i, b := range buffer {
-		mockIo.Data.BytesWritten[i+mockIo.Data.byteWritten] = b
+		mockIo.Data.BytesWritten[i+mockIo.Data.NumberBytesWritten] = b
 	}
-	mockIo.Data.byteWritten += len(buffer)
+	mockIo.Data.NumberBytesWritten += len(buffer)
 	return mockIo.Data.ErrorToThrow
 }
 
 func (mockIo MockIo) WriteBuffer(buffer []byte) error {
 	for i, b := range buffer {
-		mockIo.Data.BytesWritten[i+mockIo.Data.byteWritten] = b
+		mockIo.Data.BytesWritten[i+mockIo.Data.NumberBytesWritten] = b
 	}
-	mockIo.Data.byteWritten += len(buffer)
+	mockIo.Data.NumberBytesWritten += len(buffer)
 	return mockIo.Data.ErrorToThrow
 }
 
 func (mockIo MockIo) ReadByte() (byte, error) {
-	b := mockIo.Data.BytesToRead[mockIo.Data.byteRead]
-	mockIo.Data.byteRead++
+	b := mockIo.Data.BytesToRead[mockIo.Data.NumberBytesRead]
+	mockIo.Data.NumberBytesRead++
 	return b, mockIo.Data.ErrorToThrow
 }
 
 func (mockIo MockIo) ReadString() (string, error) {
 	builder := strings.Builder{}
 	for {
-		if mockIo.Data.byteRead > len(mockIo.Data.BytesToRead) {
+		if mockIo.Data.NumberBytesRead > len(mockIo.Data.BytesToRead) {
 			return "", errors.New("Read more data than available")
 		}
-		builder.WriteByte(mockIo.Data.BytesToRead[mockIo.Data.byteRead])
-		mockIo.Data.byteRead++
-		if mockIo.Data.BytesToRead[mockIo.Data.byteRead] == 0 {
-			mockIo.Data.byteRead++
+		builder.WriteByte(mockIo.Data.BytesToRead[mockIo.Data.NumberBytesRead])
+		mockIo.Data.NumberBytesRead++
+		if mockIo.Data.BytesToRead[mockIo.Data.NumberBytesRead] == 0 {
+			mockIo.Data.NumberBytesRead++
 			break
 		}
 	}
@@ -80,12 +80,12 @@ func (mockIo MockIo) ReadString() (string, error) {
 }
 
 func (mockIo MockIo) ReadBlock(buffer []byte) error {
-	if mockIo.Data.byteRead+512 > len(mockIo.Data.BytesToRead) {
+	if mockIo.Data.NumberBytesRead+512 > len(mockIo.Data.BytesToRead) {
 		return errors.New("Read more data than available")
 	}
 	for i := 0; i < 512; i++ {
-		buffer[i] = mockIo.Data.BytesToRead[mockIo.Data.byteRead]
-		mockIo.Data.byteRead++
+		buffer[i] = mockIo.Data.BytesToRead[mockIo.Data.NumberBytesRead]
+		mockIo.Data.NumberBytesRead++
 	}
 	return mockIo.Data.ErrorToThrow
 }

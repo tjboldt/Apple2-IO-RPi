@@ -3,18 +3,16 @@ package handlers
 import (
 	"fmt"
 	"os"
-
-	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
 )
 
 func LoadFileCommand() {
-	fileName, _ := a2io.ReadString()
+	fileName, _ := comm.ReadString()
 
 	file, err := os.OpenFile(fileName, os.O_RDWR, 0755)
 	if err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
-		a2io.WriteByte(0)
-		a2io.WriteByte(0)
+		comm.WriteByte(0)
+		comm.WriteByte(0)
 		return
 	}
 
@@ -26,11 +24,11 @@ func LoadFileCommand() {
 	fileSizeHigh := byte(fileSize >> 8)
 	fileSizeLow := byte(fileSize & 255)
 
-	err = a2io.WriteByte(fileSizeLow)
+	err = comm.WriteByte(fileSizeLow)
 	if err != nil {
 		return
 	}
-	err = a2io.WriteByte(fileSizeHigh)
+	err = comm.WriteByte(fileSizeHigh)
 	if err != nil {
 		return
 	}
@@ -41,5 +39,5 @@ func LoadFileCommand() {
 
 	file.Read(buffer)
 
-	a2io.WriteBuffer(buffer)
+	comm.WriteBuffer(buffer)
 }

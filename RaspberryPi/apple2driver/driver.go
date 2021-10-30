@@ -24,10 +24,13 @@ func main() {
 
 	fmt.Printf("Starting Apple II RPi...\n")
 
-	a2io.InitGpio()
+	comm := a2io.A2Gpio{}
+
+	handlers.SetCommunication(comm)
+	comm.Init()
 
 	for {
-		command, err := a2io.ReadByte()
+		command, err := comm.ReadByte()
 		if err == nil {
 			switch command {
 			case ReadBlockCommand:

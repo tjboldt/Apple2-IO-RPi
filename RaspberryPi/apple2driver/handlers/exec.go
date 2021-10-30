@@ -7,8 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-
-	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
 )
 
 var forceLowercase = false
@@ -17,11 +15,11 @@ func ExecCommand() {
 	workingDirectory, err := os.Getwd()
 	if err != nil {
 		workingDirectory = "/home"
-		a2io.WriteString("Failed to get current working directory, setting to /home\r")
+		comm.WriteString("Failed to get current working directory, setting to /home\r")
 	}
 
 	fmt.Printf("Reading command to execute...\n")
-	linuxCommand, err := a2io.ReadString()
+	linuxCommand, err := comm.ReadString()
 	if forceLowercase {
 		linuxCommand = strings.ToLower(linuxCommand)
 	}
@@ -30,10 +28,10 @@ func ExecCommand() {
 		workingDirectory = strings.Replace(linuxCommand, "cd ", "", 1)
 		err = os.Chdir(workingDirectory)
 		if err != nil {
-			a2io.WriteString("Failed to set working directory\r")
+			comm.WriteString("Failed to set working directory\r")
 			return
 		}
-		a2io.WriteString("Working directory set\r")
+		comm.WriteString("Working directory set\r")
 		return
 	}
 	if linuxCommand == "a2help" {
@@ -68,14 +66,14 @@ func execCommand(linuxCommand string, workingDirectory string) {
 
 	if err != nil {
 		fmt.Printf("Failed to set stdout\n")
-		a2io.WriteString("Failed to set stdout\r")
+		comm.WriteString("Failed to set stdout\r")
 		return
 	}
 	fmt.Printf("Command output:\n")
 	err = cmd.Start()
 	if err != nil {
 		fmt.Printf("Failed to start command\n")
-		a2io.WriteString("Failed to start command\r")
+		comm.WriteString("Failed to start command\r")
 		return
 	}
 
@@ -98,12 +96,12 @@ func execCommand(linuxCommand string, workingDirectory string) {
 		case <-outputComplete:
 			outputComplete <- true
 		case <-userCancelled:
-			a2io.WriteString("^C\r")
+			comm.WriteString("^C\r")
 			cmd.Process.Kill()
 			return
 		case <-inputComplete:
 			cmd.Wait()
-			a2io.WriteByte(0)
+			comm.WriteByte(0)
 			return
 		default:
 		}
@@ -173,7 +171,7 @@ func getStdin(stdin io.WriteCloser, done chan bool, inputComplete chan bool, use
 			inputComplete <- true
 			return
 		default:
-			b, err := a2io.ReadByte()
+			b, err := comm.ReadByte()
 			if err == nil {
 				if b == 3 {
 					stdin.Close()
@@ -192,7 +190,7 @@ func getStdin(stdin io.WriteCloser, done chan bool, inputComplete chan bool, use
 }
 
 func a2help() {
-	a2io.WriteString("\r" +
+	comm.WriteString("\r" +
 		"This is a pseudo shell. Each command is executed as a process. The cd command\r" +
 		"is intercepted and sets the working directory for the next command.\r" +
 		"\r" +
@@ -205,11 +203,11 @@ func a2help() {
 
 func a2lower() {
 	forceLowercase = true
-	a2io.WriteString("All commands will be converted to lowercase\r")
+	comm.WriteString("All commands will be converted to lowercase\r")
 }
 
 func a2wifi() {
-	a2io.WriteString("\r" +
+	comm.WriteString("\r" +
 		"Usage: a2wifi list\r" +
 		"       a2wifi select SSID PASSWORD\r" +
 		"\r")
@@ -222,7 +220,7 @@ func a2wifiList() string {
 func a2wifiSelect(linuxCommand string) (string, error) {
 	params := strings.Fields(linuxCommand)
 	if len(params) != 4 {
-		a2io.WriteString("\rIncorrect number of parameters. Usage: a2wifi select SSID PASSWORD\r\r")
+		comm.WriteString("\rIncorrect number of parameters. Usage: a2wifi select SSID PASSWORD\r\r")
 		return "", errors.New("Incorrect number of parameters. Usage: a2wifi select SSID PASSWORD")
 	}
 	ssid := params[2]
@@ -244,8 +242,8 @@ func sendCharacter(b byte) {
 	if b == 9 { // convert TAB to spaces
 		b = ' '
 		b += 128
-		a2io.WriteByte(b)
+		comm.WriteByte(b)
 	}
 	b |= 128
-	a2io.WriteByte(b)
+	comm.WriteByte(b)
 }

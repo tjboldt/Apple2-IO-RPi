@@ -1,3 +1,10 @@
+// Copyright Terence J. Boldt (c)2021
+// Use of this source code is governed by an MIT
+// license that can be found in the LICENSE file.
+
+// This file defines the interface for communicating with the Apple II via
+// the Raspberry Pi GPIO ports but can also be mocked out for tests or
+// passed input to the user for interactive testing
 package a2io
 
 type A2Io interface {

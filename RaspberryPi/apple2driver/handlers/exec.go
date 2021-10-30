@@ -1,3 +1,9 @@
+// Copyright Terence J. Boldt (c)2020-2021
+// Use of this source code is governed by an MIT
+// license that can be found in the LICENSE file.
+
+// This file is contains the handler for executing Linux and internal
+// commands
 package handlers
 
 import (

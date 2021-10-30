@@ -1,3 +1,8 @@
+// Copyright Terence J. Boldt (c)2021
+// Use of this source code is governed by an MIT
+// license that can be found in the LICENSE file.
+
+// This file is used for setting up the communications for the handlers
 package handlers
 
 import (

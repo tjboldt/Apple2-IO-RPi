@@ -1,3 +1,9 @@
+// Copyright Terence J. Boldt (c)2020-2021
+// Use of this source code is governed by an MIT
+// license that can be found in the LICENSE file.
+
+// This file is used for communicating with the Apple II data bus via the
+// GPIO ports on the Raspberry Pi
 package a2io
 
 import (

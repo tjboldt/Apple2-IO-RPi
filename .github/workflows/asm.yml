@@ -1,0 +1,27 @@
+name: Assembler
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up cc65
+      run: |
+        cd ..
+        git clone https://github.com/cc65/cc65.git
+        cd cc65
+        make
+
+    - name: Build
+      run: |
+        cd Apple2
+        ./assemble.sh
+        

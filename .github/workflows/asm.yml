@@ -19,6 +19,7 @@ jobs:
         git clone https://github.com/cc65/cc65.git
         cd cc65
         make
+        cp bin/ca65 ../Apple2-IO-RPi/Apple2
 
     - name: Build
       run: |

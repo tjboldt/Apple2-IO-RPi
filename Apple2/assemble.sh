@@ -49,5 +49,5 @@ rm MenuFirmware.bin
 rm CommandFirmware.bin
 rm FileAccessFirmware.bin
 
-../../ProDOS-Utilities/ProDOS-Utilities -d ../RaspberryPi/Apple2-IO-RPi.hdv -c put -i AT28C64B.bin -p /APPLE2.IO.RPI/AT28C64B.BIN
-../../ProDOS-Utilities/ProDOS-Utilities -d ../RaspberryPi/Apple2-IO-RPi.hdv -c ls
+ProDOS-Utilities -d ../RaspberryPi/Apple2-IO-RPi.hdv -c put -i AT28C64B.bin -p /APPLE2.IO.RPI/AT28C64B.BIN
+ProDOS-Utilities -d ../RaspberryPi/Apple2-IO-RPi.hdv -c ls

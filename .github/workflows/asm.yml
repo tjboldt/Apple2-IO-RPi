@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Build firmare
+    - name: Build firmware
       run: |
         export PATH=$PATH:$(pwd)/.cicd
         cd Apple2

@@ -71,8 +71,8 @@ func getDriveFiles() (*os.File, *os.File) {
 	flag.StringVar(&drive2Name, "d2", defaultFileName, "A ProDOS format drive image for drive 2 and will be used for drive 1 if drive 1 empty")
 	flag.Parse()
 
-	var drive1 *os.File = nil
-	var drive2 *os.File = nil
+	var drive1 *os.File
+	var drive2 *os.File
 	var err error
 
 	if len(drive1Name) > 0 {

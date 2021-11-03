@@ -4,6 +4,7 @@
 
 // This file is used for communicating with the Apple II data bus via the
 // GPIO ports on the Raspberry Pi
+
 package a2io
 
 import (
@@ -44,6 +45,7 @@ var inBit2 gpio.PinIO
 var inBit1 gpio.PinIO
 var inBit0 gpio.PinIO
 
+// A2Gpio is the live implementation of A2Io interface
 type A2Gpio struct {
 }
 

@@ -5,6 +5,7 @@
 // This file is only used during development for interactive testing of the
 // driver code. Simply replace `comm := a2io.A2Gpio{}` with
 // `comm := a2io.UserIo{}` in the driver.go file to allow local testing
+
 package a2io
 
 import (
@@ -13,6 +14,7 @@ import (
 	"strings"
 )
 
+// UserIo implements A2Io for the purpose of debugging locally
 type UserIo struct {
 }
 

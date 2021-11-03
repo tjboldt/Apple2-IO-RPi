@@ -49,6 +49,7 @@ var inBit0 gpio.PinIO
 type A2Gpio struct {
 }
 
+// Init initializes the GPIO ports on the Raspberry Pi
 func (a2 A2Gpio) Init() {
 	host.Init()
 
@@ -95,6 +96,7 @@ func (a2 A2Gpio) Init() {
 	edgeTimeout = time.Second
 }
 
+// ReadString reads a string from the Apple II via Raspberry Pi's GPIO ports
 func (a2 A2Gpio) ReadString() (string, error) {
 	var inBytes bytes.Buffer
 	for {
@@ -110,6 +112,7 @@ func (a2 A2Gpio) ReadString() (string, error) {
 	return inBytes.String(), nil
 }
 
+// WriteString writes a string to the Apple II via Raspberry Pi's GPIO ports
 func (a2 A2Gpio) WriteString(outString string) error {
 	for _, character := range outString {
 		err := a2.WriteByte(byte(character) | 128)
@@ -122,6 +125,7 @@ func (a2 A2Gpio) WriteString(outString string) error {
 	return nil
 }
 
+// ReadByte reads a byte from the Apple II via Raspberry Pi's GPIO ports
 func (a2 A2Gpio) ReadByte() (byte, error) {
 	// let the Apple II know we are ready to read
 	outRead.Out(gpio.Low)
@@ -186,6 +190,7 @@ func (a2 A2Gpio) ReadByte() (byte, error) {
 	return data, nil
 }
 
+// WriteByte writes a byte to the Apple II via Raspberry Pi's GPIO ports
 func (a2 A2Gpio) WriteByte(data byte) error {
 	// check if the Apple II wants to send a byte to us first
 	if inWrite.Read() == gpio.Low {
@@ -267,6 +272,7 @@ func (a2 A2Gpio) WriteByte(data byte) error {
 	return nil
 }
 
+// WriteBlock writes 512 bytes to the Apple II via Raspberry Pi's GPIO ports
 func (a2 A2Gpio) WriteBlock(buffer []byte) error {
 	for i := 0; i < 512; i++ {
 		err := a2.WriteByte(buffer[i])
@@ -278,6 +284,7 @@ func (a2 A2Gpio) WriteBlock(buffer []byte) error {
 	return nil
 }
 
+// ReadBlock reads 512 bytes from the Apple II via Raspberry Pi's GPIO ports
 func (a2 A2Gpio) ReadBlock(buffer []byte) error {
 	var err error
 	for i := 0; i < 512; i++ {
@@ -290,6 +297,7 @@ func (a2 A2Gpio) ReadBlock(buffer []byte) error {
 	return nil
 }
 
+// WriteBuffer writes a buffer of bytes to the Apple II via Raspberry Pi's GPIO ports
 func (a2 A2Gpio) WriteBuffer(buffer []byte) error {
 	bufferSize := len(buffer)
 	for i := 0; i < bufferSize; i++ {

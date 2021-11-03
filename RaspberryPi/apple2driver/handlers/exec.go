@@ -4,6 +4,7 @@
 
 // This file is contains the handler for executing Linux and internal
 // commands
+
 package handlers
 
 import (
@@ -17,6 +18,7 @@ import (
 
 var forceLowercase = false
 
+// ExecCommand handles requests for the Apple II executing Linux commands
 func ExecCommand() {
 	workingDirectory, err := os.Getwd()
 	if err != nil {

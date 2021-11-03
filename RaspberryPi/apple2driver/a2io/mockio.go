@@ -4,6 +4,7 @@
 
 // This file is used for mocking the GPIO code so that unit tests can be run
 // on any machine and not just a Raspberry Pi
+
 package a2io
 
 import (
@@ -19,6 +20,7 @@ type MockIoData struct {
 	ErrorToThrow       error
 }
 
+// MockIo implements A2Io to allow unit tests to run without needing GPIO functioning
 type MockIo struct {
 	Data *MockIoData
 }

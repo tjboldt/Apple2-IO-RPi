@@ -4,6 +4,7 @@
 
 // This file is contains the handler for retrieving the ProDOS timestamp
 // based on the current time
+
 package handlers
 
 import (
@@ -13,6 +14,7 @@ import (
 	"github.com/tjboldt/ProDOS-Utilities/prodos"
 )
 
+// GetTimeCommand handles the request to get ProDOS time bytes
 func GetTimeCommand() {
 	fmt.Printf("Sending date/time...\n")
 	prodosTime := prodos.DateTimeToProDOS(time.Now())

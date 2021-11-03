@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // This file is used for setting up the communications for the handlers
+
 package handlers
 
 import (
@@ -11,6 +12,7 @@ import (
 
 var comm a2io.A2Io
 
+// SetCommunication configures whether to use real or mock communications
 func SetCommunication(commIO a2io.A2Io) {
 	comm = commIO
 }

@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // This file is used for handling ProDOS image block reading and writing
+
 package handlers
 
 import (
@@ -14,10 +15,11 @@ import (
 
 var oldFirmware = false
 
+// ReadBlockCommand handles requests to read ProDOS blocks
 func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
 	blockLow, _ := comm.ReadByte()
 	blockHigh, _ := comm.ReadByte()
-	var driveUnit byte = 0
+	var driveUnit byte
 	var err error
 
 	if !oldFirmware {
@@ -50,11 +52,12 @@ func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
 	}
 }
 
+// WriteBlockCommand handles requests to write ProDOS blocks
 func WriteBlockCommand(drive1 *os.File, drive2 *os.File) {
 	blockLow, _ := comm.ReadByte()
 	blockHigh, _ := comm.ReadByte()
 
-	var driveUnit byte = 0
+	var driveUnit byte
 	var err error
 
 	if !oldFirmware {

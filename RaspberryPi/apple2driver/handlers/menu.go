@@ -4,12 +4,14 @@
 
 // This file is contains the handler for displaying the menu of choices on
 // the Apple II
+
 package handlers
 
 import (
 	"fmt"
 )
 
+// MenuCommand handles the request to show menu options on the Apple II
 func MenuCommand() {
 	fmt.Printf("Sending menu...\n")
 	comm.WriteString("Apple2-IO-RPi\r" +

@@ -32,8 +32,8 @@ So far, this is a project and not a finished product. The current prototype is o
 1. Have PCBs made from the gerber and drill files in the Hardware folder or email me for a blank or fully assembled board
 2. Solder chips, header and capacitors in place
 3. Attach Raspberry Pi Zero W facing outward from the card
-4. Install Raspberry Pi OS on microSD card https://www.raspberrypi.org/software/
-5. Configure wifi in boot/wpa_supplicant.conf https://howtoraspberrypi.com/how-to-raspberry-pi-headless-setup/
+4. Install [Raspberry Pi OS](https://www.raspberrypi.org/software/) on microSD card
+5. Configure wifi in [boot/wpa_supplicant.conf](https://howtoraspberrypi.com/how-to-raspberry-pi-headless-setup/)
 6. Add empty ssh file boot (for ssh access over wifi)
 7. Put microSD card in the RPi
 8. Install the expansion card into the Apple II
@@ -56,10 +56,10 @@ So far, this is a project and not a finished product. The current prototype is o
 17. `git clone https://github.com/tjboldt/Apple2-IO-RPi.git`
 18. `cd Apple2-IO-RPi/RaspberryPi/apple2driver`
 19. `go get`
-21. `go build`
-22. `./apple2driver`
-23. Optional to step above, `./apple2driver -d1 YOUR_DRIVE.hdv` (Apple2-IO-RPi.hdv is automatically selected as drive 2), or `./apple2driver -d1 YOUR_DRIVE.hdv -d2 YOUR_SECOND_DRIVE.hdv`
-24. Setup the Driver as a service or to autostart via cronjob (`crontab -e` then add the line `@reboot /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver -d1 YOUR_DRIVE.hdv -d2 /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.hdv > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log`)
+20. `go build`
+21. `./apple2driver`
+22. Optional to step above, `./apple2driver -d1 YOUR_DRIVE.hdv` (Apple2-IO-RPi.hdv is automatically selected as drive 2), or `./apple2driver -d1 YOUR_DRIVE.hdv -d2 YOUR_SECOND_DRIVE.hdv`
+23. Setup the Driver as a service or to autostart via cronjob (`crontab -e` then add the line `@reboot /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver -d1 YOUR_DRIVE.hdv -d2 /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.hdv > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log`)
 
 ## Setup if you received a complete board from me
 1. Put in any slot (slot 7 preferred as it is the first to boot)

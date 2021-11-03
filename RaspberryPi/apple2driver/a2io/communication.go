@@ -5,8 +5,10 @@
 // This file defines the interface for communicating with the Apple II via
 // the Raspberry Pi GPIO ports but can also be mocked out for tests or
 // passed input to the user for interactive testing
+
 package a2io
 
+// A2Io provides an interface to send and receive data to the Apple II
 type A2Io interface {
 	Init()
 	WriteByte(data byte) error
@@ -16,8 +18,4 @@ type A2Io interface {
 	ReadByte() (byte, error)
 	ReadString() (string, error)
 	ReadBlock(buffer []byte) error
-}
-
-type A2Comm struct {
-	A2Io A2Io
 }

@@ -43,7 +43,7 @@ cat \
 DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
 > AT28C64B.bin
 
-rm *.o
+rm ./*.o
 rm DriveFirmware.bin
 rm MenuFirmware.bin
 rm CommandFirmware.bin

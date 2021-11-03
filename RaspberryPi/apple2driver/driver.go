@@ -17,14 +17,14 @@ import (
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/handlers"
 )
 
-const ReadBlockCommand = 1
-const WriteBlockCommand = 2
-const GetTimeCommand = 3
-const ChangeDriveCommand = 4
-const ExecCommand = 5
-const LoadFileCommand = 6
-const SaveFileCommand = 7
-const MenuCommand = 8
+const readBlockCommand = 1
+const writeBlockCommand = 2
+const getTimeCommand = 3
+const changeDriveCommand = 4
+const execCommand = 5
+const loadFileCommand = 6
+const saveFileCommand = 7
+const menuCommand = 8
 
 func main() {
 	drive1, drive2 := getDriveFiles()
@@ -40,17 +40,17 @@ func main() {
 		command, err := comm.ReadByte()
 		if err == nil {
 			switch command {
-			case ReadBlockCommand:
+			case readBlockCommand:
 				handlers.ReadBlockCommand(drive1, drive2)
-			case WriteBlockCommand:
+			case writeBlockCommand:
 				handlers.WriteBlockCommand(drive1, drive2)
-			case GetTimeCommand:
+			case getTimeCommand:
 				handlers.GetTimeCommand()
-			case ExecCommand:
+			case execCommand:
 				handlers.ExecCommand()
-			case LoadFileCommand:
+			case loadFileCommand:
 				handlers.LoadFileCommand()
-			case MenuCommand:
+			case menuCommand:
 				handlers.MenuCommand()
 			}
 		}
@@ -71,8 +71,8 @@ func getDriveFiles() (*os.File, *os.File) {
 	flag.StringVar(&drive2Name, "d2", defaultFileName, "A ProDOS format drive image for drive 2 and will be used for drive 1 if drive 1 empty")
 	flag.Parse()
 
-	var drive1 *os.File = nil
-	var drive2 *os.File = nil
+	var drive1 *os.File
+	var drive2 *os.File
 	var err error
 
 	if len(drive1Name) > 0 {

@@ -4,6 +4,7 @@
 
 // This file is contains the handler for loading files directly from the
 // Raspberry Pi onto the Apple II
+
 package handlers
 
 import (
@@ -11,6 +12,7 @@ import (
 	"os"
 )
 
+// LoadFileCommand handles requests to direct read files from Linux to the Apple II
 func LoadFileCommand() {
 	fileName, _ := comm.ReadString()
 

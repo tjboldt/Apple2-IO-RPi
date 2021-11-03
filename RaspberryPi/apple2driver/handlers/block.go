@@ -17,7 +17,7 @@ var oldFirmware = false
 func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
 	blockLow, _ := comm.ReadByte()
 	blockHigh, _ := comm.ReadByte()
-	var driveUnit byte = 0
+	var driveUnit byte
 	var err error
 
 	if !oldFirmware {
@@ -54,7 +54,7 @@ func WriteBlockCommand(drive1 *os.File, drive2 *os.File) {
 	blockLow, _ := comm.ReadByte()
 	blockHigh, _ := comm.ReadByte()
 
-	var driveUnit byte = 0
+	var driveUnit byte
 	var err error
 
 	if !oldFirmware {

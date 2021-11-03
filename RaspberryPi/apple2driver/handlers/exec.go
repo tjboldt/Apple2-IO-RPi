@@ -109,7 +109,6 @@ func execCommand(linuxCommand string, workingDirectory string) {
 			cmd.Wait()
 			comm.WriteByte(0)
 			return
-		default:
 		}
 	}
 }
@@ -183,13 +182,12 @@ func getStdin(stdin io.WriteCloser, done chan bool, inputComplete chan bool, use
 					stdin.Close()
 					userCancelled <- true
 					return
-				} else {
-					if b == 13 {
-						b = 10
-					}
-					fmt.Printf("%c", b)
-					io.WriteString(stdin, string(b))
 				}
+				if b == 13 {
+					b = 10
+				}
+				fmt.Printf("%c", b)
+				io.WriteString(stdin, string(b))
 			}
 		}
 	}

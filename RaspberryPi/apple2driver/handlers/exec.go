@@ -54,6 +54,11 @@ func ExecCommand() {
 		a2wifi()
 		return
 	}
+	if linuxCommand == "a2prompt" {
+		prompt := fmt.Sprintf("A2IO:%s ", workingDirectory)
+		comm.WriteString(prompt)
+		return
+	}
 	if linuxCommand == "a2wifi list" {
 		linuxCommand = a2wifiList()
 	}
@@ -66,17 +71,23 @@ func ExecCommand() {
 }
 
 func execCommand(linuxCommand string, workingDirectory string) {
+	// force the command to combine stderr(2) into stdout(1)
+	linuxCommand += " 2>&1"
 	cmd := exec.Command("bash", "-c", linuxCommand)
 	cmd.Dir = workingDirectory
 	stdout, err := cmd.StdoutPipe()
-	stdin, err := cmd.StdinPipe()
-	stderr, err := cmd.StderrPipe()
-
 	if err != nil {
 		fmt.Printf("Failed to set stdout\n")
 		comm.WriteString("Failed to set stdout\r")
 		return
 	}
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		fmt.Printf("Failed to set stdin\n")
+		comm.WriteString("Failed to set stdin\r")
+		return
+	}
+
 	fmt.Printf("Command output:\n")
 	err = cmd.Start()
 	if err != nil {
@@ -88,7 +99,6 @@ func execCommand(linuxCommand string, workingDirectory string) {
 	outputComplete := make(chan bool)
 	inputComplete := make(chan bool)
 	userCancelled := make(chan bool)
-	stderrComplete := make(chan bool)
 
 	if linuxCommand == "openssl" {
 		fmt.Printf("\nSending help command...\n")
@@ -96,14 +106,17 @@ func execCommand(linuxCommand string, workingDirectory string) {
 	}
 
 	go getStdin(stdin, outputComplete, inputComplete, userCancelled)
-	go getStdout(stdout, outputComplete, userCancelled, stderrComplete)
-	go getStderr(stderr, userCancelled, stderrComplete)
+	go getStdout(stdout, outputComplete, userCancelled)
 
 	for {
 		select {
 		case <-outputComplete:
 			outputComplete <- true
+			cmd.Wait()
+			comm.WriteByte(0)
+			return
 		case <-userCancelled:
+			userCancelled <- true
 			comm.WriteString("^C\r")
 			cmd.Process.Kill()
 			return
@@ -115,56 +128,23 @@ func execCommand(linuxCommand string, workingDirectory string) {
 	}
 }
 
-func getStdout(stdout io.ReadCloser, outputComplete chan bool, userCancelled chan bool, stderrComplete chan bool) {
-	stderrDone := false
-	stdoutDone := false
-
+func getStdout(stdout io.ReadCloser, outputComplete chan bool, userCancelled chan bool) {
 	for {
 		select {
 		case <-userCancelled:
 			stdout.Close()
 			return
-		case <-stderrComplete:
-			stderrDone = true
-			if stdoutDone {
-				outputComplete <- true
-				return
-			}
 		default:
 			bb := make([]byte, 1)
 			n, err := stdout.Read(bb)
 			if err != nil {
 				stdout.Close()
-				stdoutDone = true
-				if stderrDone {
-					outputComplete <- true
-					return
-				}
+				outputComplete <- true
+				return
 			}
 			if n > 0 {
 				b := bb[0]
 				sendCharacter(b)
-			}
-		}
-	}
-}
-
-func getStderr(stderr io.ReadCloser, userCancelled chan bool, stderrComplete chan bool) {
-	for {
-		select {
-		case <-userCancelled:
-			stderr.Close()
-			return
-		default:
-			bb := make([]byte, 1)
-			n, err := stderr.Read(bb)
-			if err != nil {
-				stderr.Close()
-				stderrComplete <- true
-				return
-			}
-			if n > 0 {
-				sendCharacter(bb[0])
 			}
 		}
 	}
@@ -198,7 +178,8 @@ func getStdin(stdin io.WriteCloser, done chan bool, inputComplete chan bool, use
 func a2help() {
 	comm.WriteString("\r" +
 		"This is a pseudo shell. Each command is executed as a process. The cd command\r" +
-		"is intercepted and sets the working directory for the next command.\r" +
+		"is intercepted and sets the working directory for the next command. The exit\r" +
+		"command will exit the shell when not running from firmware.\r" +
 		"\r" +
 		"Built-in commands:\r" +
 		"a2help - display this message\r" +

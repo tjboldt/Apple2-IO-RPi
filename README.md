@@ -41,25 +41,21 @@ So far, this is a project and not a finished product. The current prototype is o
 10. Update firmware with utility (can be found on Apple2-IO-RPi.hdv drive image) or use EPROM programmer
 11. Install Golang (note that `sudo apt install golang` will install an older version that doesn't work with this code)
     1. `sudo apt install git`
-    2. `sudo apt remove golang`
-    3. `export GOLANG="$(curl https://golang.org/dl/|grep linux-armv6l|grep -v beta|head -1|awk -F\> {'print $3'}|awk -F\< {'print $1'})"`
-    4. `wget https://golang.org/dl/$GOLANG`
-    5. `sudo tar -C /usr/local -xzf $GOLANG`
-    6. Edit `~/.profile` with your favourite editor and add the following:
+    2. `wget https://golang.org/dl/go1.17.3.linux-armv6l.tar.gz`
+    3. `sudo tar -C /usr/local -xzf go1.17.3.linux-armv6l.tar.gz`
+    4. Edit `~/.profile` with your favourite editor and add the following:
         1. `PATH=$PATH:/usr/local/go/bin`
         2. `GOPATH=$HOME/golang`
 12. `git clone https://github.com/tjboldt/ProDOS-Utilities.git`
 13. `cd ProDOS-Utilities`
-14. `go get`
-15. `go build`
-16. `cd ~`
-17. `git clone https://github.com/tjboldt/Apple2-IO-RPi.git`
-18. `cd Apple2-IO-RPi/RaspberryPi/apple2driver`
-19. `go get`
-20. `go build`
-21. `./apple2driver`
-22. Optional to step above, `./apple2driver -d1 YOUR_DRIVE.hdv` (Apple2-IO-RPi.hdv is automatically selected as drive 2), or `./apple2driver -d1 YOUR_DRIVE.hdv -d2 YOUR_SECOND_DRIVE.hdv`
-23. Setup the Driver as a service or to autostart via cronjob (`crontab -e` then add the line `@reboot /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver -d1 YOUR_DRIVE.hdv -d2 /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.hdv > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log`)
+14. `go build`
+15. `cd ~`
+16. `git clone https://github.com/tjboldt/Apple2-IO-RPi.git`
+17. `cd Apple2-IO-RPi/RaspberryPi/apple2driver`
+18. `go build`
+19. `./apple2driver`
+20. Optional to step above, `./apple2driver -d1 YOUR_DRIVE.hdv` (Apple2-IO-RPi.hdv is automatically selected as drive 2), or `./apple2driver -d1 YOUR_DRIVE.hdv -d2 YOUR_SECOND_DRIVE.hdv`
+21. Setup the Driver as a service or to autostart via cronjob (`crontab -e` then add the line `@reboot /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver -d1 YOUR_DRIVE.hdv -d2 /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.hdv > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log`)
 
 ## Setup if you received a complete board from me
 1. Put in any slot (slot 7 preferred as it is the first to boot)
@@ -89,18 +85,17 @@ So far, this is a project and not a finished product. The current prototype is o
 ### Additional steps to upgrade Golang and use new command line parameters for the service (if you had set up before October 11, 2021)
 This must be done via ssh directly into the RPi:
 1. `sudo apt remove golang`
-2. `export GOLANG="$(curl https://golang.org/dl/|grep linux-armv6l|grep -v beta|head -1|awk -F\> {'print $3'}|awk -F\< {'print $1'})"`
-3. `wget https://golang.org/dl/$GOLANG`
-4. `sudo tar -C /usr/local -xzf $GOLANG`
-5. Edit `~/.profile` with your favourite editor and add the following:
+2. `wget https://golang.org/dl/go1.17.3.linux-armv6l.tar.gz`
+3. `sudo tar -C /usr/local -xzf go1.17.3.linux-armv6l.tar.gz`
+4. Edit `~/.profile` with your favourite editor and add the following:
     1. `PATH=$PATH:/usr/local/go/bin`
     2. `GOPATH=$HOME/golang`
-6. `cd ~/`
-7. `git clone https://github.com/tjboldt/ProDOS-Utilities.git`
-8. `cd ProDOS-Utilities`
-9. `cd ~/Apple2-IO-RPi/RaspberryPi/apple2driver`
-10. `go build`
-11. Edit the Driver autostart via cronjob (`crontab -e` then edit the line to be `@reboot /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver -d1 YOUR_DRIVE.hdv -d2 /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.hdv > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log`) or simply `@reboot /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log` if you don't need your own drive image.
+5. `cd ~/`
+6. `git clone https://github.com/tjboldt/ProDOS-Utilities.git`
+7. `cd ProDOS-Utilities`
+8. `cd ~/Apple2-IO-RPi/RaspberryPi/apple2driver`
+9. `go build`
+10. Edit the Driver autostart via cronjob (`crontab -e` then edit the line to be `@reboot /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver -d1 YOUR_DRIVE.hdv -d2 /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.hdv > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log`) or simply `@reboot /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log` if you don't need your own drive image.
 
 ## Similar Project
 If you prefer having Apple II peripherals control a Raspberry Pi rather than simply using the Raspberry Pi to provide storage, network access and processing to the Apple II, have a look at David Schmenk's excellent [Apple2Pi](https://github.com/dschmenk/apple2pi) project. 

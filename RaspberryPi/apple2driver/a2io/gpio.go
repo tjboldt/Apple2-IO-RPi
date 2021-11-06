@@ -131,8 +131,9 @@ func (a2 A2Gpio) ReadByte() (byte, error) {
 	outRead.Out(gpio.Low)
 
 	// wait for the Apple II to write
+	startTime := time.Now()
 	for inWrite.Read() == gpio.High {
-		if !inWrite.WaitForEdge(edgeTimeout) {
+		if time.Since(startTime) > edgeTimeout {
 			outRead.Out(gpio.High)
 			return 0, errors.New("timed out reading byte -- write stuck high")
 		}
@@ -181,8 +182,9 @@ func (a2 A2Gpio) ReadByte() (byte, error) {
 
 	// wait for the Apple II to finish writing
 	//fmt.Printf("wait for the Apple II to finish writing\n")
+	startTime = time.Now()
 	for inWrite.Read() == gpio.Low {
-		if !inWrite.WaitForEdge(edgeTimeout) {
+		if time.Since(startTime) > edgeTimeout {
 			return 0, errors.New("timed out reading byte -- write stuck low")
 		}
 	}
@@ -199,8 +201,9 @@ func (a2 A2Gpio) WriteByte(data byte) error {
 	}
 
 	// wait for the Apple II to be ready to read
+	startTime := time.Now()
 	for inRead.Read() == gpio.High {
-		if !inRead.WaitForEdge(edgeTimeout) {
+		if time.Since(startTime) > edgeTimeout {
 			outWrite.Out(gpio.High)
 			return errors.New("timed out writing byte -- read stuck high")
 		}
@@ -260,8 +263,9 @@ func (a2 A2Gpio) WriteByte(data byte) error {
 
 	// wait for the Apple II to finsih reading
 	//fmt.Printf("wait for the Apple II to finsih reading\n")
+	startTime = time.Now()
 	for inRead.Read() == gpio.Low {
-		if !inRead.WaitForEdge(edgeTimeout) {
+		if time.Since(startTime) > edgeTimeout {
 			outWrite.Out(gpio.High)
 			return errors.New("timed out writing byte -- read stuck low")
 		}

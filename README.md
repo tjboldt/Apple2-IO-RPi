@@ -56,6 +56,9 @@ So far, this is a project and not a finished product. The current prototype is o
 19. `./apple2driver`
 20. Optional to step above, `./apple2driver -d1 YOUR_DRIVE.hdv` (Apple2-IO-RPi.hdv is automatically selected as drive 2), or `./apple2driver -d1 YOUR_DRIVE.hdv -d2 YOUR_SECOND_DRIVE.hdv`
 21. Setup the Driver as a service or to autostart via cronjob (`crontab -e` then add the line `@reboot /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver -d1 YOUR_DRIVE.hdv -d2 /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.hdv > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log`)
+22. If you want to assemble 6502 code on the RPi:
+    1. Add to your ~/.profile `PATH=$PATH:/home/pi/ProDOS-Utilities`
+    2. Install cc65 with `sudo apt install cc65`
 
 ## Setup if you received a complete board from me
 1. Put in any slot (slot 7 preferred as it is the first to boot)

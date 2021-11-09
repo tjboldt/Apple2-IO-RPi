@@ -33,8 +33,11 @@ StringBuffer = $0200
 PrintChar = $fded
 Keyboard = $c000
 ClearKeyboard = $c010
+Home = $fc58
 Wait = $fca8
 PromptChar = $33
+htab = $24
+vtab = $25
 
 ESC = $9b
 
@@ -116,39 +119,53 @@ sendNullTerminator:
 
 DumpOutput:
  jsr GetByte
- bcs skipOutput
+ bcs checkInput
  cmp #$00
  beq endOutput
- cmp #ESC
- beq escapeSequence
+ cmp #'H'
+ beq setColumn
+ cmp #'V'
+ beq setRow
+ cmp #'C'
+ beq clearScreen
+ cmp #'T'
+ beq setTop
+ cmp #'B'
+ beq setBottom 
  jsr PrintChar
-skipOutput:
+ jmp DumpOutput
+checkInput:
  bit Keyboard ;check for keypress
  bpl DumpOutput ;keep dumping output if no keypress
  lda Keyboard ;send keypress to RPi
- ;jsr PrintChar
  and #$7f
  jsr SendByte
  bit ClearKeyboard
- clc
- bcc DumpOutput
+ jmp DumpOutput
 endOutput:
  rts
-escapeSequence:
- jsr ParseEscape
- clc
- bcc DumpOutput
-
-ParseEscape:
- jsr GetByte ; expect first byte after ESC to be '['
- cmp #'['|$80
- beq endParse
-checkLetter:
- jsr GetByte ; loop until there is a letter
- cmp #$C1
- bcc checkLetter
-endParse:
- rts
+clearScreen:
+ jsr Home
+ jmp DumpOutput
+setColumn:
+ jsr GetByte
+ sta htab
+ sta $057B
+ jmp DumpOutput
+setRow:
+ jsr GetByte
+ sta vtab
+ jsr $fbc1 ; bascalc
+ sta $28 ;basl
+ jmp DumpOutput
+setTop:
+ jsr GetByte
+ sta $22
+ jmp DumpOutput
+setBottom:
+ jsr GetByte
+ sta $23
+ jmp DumpOutput
 
 SendByte:
  pha 

@@ -77,3 +77,8 @@ func (userIo UserIo) ReadBlock(buffer []byte) error {
 	fmt.Printf("ReadBlock: (Not supported)")
 	return errors.New("ReadBlock not supported")
 }
+
+// SendCharacter is a pass-through to vt100 implementation
+func (userIo UserIo) SendCharacter(character byte) {
+	sendCharacter(userIo, character)
+}

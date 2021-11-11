@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/handlers"
@@ -36,9 +37,12 @@ func main() {
 	handlers.SetCommunication(comm)
 	comm.Init()
 
+	lastCommandTime := time.Now()
+
 	for {
 		command, err := comm.ReadByte()
 		if err == nil {
+			lastCommandTime = time.Now()
 			switch command {
 			case readBlockCommand:
 				handlers.ReadBlockCommand(drive1, drive2)
@@ -53,6 +57,9 @@ func main() {
 			case menuCommand:
 				handlers.MenuCommand()
 			}
+			// temporary workaround for busy wait loop heating up the RPi
+		} else if time.Since(lastCommandTime) > time.Millisecond*100 {
+			time.Sleep(time.Millisecond * 100)
 		}
 	}
 }

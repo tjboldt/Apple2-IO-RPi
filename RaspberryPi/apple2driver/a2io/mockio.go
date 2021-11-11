@@ -100,3 +100,8 @@ func (mockIo MockIo) ReadBlock(buffer []byte) error {
 	}
 	return mockIo.Data.ErrorToThrow
 }
+
+// SendCharacter is a pass-through to vt100 implementation
+func (mockIo MockIo) SendCharacter(character byte) {
+	sendCharacter(mockIo, character)
+}

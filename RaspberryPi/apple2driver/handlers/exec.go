@@ -75,6 +75,11 @@ func execCommand(linuxCommand string, workingDirectory string) {
 	linuxCommand += " 2>&1"
 	cmd := exec.Command("bash", "-c", linuxCommand)
 	cmd.Dir = workingDirectory
+	cmd.Env = append(os.Environ(),
+		"TERM=vt100",
+		"LINES=24",
+		"COLUMNS=80",
+	)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fmt.Printf("Failed to set stdout\n")
@@ -99,11 +104,6 @@ func execCommand(linuxCommand string, workingDirectory string) {
 	outputComplete := make(chan bool)
 	inputComplete := make(chan bool)
 	userCancelled := make(chan bool)
-
-	if linuxCommand == "openssl" {
-		fmt.Printf("\nSending help command...\n")
-		io.WriteString(stdin, "help\n")
-	}
 
 	go getStdin(stdin, outputComplete, inputComplete, userCancelled)
 	go getStdout(stdout, outputComplete, userCancelled)
@@ -144,7 +144,7 @@ func getStdout(stdout io.ReadCloser, outputComplete chan bool, userCancelled cha
 			}
 			if n > 0 {
 				b := bb[0]
-				sendCharacter(b)
+				comm.SendCharacter(b)
 			}
 		}
 	}
@@ -160,14 +160,18 @@ func getStdin(stdin io.WriteCloser, done chan bool, inputComplete chan bool, use
 		default:
 			b, err := comm.ReadByte()
 			if err == nil {
-				if b == 3 {
+				if b == 0x03 {
 					stdin.Close()
 					userCancelled <- true
 					return
 				}
-				if b == 13 {
-					b = 10
+				if b == 0x0d {
+					b = 0x0a
 				}
+				if b == 0x0b {
+					b = 'k'
+				}
+
 				fmt.Printf("%c", b)
 				io.WriteString(stdin, string(b))
 			}
@@ -219,18 +223,4 @@ func a2wifiSelect(linuxCommand string) (string, error) {
 		"sudo mv /tmp/wpa_supplicant.conf /etc/wpa_supplicant/; " +
 		"sudo wpa_cli -i wlan0 reconfigure"
 	return linuxCommand, nil
-}
-
-func sendCharacter(b byte) {
-	fmt.Print(string(b))
-	if b == 10 { // convert LF to CR for Apple II compatiblity
-		b = 13
-	}
-	if b == 9 { // convert TAB to spaces
-		b = ' '
-		b += 128
-		comm.WriteByte(b)
-	}
-	b |= 128
-	comm.WriteByte(b)
 }

@@ -18,4 +18,5 @@ type A2Io interface {
 	ReadByte() (byte, error)
 	ReadString() (string, error)
 	ReadBlock(buffer []byte) error
+	SendCharacter(character byte)
 }

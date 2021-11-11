@@ -12,7 +12,7 @@ So far, this is a project and not a finished product. The current prototype is o
 ## Features
 1. Boot menu which waits for RPi to be ready
 2. ProDOS bootable drive from image stored on RPi
-3. Execute Linux commands on the RPi from the Apple II
+3. Execute Linux commands on the RPi from the Apple II (has partial VT100 emulation but is buggy and missing the cursor in apps like vim)
 4. Load binary files directly from the RPi to the II
 5. Update Apple II firmware in place from image on RPi
 6. Supports two drive images at the same time (Note: backward compatible with previous firmware but requires firmware update in order to work with two drives)

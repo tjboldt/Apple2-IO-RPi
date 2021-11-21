@@ -27,6 +27,7 @@ ExecCommand = $05
 LoadFileCommand = $06
 SaveFileCommand = $07
 MenuCommand = $08
+ShellCommand = $09
 
 InputString = $fd6a
 StringBuffer = $0200
@@ -43,79 +44,12 @@ ESC = $9b
 
  .org $2000
 Start:
- lda PromptChar
- sta OldPromptChar
- lda #'$'|$80
- sta PromptChar
- lda #ExecCommand
- jsr SendByte
- ldx #$00
-sendHelpCommand:
- lda HelpCommand,x
- cmp #$00
- beq sendHelpCommandEnd
- jsr SendByte
- inx
- bpl sendHelpCommand
-sendHelpCommandEnd:
- lda #$00
- jsr SendByte 
+ jsr $c300 ; force 80 columns
  bit ClearKeyboard
- jsr DumpOutput
-
-Prompt:
- lda #ExecCommand
+ lda #ShellCommand
  jsr SendByte
- ldx #$00
-sendPromptCommand:
- lda PromptCommand,x
- cmp #$00
- beq sendPromptCommandEnd
- jsr SendByte
- inx
- bpl sendPromptCommand
-sendPromptCommandEnd:
- lda #$00
- jsr SendByte 
- bit ClearKeyboard
  jsr DumpOutput
-
-; get input
- jsr InputString
-; check for "exit"
- lda StringBuffer
- cmp #'e'|$80
- bne Execute
- lda StringBuffer+1
- cmp #'x'|$80
- bne Execute
- lda StringBuffer+2
- cmp #'i'|$80
- bne Execute
- lda StringBuffer+3
- cmp #'t'|$80
- bne Execute
- lda OldPromptChar
- sta PromptChar
  rts
-Execute: 
- bit ClearKeyboard
- lda #ExecCommand
- jsr SendByte
- ldy #$00
-sendInput:
- lda $0200,y
- cmp #$8d
- beq sendNullTerminator
- and #$7f
- jsr SendByte
- iny
- bne sendInput
-sendNullTerminator:
- lda #$00
- jsr SendByte
- jsr DumpOutput
- jmp Prompt
 
 DumpOutput:
  jsr GetByte

@@ -21,11 +21,12 @@ import (
 const readBlockCommand = 1
 const writeBlockCommand = 2
 const getTimeCommand = 3
-const changeDriveCommand = 4
+const changeDriveCommand = 4 // not currently used
 const execCommand = 5
 const loadFileCommand = 6
-const saveFileCommand = 7
+const saveFileCommand = 7 // not implemented yet
 const menuCommand = 8
+const shellCommand = 9
 
 func main() {
 	drive1, drive2 := getDriveFiles()
@@ -56,6 +57,8 @@ func main() {
 				handlers.LoadFileCommand()
 			case menuCommand:
 				handlers.MenuCommand()
+			case shellCommand:
+				handlers.ShellCommand()
 			}
 			// temporary workaround for busy wait loop heating up the RPi
 		} else if time.Since(lastCommandTime) > time.Millisecond*100 {

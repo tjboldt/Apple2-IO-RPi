@@ -2,8 +2,7 @@
 // Use of this source code is governed by an MIT
 // license that can be found in the LICENSE file.
 
-// This file is contains the handler for executing Linux and internal
-// commands
+// This file is contains the handler for executing Linux shell
 
 package handlers
 
@@ -14,7 +13,7 @@ import (
 	"github.com/creack/pty"
 )
 
-// ExecCommand handles requests for the Apple II executing Linux commands
+// ShellCommand handles requests for the Apple II executing a Linux shell
 func ShellCommand() {
 	cmd := exec.Command("bash", "-i")
 	cmd.Env = append(os.Environ(),

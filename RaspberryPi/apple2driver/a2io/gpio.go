@@ -318,3 +318,8 @@ func (a2 A2Gpio) WriteBuffer(buffer []byte) error {
 func (a2 A2Gpio) SendCharacter(character byte) {
 	sendCharacter(a2, character)
 }
+
+// ReadCharacter is a pass-through to vt100 implementation
+func (a2 A2Gpio) ReadCharacter() (string, error) {
+	return readCharacter(a2)
+}

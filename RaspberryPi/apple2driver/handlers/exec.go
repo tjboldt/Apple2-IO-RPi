@@ -158,22 +158,15 @@ func getStdin(stdin io.WriteCloser, done chan bool, inputComplete chan bool, use
 			inputComplete <- true
 			return
 		default:
-			b, err := comm.ReadByte()
+			s, err := comm.ReadCharacter()
 			if err == nil {
-				if b == 0x03 {
-					stdin.Close()
-					userCancelled <- true
-					return
-				}
-				if b == 0x0d {
-					b = 0x0a
-				}
-				if b == 0x0b {
-					b = 'k'
-				}
-
-				fmt.Printf("%c", b)
-				io.WriteString(stdin, string(b))
+				// if b == 0x03 {
+				// 	stdin.Close()
+				// 	userCancelled <- true
+				// 	return
+				// }
+				//fmt.Printf("%s", s)
+				io.WriteString(stdin, string(s))
 			}
 		}
 	}

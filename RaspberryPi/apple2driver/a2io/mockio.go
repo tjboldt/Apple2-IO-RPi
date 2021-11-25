@@ -105,3 +105,8 @@ func (mockIo MockIo) ReadBlock(buffer []byte) error {
 func (mockIo MockIo) SendCharacter(character byte) {
 	sendCharacter(mockIo, character)
 }
+
+// ReadCharacter is a pass-through to vt100 implementation
+func (mockIo MockIo) ReadCharacter() (string, error) {
+	return readCharacter(mockIo)
+}

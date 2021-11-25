@@ -82,3 +82,8 @@ func (userIo UserIo) ReadBlock(buffer []byte) error {
 func (userIo UserIo) SendCharacter(character byte) {
 	sendCharacter(userIo, character)
 }
+
+// ReadCharacter is a pass-through to vt100 implementation
+func (userIo UserIo) ReadCharacter() (string, error) {
+	return readCharacter(userIo)
+}

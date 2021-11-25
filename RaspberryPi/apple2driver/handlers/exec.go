@@ -117,7 +117,6 @@ func execCommand(linuxCommand string, workingDirectory string) {
 			return
 		case <-userCancelled:
 			userCancelled <- true
-			comm.WriteString("^C\r")
 			cmd.Process.Kill()
 			return
 		case <-inputComplete:
@@ -132,6 +131,7 @@ func getStdout(stdout io.ReadCloser, outputComplete chan bool, userCancelled cha
 	for {
 		select {
 		case <-userCancelled:
+			fmt.Printf("User Cancelled stdout\n")
 			stdout.Close()
 			return
 		default:
@@ -158,22 +158,15 @@ func getStdin(stdin io.WriteCloser, done chan bool, inputComplete chan bool, use
 			inputComplete <- true
 			return
 		default:
-			b, err := comm.ReadByte()
+			s, err := comm.ReadCharacter()
 			if err == nil {
-				if b == 0x03 {
+				if s == string(byte(0x00)) {
 					stdin.Close()
 					userCancelled <- true
+					fmt.Printf("\nUser cancelled stdin\n")
 					return
 				}
-				if b == 0x0d {
-					b = 0x0a
-				}
-				if b == 0x0b {
-					b = 'k'
-				}
-
-				fmt.Printf("%c", b)
-				io.WriteString(stdin, string(b))
+				io.WriteString(stdin, string(s))
 			}
 		}
 	}

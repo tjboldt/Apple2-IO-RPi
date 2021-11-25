@@ -37,8 +37,15 @@ ClearKeyboard = $c010
 Home = $fc58
 Wait = $fca8
 PromptChar = $33
+Read80Col = $c01f
+TextPage1 = $c054
+TextPage2 = $c055
+
 htab = $24
 vtab = $25
+BasL = $28
+htab80 = $057b
+BasCalc = $fbc1
 
 ESC = $9b
 
@@ -56,6 +63,9 @@ DumpOutput:
  bcs checkInput
  cmp #$00
  beq endOutput
+ pha
+ jsr InvertChar
+ pla
  cmp #'H'
  beq setColumn
  cmp #'V'
@@ -65,8 +75,11 @@ DumpOutput:
  cmp #'T'
  beq setTop
  cmp #'B'
- beq setBottom 
+ beq setBottom
+ cmp #'U'
+ beq moveUp
  jsr PrintChar
+ jsr InvertChar
  jmp DumpOutput
 checkInput:
  bit Keyboard ;check for keypress
@@ -80,25 +93,35 @@ endOutput:
  rts
 clearScreen:
  jsr Home
+ jsr InvertChar
  jmp DumpOutput
 setColumn:
  jsr GetByte
  sta htab
- sta $057B
+ sta htab80
+ jsr InvertChar
  jmp DumpOutput
 setRow:
  jsr GetByte
  sta vtab
- jsr $fbc1 ; bascalc
- sta $28 ;basl
+ jsr BasCalc
+ jsr InvertChar
  jmp DumpOutput
 setTop:
  jsr GetByte
  sta $22
+ jsr InvertChar
  jmp DumpOutput
 setBottom:
  jsr GetByte
  sta $23
+ jsr InvertChar
+ jmp DumpOutput
+moveUp:
+ dec vtab
+ lda vtab
+ jsr BasCalc
+ jsr InvertChar
  jmp DumpOutput
 
 SendByte:
@@ -148,9 +171,26 @@ finishRead:
 end:
  rts
 
+InvertChar:
+ lda htab80 ;get horizontal location / 2
+ lsr
+ tay
+ lda TextPage2
+ bcc invert
+ lda TextPage1
+invert:
+ lda (BasL),y
+ eor #$80
+ sta (BasL),y
+ lda TextPage1
+screen40:
+ rts
+
 HelpCommand:
 .byte	"a2help",$00
 PromptCommand:
 .byte   "a2prompt",$00
 OldPromptChar:
 .byte   "]"
+DrawCursor:
+.byte $80

@@ -7,6 +7,7 @@
 package handlers
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -41,14 +42,14 @@ func ShellCommand() {
 	for {
 		select {
 		case <-outputComplete:
-			outputComplete <- true
-			cmd.Wait()
+			ptmx.Close()
 			comm.WriteByte(0)
 			return
 		case <-userCancelled:
-			userCancelled <- true
-			comm.WriteString("^C\r")
+			fmt.Printf("User cancelled, killing process\n")
+			ptmx.Close()
 			cmd.Process.Kill()
+			comm.WriteByte(0)
 			return
 		case <-inputComplete:
 			cmd.Wait()

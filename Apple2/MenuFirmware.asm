@@ -16,6 +16,7 @@ OutputByte = $c08d+SLOT*$10
 InputFlags = $c08b+SLOT*$10
 OutputFlags = $c087+SLOT*$10
 
+ResetCommand = $00
 ReadBlockCommand = $01
 WriteBlockCommand = $02
 GetTimeCommand = $03
@@ -29,6 +30,11 @@ Wait = $fca8
 PrintChar = $fded
 Home = $fc58
 ReadChar = $fd0c
+BasCalc = $fbc1
+htab = $24
+vtab = $25
+BasL = $28
+htab80 = $057b
 
  .org SLOT*$100 + $C000
 ;ID bytes for booting and drive detection
@@ -57,7 +63,10 @@ Start:
  sta $36
  lda #$fd
  sta $37
- jsr Home	;clear screen and show menu options
+ ;jsr Home	;clear screen and show menu options
+ lda #$10
+ sta vtab
+ jsr BasCalc
  ldy #$00
 PrintString:
  lda Text,y
@@ -70,36 +79,36 @@ PrintString:
 WaitForRPi:
  lda InputFlags
  rol
- bcs OK
+ bcs Reset
  lda #$ff
  jsr Wait
  lda #'.'+$80
  jsr PrintChar
  jmp WaitForRPi
 
-OK:
- jsr Home ;clear screen
-
- lda #MenuCommand ;request menu text from RPi
- jsr SendByte
-
-DumpOutput:
- jsr GetByte
- cmp #$00
- beq GetChar
+Reset:
+ lda #'_'|$80
  jsr PrintChar
- clc
- bcc DumpOutput
+ lda #ResetCommand
+ jsr SendByte
+ lda #$88
+ jsr PrintChar
+ lda #'.'|$80
+ jsr PrintChar
+ jsr GetByte
+ beq Ok
+ jmp Reset
 
-GetChar: 
- jsr ReadChar
- sec	;subtract ascii "1" to get 0 - 3 from "1" to "4"
- sbc #$b1
- asl	;put in top nibble as EPROM page 
- asl
- asl
- asl
- ora #$0f ;set all flags high
+Ok:
+ lda #$8D
+ jsr PrintChar
+ lda #'O'|$80
+ jsr PrintChar
+ lda #'K'|$80
+ jsr PrintChar
+
+Boot:
+ lda #$0f 
  jmp PageJump
 
 SendByte:

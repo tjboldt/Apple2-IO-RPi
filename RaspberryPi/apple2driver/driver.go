@@ -18,6 +18,7 @@ import (
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/handlers"
 )
 
+const resetCommand = 0
 const readBlockCommand = 1
 const writeBlockCommand = 2
 const getTimeCommand = 3
@@ -40,11 +41,16 @@ func main() {
 
 	lastCommandTime := time.Now()
 
+	// In case Apple II is waiting, send 0 byte to start
+	comm.WriteByte(0)
+
 	for {
 		command, err := comm.ReadByte()
 		if err == nil {
 			lastCommandTime = time.Now()
 			switch command {
+			case resetCommand:
+				handlers.ResetCommand()
 			case readBlockCommand:
 				handlers.ReadBlockCommand(drive1, drive2)
 			case writeBlockCommand:

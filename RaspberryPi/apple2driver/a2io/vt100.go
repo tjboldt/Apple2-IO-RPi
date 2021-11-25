@@ -73,19 +73,27 @@ func sendCharacter(comm A2Io, b byte) {
 			switch b {
 			// Set cursor location
 			case 'H', 'f':
-				var ignore string
-				fmt.Sscanf(escapeSequence, "^[[%d;%d%s", &vtab, &htab, &ignore)
-				htab--
-				vtab--
-				if htab < 0 {
+				if escapeSequence == "^[[H" || escapeSequence ==  "^[[;H" {
 					htab = 0
+					vtab = 0
+					comm.WriteByte(0x19) // ^Y moves to home position
+					fmt.Printf("Home: %s\n", escapeSequence)
+					escapeSequence = ""
+				} else {
+					var ignore string
+					fmt.Sscanf(escapeSequence, "^[[%d;%d%s", &vtab, &htab, &ignore)
+					htab--
+					vtab--
+					if htab < 0 {
+						htab = 0
+					}
+					comm.WriteByte('H')
+					comm.WriteByte(byte(htab))
+					comm.WriteByte('V')
+					comm.WriteByte(byte(vtab))
+					fmt.Printf("Set Cursor (%d, %d): %s\n", htab, vtab, escapeSequence)
+					escapeSequence = ""
 				}
-				comm.WriteByte('H')
-				comm.WriteByte(byte(htab))
-				comm.WriteByte('V')
-				comm.WriteByte(byte(vtab))
-				fmt.Printf("Set Cursor (%d, %d): %s\n", htab, vtab, escapeSequence)
-				escapeSequence = ""
 			case 'r':
 				fmt.Sscanf(escapeSequence, "^[[%d;%dr", &windowTop, &windowBottom)
 				windowTop--
@@ -176,7 +184,7 @@ func sendCharacter(comm A2Io, b byte) {
 				fmt.Printf("End application mode: %s\n", escapeSequence)
 				escapeSequence = ""
 			// Tab to home position
-			case "^[[H", "^[[;H", "^[[f", "^[[;f":
+			case "^[[f", "^[[;f":
 				htab = 0
 				vtab = 0
 				comm.WriteByte(0x19) // ^Y moves to home position
@@ -189,7 +197,6 @@ func sendCharacter(comm A2Io, b byte) {
 				comm.WriteByte(0x0c) // ^L clears the screen
 				fmt.Printf("Clear screen: %s\n", escapeSequence)
 				escapeSequence = ""
-			// Move down one line
 			case "^[E":
 				comm.WriteByte(0x0A) // ^J moves cursor down
 				fmt.Printf("Move down: %s\n", escapeSequence)
@@ -198,16 +205,18 @@ func sendCharacter(comm A2Io, b byte) {
 				comm.WriteByte(0x17) // ^W scrolls up
 				fmt.Printf("Scroll up: %s\n", escapeSequence)
 				escapeSequence = ""
-			// Clear line to the right
 			case "^[[K", "^[[0K":
 				comm.WriteByte(0x1d) // ^] clears to end of line
 				fmt.Printf("Clear line right: %s\n", escapeSequence)
+				escapeSequence = ""
+			case "^[[2K":
+				comm.WriteByte(0x1a) // ^Z clears line
+				fmt.Printf("Clear line: %s\n", escapeSequence)
 				escapeSequence = ""
 			case "^[M":
 				comm.WriteByte(0x16) // ^V scrolls down
 				fmt.Printf("Scroll down: %s\n", escapeSequence)
 				escapeSequence = ""
-			// Clear screen below cursor
 			case "^[[J":
 				comm.WriteByte(0x0b) // ^K clears to end of screen
 				fmt.Printf("Clear below cursor: %s\n", escapeSequence)

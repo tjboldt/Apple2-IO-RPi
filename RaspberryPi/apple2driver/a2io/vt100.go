@@ -87,6 +87,9 @@ func sendCharacter(comm A2Io, b byte) {
 					if htab < 0 {
 						htab = 0
 					}
+					if vtab > 23 {
+						vtab = 23
+					}
 					comm.WriteByte('H')
 					comm.WriteByte(byte(htab))
 					comm.WriteByte('V')
@@ -171,7 +174,7 @@ func sendCharacter(comm A2Io, b byte) {
 			// Set/clear application mode for cursor
 			case "^[[?1h":
 				applicationMode = true
-				comm.WriteByte(0x0c) // ^L clears the screen
+				//comm.WriteByte(0x0c) // ^L clears the screen
 				fmt.Printf("Start application mode: %s\n", escapeSequence)
 				escapeSequence = ""
 			case "^[[?1l":
@@ -180,7 +183,7 @@ func sendCharacter(comm A2Io, b byte) {
 				comm.WriteByte(0x00)
 				comm.WriteByte('B')
 				comm.WriteByte(0x18)
-				comm.WriteByte(0x0c) // ^L clears the screen
+				//comm.WriteByte(0x0c) // ^L clears the screen
 				fmt.Printf("End application mode: %s\n", escapeSequence)
 				escapeSequence = ""
 			// Tab to home position
@@ -226,7 +229,7 @@ func sendCharacter(comm A2Io, b byte) {
 				fmt.Printf("Inverse: %s\n", escapeSequence)
 				escapeSequence = ""
 			case "^[[m", "^[[0m":
-				//comm.WriteByte(0x0e) // ^N normal video
+				comm.WriteByte(0x0e) // ^N normal video
 				fmt.Printf("Normal: %s\n", escapeSequence)
 				escapeSequence = ""
 			}

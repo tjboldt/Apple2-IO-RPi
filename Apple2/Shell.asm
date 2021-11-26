@@ -110,12 +110,10 @@ setRow:
 setTop:
  jsr GetByte
  sta $22
- jsr InvertChar
  jmp DumpOutput
 setBottom:
  jsr GetByte
  sta $23
- jsr InvertChar
  jmp DumpOutput
 moveUp:
  dec vtab

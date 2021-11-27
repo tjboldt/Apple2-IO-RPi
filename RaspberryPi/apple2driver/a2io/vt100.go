@@ -20,35 +20,27 @@ func sendCharacter(comm A2Io, b byte) {
 		escapeSequence = "^["
 		return
 	}
-	if b == 13 {
-		// fmt.Printf("\nCR\n")
+	if b == 0x0d {
 		comm.WriteByte('H')
 		comm.WriteByte(0)
 		return
 	}
 	if b > 0x0d && b < 0x20 || b > 0x80 && b < 0xa0 {
-		// fmt.Printf("Control code: %02X\n", b)
 		return
 	}
 	if b >= 0xa0 {
 		comm.WriteByte('+' | 0x80)
-		// fmt.Printf("Code: %02X\n", b)
 		return
-	}
-	if len(escapeSequence) == 0 {
-		fmt.Printf("%c", b)
 	}
 	if len(escapeSequence) > 0 {
 		// Parse the escape codes that don't end with a letter
 		escapeSequence += string(b)
 		if escapeSequence == "^[]" {
-			// fmt.Printf("Start operating system sequence\n")
 			operatingSystemSequence = true
 			return
 		}
 		if operatingSystemSequence {
 			if b == 0x07 {
-				// fmt.Printf("Operating system sequence: %s\n", escapeSequence)
 				operatingSystemSequence = false
 				escapeSequence = ""
 			}
@@ -72,58 +64,54 @@ func sendCharacter(comm A2Io, b byte) {
 			// Set/clear application mode for cursor
 			case "^[[?1h":
 				//applicationMode = true
-				// fmt.Printf("Start application mode: %s\n", escapeSequence)
 				escapeSequence = ""
+				return
 			case "^[[?1l":
 				//applicationMode = false
 				comm.WriteByte('T')
 				comm.WriteByte(0x00)
 				comm.WriteByte('B')
 				comm.WriteByte(0x18)
-				// fmt.Printf("End application mode: %s\n", escapeSequence)
 				escapeSequence = ""
+				return
 			// Tab to home position
 			case "^[[f", "^[[;f":
 				comm.WriteByte(0x19) // ^Y moves to home position
-				// fmt.Printf("Home: %s\n", escapeSequence)
 				escapeSequence = ""
+				return
 			// Clear screen
 			case "^[[2J", "^[[c":
 				comm.WriteByte(0x0c) // ^L clears the screen
-				// fmt.Printf("Clear screen: %s\n", escapeSequence)
 				escapeSequence = ""
-			case "^[E":
-				comm.WriteByte(0x0A) // ^J moves cursor down
-				// fmt.Printf("Move down: %s\n", escapeSequence)
-				escapeSequence = ""
+				return
 			case "^[D":
 				comm.WriteByte(0x17) // ^W scrolls up
-				// fmt.Printf("Scroll up: %s\n", escapeSequence)
 				escapeSequence = ""
+				return
 			case "^[[K", "^[[0K":
 				comm.WriteByte(0x1d) // ^] clears to end of line
-				// fmt.Printf("Clear line right: %s\n", escapeSequence)
 				escapeSequence = ""
+				return
 			case "^[[2K":
 				comm.WriteByte(0x1a) // ^Z clears line
-				// fmt.Printf("Clear line: %s\n", escapeSequence)
 				escapeSequence = ""
+				return
 			case "^[M":
 				comm.WriteByte(0x16) // ^V scrolls down
-				// fmt.Printf("Scroll down: %s\n", escapeSequence)
 				escapeSequence = ""
+				return
 			case "^[[J":
 				comm.WriteByte(0x0b) // ^K clears to end of screen
-				// fmt.Printf("Clear below cursor: %s\n", escapeSequence)
 				escapeSequence = ""
+				return
 			case "^[[7m":
 				comm.WriteByte(0x0f) // ^O inverse video
-				// fmt.Printf("Inverse: %s\n", escapeSequence)
 				escapeSequence = ""
+				return
 			case "^[[m", "^[[0m", "^[[0;7m", "^[[0;1m":
 				comm.WriteByte(0x0e) // ^N normal video
-				// fmt.Printf("Normal: %s\n", escapeSequence)
 				escapeSequence = ""
+				return
 			}
 
 			// Parse escape codes that need further parsing
@@ -132,7 +120,6 @@ func sendCharacter(comm A2Io, b byte) {
 			case 'H', 'f':
 				if escapeSequence == "^[[H" || escapeSequence == "^[[;H" {
 					comm.WriteByte(0x19) // ^Y moves to home position
-					// fmt.Printf("Home: %s\n", escapeSequence)
 					escapeSequence = ""
 				} else {
 					var ignore string
@@ -150,7 +137,6 @@ func sendCharacter(comm A2Io, b byte) {
 					comm.WriteByte(byte(htab))
 					comm.WriteByte('V')
 					comm.WriteByte(byte(vtab))
-					// fmt.Printf("Set Cursor (%d, %d): %s\n", htab, vtab, escapeSequence)
 					escapeSequence = ""
 				}
 			case 'r':
@@ -160,19 +146,16 @@ func sendCharacter(comm A2Io, b byte) {
 				comm.WriteByte(byte(windowTop))
 				comm.WriteByte('B')
 				comm.WriteByte(byte(windowBottom))
-				// fmt.Printf("Set Window (%d, %d): %s\n", windowTop, windowBottom, escapeSequence)
 				escapeSequence = ""
 			case 'A':
 				if escapeSequence == "^[[A" || escapeSequence == "^[A" {
 					comm.WriteByte('U')
-					// fmt.Printf("Up: %s\n", escapeSequence)
 				} else {
 					var up int
 					fmt.Sscanf(escapeSequence, "^[[%dA", &up)
 					for i := 0; i < up; i++ {
 						comm.WriteByte('U')
 					}
-					// fmt.Printf("Up (%d): %s\n", up, escapeSequence)
 				}
 				escapeSequence = ""
 			case 'B':
@@ -180,40 +163,34 @@ func sendCharacter(comm A2Io, b byte) {
 					escapeSequence = ""
 				} else if escapeSequence == "^[[B" {
 					comm.WriteByte(0x0a)
-					// fmt.Printf("Down: %s\n", escapeSequence)
 				} else {
 					var down int
 					fmt.Sscanf(escapeSequence, "^[[%dB", &down)
 					for i := 0; i < down; i++ {
 						comm.WriteByte(0x0a)
 					}
-					// fmt.Printf("Down (%d): %s\n", down, escapeSequence)
 				}
 				escapeSequence = ""
 			case 'C':
 				if escapeSequence == "^[[C" || escapeSequence == "^[C" {
 					comm.WriteByte(0x1c)
-					// fmt.Printf("Right: %s\n", escapeSequence)
 				} else {
 					var right int
 					fmt.Sscanf(escapeSequence, "^[[%dC", &right)
 					for i := 0; i < right; i++ {
 						comm.WriteByte(0x1c)
 					}
-					// fmt.Printf("Right (%d): %s\n", right, escapeSequence)
 				}
 				escapeSequence = ""
 			case 'D':
-				if escapeSequence == "^[[D" || escapeSequence == "^[D" {
+				if escapeSequence == "^[[D" {
 					comm.WriteByte(0x08)
-					// fmt.Printf("Left: %s\n", escapeSequence)
 				} else {
 					var left int
 					fmt.Sscanf(escapeSequence, "^[[%dD", &left)
 					for i := 0; i < left; i++ {
 						comm.WriteByte(0x08)
 					}
-					// fmt.Printf("Left (%d): %s\n", left, escapeSequence)
 				}
 				escapeSequence = ""
 			}
@@ -225,7 +202,6 @@ func sendCharacter(comm A2Io, b byte) {
 		}
 		return
 	}
-	//fmt.Print(string(b))
 	switch b {
 	// convert LF to CR for Apple II compatiblity
 	case 10:

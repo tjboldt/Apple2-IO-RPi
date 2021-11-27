@@ -21,11 +21,11 @@ func ShellCommand() {
 	cmd.Env = append(os.Environ(),
 		"TERM=vt100",
 		"LINES=24",
-		"COLUMNS=80",
+		"COLUMNS=79",
 	)
 
 	var ws pty.Winsize
-	ws.Cols = 80
+	ws.Cols = 79
 	ws.Rows = 24
 	ws.X = 0
 	ws.Y = 0

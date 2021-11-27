@@ -7,7 +7,7 @@ Apple II expansion card using a Raspberry Pi for I/O
 The purpose of this project is to provide I/O for an Apple II series 8 bit computer via a Raspberry Pi Zero W which is powered by the Apple II expansion bus. This includes using the attached RPi Zero W for it's storage, network and processor to provide new functionality for the Apple II.
 
 ## Project Status
-So far, this is a project and not a finished product. The current prototype is on the fifth revision and a few have been assembled and tested. It is now possible for the Apple II to boot from and write to a virutal hard drive image stored on the RPi in any slot and execute simple commands on the RPi via the Apple II. The code has very few tests and is incomplete. Note that currently the firmware assumes an 80 column card is in slot 3 and than you have lowercase support. If you have a problem or idea for enhancement, log an issue [here](https://github.com/tjboldt/Apple2-IO-RPi/issues). I recommend starring/watching the project for updates on GitHub. You are welcome to fork the project and submit pull requests which I will review.
+So far, this is a project and not a finished product. The current prototype is on the fifth revision and a few have been assembled and tested. It is now possible for the Apple II to boot from and write to a virutal hard drive image stored on the RPi in any slot and run a bash shell on the RPi via the Apple II. The code has very few tests and is incomplete. Note that currently the firmware assumes an 80 column card is in slot 3 and than you have lowercase support. If you have a problem or idea for enhancement, log an issue [here](https://github.com/tjboldt/Apple2-IO-RPi/issues). I recommend starring/watching the project for updates on GitHub. You are welcome to fork the project and submit pull requests which I will review.
 
 ## Features
 1. Boot message which waits for RPi to be ready
@@ -97,7 +97,7 @@ This must be done via ssh directly into the RPi:
 7. `cd ProDOS-Utilities`
 8. `cd ~/Apple2-IO-RPi/RaspberryPi/apple2driver`
 9. `go build`
-10. Edit the Driver autostart via cronjob (`crontab -e` then edit the line to be `@reboot /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver -d1 YOUR_DRIVE.hdv -d2 /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.hdv > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log`) or simply `@reboot /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log` if you don't need your own drive image.
+10. Edit the Driver autostart via cronjob (`crontab -e` then edit the line to be `@reboot . /home/pi/.profile; /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver -d1 YOUR_DRIVE.hdv -d2 /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.hdv > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log`) or simply `@reboot /home/pi/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver > /home/pi/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.log` if you don't need your own drive image.
 
 ## Similar Project
 If you prefer having Apple II peripherals control a Raspberry Pi rather than simply using the Raspberry Pi to provide storage, network access and processing to the Apple II, have a look at David Schmenk's excellent [Apple2Pi](https://github.com/dschmenk/apple2pi) project. 

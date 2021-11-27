@@ -46,8 +46,12 @@ func ExecCommand() {
 		a2help()
 		return
 	}
+	if linuxCommand == "a2lower" {
+		a2lower(false)
+		return
+	}
 	if linuxCommand == "A2LOWER" {
-		a2lower()
+		a2lower(true)
 		return
 	}
 	if linuxCommand == "a2wifi" {
@@ -158,15 +162,16 @@ func getStdin(stdin io.WriteCloser, done chan bool, inputComplete chan bool, use
 			inputComplete <- true
 			return
 		default:
-			s, err := comm.ReadCharacter()
+			b, err := comm.ReadByte()
 			if err == nil {
-				if s == string(byte(0x00)) {
+				if b == 0x00 || b == 0x03 {
 					stdin.Close()
 					userCancelled <- true
 					fmt.Printf("\nUser cancelled stdin\n")
 					return
 				}
-				io.WriteString(stdin, string(s))
+				bb := make([]byte, 1)
+				stdin.Write(bb)
 			}
 		}
 	}
@@ -174,20 +179,18 @@ func getStdin(stdin io.WriteCloser, done chan bool, inputComplete chan bool, use
 
 func a2help() {
 	comm.WriteString("\r" +
-		"This is a pseudo shell. Each command is executed as a process. The cd command\r" +
-		"is intercepted and sets the working directory for the next command. The exit\r" +
-		"command will exit the shell when not running from firmware.\r" +
-		"\r" +
 		"Built-in commands:\r" +
+		"------------------\r" +
 		"a2help - display this message\r" +
 		"a2wifi - set up wifi\r" +
 		"A2LOWER - force lowercase for II+\r" +
+		"a2lower - disable force lowercase for II+\r" +
 		"\r")
 }
 
-func a2lower() {
-	forceLowercase = true
-	comm.WriteString("All commands will be converted to lowercase\r")
+func a2lower(enable bool) {
+	forceLowercase = enable
+	comm.WriteString(fmt.Sprintf("All commands will be converted to lowercase: %t\r", forceLowercase))
 }
 
 func a2wifi() {

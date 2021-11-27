@@ -19,6 +19,7 @@ OutputByte = $c08d+SLOT*$10
 InputFlags = $c08b+SLOT*$10
 OutputFlags = $c087+SLOT*$10
 
+ResetCommand = $00
 ReadBlockCommand = $01
 WriteBlockCommand = $02
 GetTimeCommand = $03
@@ -47,15 +48,23 @@ BasL = $28
 htab80 = $057b
 BasCalc = $fbc1
 
+LastChar = $06
+
 ESC = $9b
 
  .org $2000
 Start:
  jsr $c300 ; force 80 columns
+ lda LastChar
+ pha
  bit ClearKeyboard
+ lda #ResetCommand
+ jsr SendByte
  lda #ShellCommand
  jsr SendByte
  jsr DumpOutput
+ pla
+ sta LastChar
  rts
 
 DumpOutput:
@@ -64,7 +73,7 @@ DumpOutput:
  cmp #$00
  beq endOutput
  pha
- jsr InvertChar
+ jsr ClearCursor
  pla
  cmp #'H'
  beq setColumn
@@ -79,7 +88,7 @@ DumpOutput:
  cmp #'U'
  beq moveUp
  jsr PrintChar
- jsr InvertChar
+ jsr SetCursor
  jmp DumpOutput
 checkInput:
  bit Keyboard ;check for keypress
@@ -93,19 +102,19 @@ endOutput:
  rts
 clearScreen:
  jsr Home
- jsr InvertChar
+ jsr SetCursor
  jmp DumpOutput
 setColumn:
  jsr GetByte
  sta htab
  sta htab80
- jsr InvertChar
+ jsr SetCursor
  jmp DumpOutput
 setRow:
  jsr GetByte
  sta vtab
  jsr BasCalc
- jsr InvertChar
+ jsr SetCursor
  jmp DumpOutput
 setTop:
  jsr GetByte
@@ -119,7 +128,7 @@ moveUp:
  dec vtab
  lda vtab
  jsr BasCalc
- jsr InvertChar
+ jsr SetCursor
  jmp DumpOutput
 
 SendByte:
@@ -143,6 +152,8 @@ finishWrite:
  rts
 
 GetByte:
+ bit Keyboard ; skip byte read if key pressed
+ bcc keyPressed
  lda #$1d ;set read flag low
  sta OutputFlags
 waitRead:
@@ -151,6 +162,7 @@ waitRead:
  bcc readByte
  bit Keyboard ;keypress will abort waiting to read
  bpl waitRead
+keyPressed:
  lda #$1f ;set all flags high and exit
  sta OutputFlags
  sec ;failure
@@ -169,26 +181,47 @@ finishRead:
 end:
  rts
 
-InvertChar:
+SetCursor:
  lda htab80 ;get horizontal location / 2
  lsr
  tay
  lda TextPage2
- bcc invert
+ bcc setChar
  lda TextPage1
-invert:
+setChar:
  lda (BasL),y
+ sta LastChar ; save so ClearCursor will pick it up
+ cmp #$e0
+ bpl lowerCase
+ cmp #$c0
+ bpl upperCase
+ cmp #$a0
+ bpl symbol
+ cmp #$80
+ bpl noop
+symbol:
+lowerCase:
+invert:
  eor #$80
+ jmp storeChar
+upperCase:
+ and #$1f
+ jmp storeChar
+noop:
+storeChar:
  sta (BasL),y
  lda TextPage1
-screen40:
  rts
 
-HelpCommand:
-.byte	"a2help",$00
-PromptCommand:
-.byte   "a2prompt",$00
-OldPromptChar:
-.byte   "]"
-DrawCursor:
-.byte $80
+ClearCursor:
+ lda htab80 ;get horizontal location / 2
+ lsr
+ tay
+ lda TextPage2
+ bcc restoreChar
+ lda TextPage1
+restoreChar:
+ lda LastChar 
+ sta (BasL),y
+ lda TextPage1
+ rts

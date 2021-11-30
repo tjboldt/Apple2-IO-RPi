@@ -22,13 +22,14 @@ So far, this is a project and not a finished product. The current prototype is o
     1. RPI - Execute a single Linux command
     2. SH - Open a Linux shell
     3. WGET - Download and save to file 
-2. Proper ProDOS clock driver (currently just directly sets values on block reads)
-3. Bi-directional image conversion between common formats and HIRES
-4. Remote code execution 
-5. Proxy VNC connection, rendering as Apple II compatible graphics
+2. Shell improvements
+3. Proper ProDOS clock driver (currently just directly sets values on block reads)
+4. Bi-directional image conversion between common formats and HIRES
+5. Remote code execution 
+6. Proxy VNC connection, rendering as Apple II compatible graphics
 
 ## Setup starting from scratch
-1. Have PCBs made from the gerber and drill files in the Hardware folder or email me for a blank or fully assembled board
+1. Have PCBs made from [PCBWay](https://www.pcbway.com/project/shareproject/Apple2_IO_RPi_v5.html) or from the gerber and drill files in the Hardware folder or email me for a blank or fully assembled board
 2. Solder chips, header and capacitors in place
 3. Attach Raspberry Pi Zero W facing outward from the card
 4. Install [Raspberry Pi OS](https://www.raspberrypi.org/software/) on microSD card
@@ -63,12 +64,14 @@ So far, this is a project and not a finished product. The current prototype is o
 1. Put in any slot (slot 7 preferred as it is the first to boot)
 2. Turn on your Apple II
 3. Wait for the RPi to start up (will show ... until it connects)
-4. Select `2` from the menu to run a command
-5. Type `a2wifi list` to check that you have a wireless network in range
-6. Type `a2wifi select YOUR_SSID YOUR_PASSWORD` to connect the RPi to your network
-7. Once connected, you should be able to ssh to the RPi from any computer if you want. From a Mac or Linux (or Windows with Bash) shell, type `ssh pi@raspberrypi`. The default password is `raspberry`. 
-8. Rebooting the Apple II, you can then select `1` from the menu and it will boot to ProDOS 2.4.2 and you will have a mostly blank 32 MB drive with a couple of utilities for updating firmware and such.
-9. Star and Watch this repo on GitHub for the latest updates
+4. After ProDOS boots, type `-SHELL`
+5. Type `sudo vim /etc/wpa_supplicant/wpa_supplicant.conf`
+6. Use `h j k l` keys to navigate, `i` to insert text and `ESC` to go back to navigation more
+7. Enter your wifi information
+8. Press `ESC:wq` to save and quit
+9. Type `sudo reboot`
+10. Restart Apple II
+11. Star and Watch this repo on GitHub for the latest updates
 
 ## Update
 1. Restart Apple II

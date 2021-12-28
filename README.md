@@ -16,10 +16,11 @@ So far, this is a project and not a finished product. The current prototype is o
 4. Load binary files directly from the RPi to the II
 5. Update Apple II firmware in place from image on RPi
 6. Supports two drive images at the same time (Note: backward compatible with previous firmware but requires firmware update in order to work with two drives)
+7. Supports "RPI" command from BASIC to execute Linux commands from the command prompt or inside BASIC programs: `10 PRINT CHR$(4);"RPI ls -al /"`
 
 ## Roadmap
 1. Extend BASIC.SYSTEM commands
-    1. RPI - Execute a single Linux command
+    1. RPI - Execute a single Linux command (DONE)
     2. SH - Open a Linux shell
     3. WGET - Download and save to file 
 2. Shell improvements

@@ -31,6 +31,7 @@ func ExecCommand() {
 	if forceLowercase {
 		linuxCommand = strings.ToLower(linuxCommand)
 	}
+	linuxCommand = strings.Trim(linuxCommand, " ")
 	fmt.Printf("Command to run: %s\n", linuxCommand)
 	if strings.HasPrefix(linuxCommand, "cd ") {
 		workingDirectory = strings.Replace(linuxCommand, "cd ", "", 1)

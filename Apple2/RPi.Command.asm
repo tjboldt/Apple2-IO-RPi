@@ -7,7 +7,7 @@ XTRNADDR   =  $BE50    ;Ext cmd implementation addr.
 XLEN       =  $BE52    ;length of command string-1.
 XCNUM      =  $BE53    ;CI cmd no. (ext cmd - 0).
 PBITS      =  $BE54    ;Command parameter bits.
-XRETURN    =  $BE9E    ;Known RTS instruction.
+XRETURN    =  $FF58    ;Known RTS instruction.
 InputByte = $c0fe
 OutputByte = $c0fd
 InputFlags = $c0fb
@@ -53,10 +53,13 @@ Wait = $fca8
             BNE  NXTCHR      ;No, read next one.
  ;
             LDA  #CMDLEN-1   ;Our cmd! Put cmd length-1
+            ;lda #$8d
+            ;sta $02ff
+            ;lda #$fe
             STA  XLEN        ; in CI global XLEN.
-            LDA  #>XRETURN   ;Point XTRNADDR to a known
+            LDA  #<XRETURN   ;Point XTRNADDR to a known
             STA  XTRNADDR    ; RTS since we'll handle
-            LDA  #<XRETURN   ; at the time we intercept
+            LDA  #>XRETURN   ; at the time we intercept
 
             STA  XTRNADDR+1  ; our command.
             LDA  #0          ;Mark the cmd number as
@@ -105,7 +108,8 @@ skipOutput:
  clc
  bcc DumpOutput
 endOutput:
- rts
+ clc
+ jmp (NXTCMD) 
 
 HelpCommand:
  .byte "a2help",$00
@@ -154,8 +158,6 @@ finishRead:
  bcc finishRead
  pla
  clc ;success
-end:
- clc
  rts
 
 

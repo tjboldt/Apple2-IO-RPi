@@ -200,7 +200,7 @@ func a2lower(enable bool) {
 func a2wifi() {
 	comm.WriteString("\r" +
 		"Usage: a2wifi list\r" +
-		"       a2wifi select SSID PASSWORD\r" +
+		"       a2wifi select SSID PASSWORD REGION\r" +
 		"\r")
 }
 
@@ -210,14 +210,16 @@ func a2wifiList() string {
 
 func a2wifiSelect(linuxCommand string) (string, error) {
 	params := strings.Fields(linuxCommand)
-	if len(params) != 4 {
-		comm.WriteString("\rIncorrect number of parameters. Usage: a2wifi select SSID PASSWORD\r\r")
-		return "", errors.New("Incorrect number of parameters. Usage: a2wifi select SSID PASSWORD")
+	if len(params) != 5 {
+		comm.WriteString("\rIncorrect number of parameters. Usage: a2wifi select SSID PASSWORD REGION\r\r")
+		return "", errors.New("Incorrect number of parameters. Usage: a2wifi select SSID PASSWORD REGION")
 	}
 	ssid := params[2]
 	psk := params[3]
-	linuxCommand = "printf \"country=ca\\nupdate_config=1\\nctrl_interface=/var/run/wpa_supplicant\\n\\nnetwork={\\n  scan_ssid=1\\n  ssid=\\\"%s\\\"\n  psk=\\\"%s\\\"\\n}\\n\" " +
-		ssid + " " +
+	region := params[4]
+	linuxCommand = "printf \"country=%s\\nupdate_config=1\\nctrl_interface=/var/run/wpa_supplicant\\n\\nnetwork={\\n  scan_ssid=1\\n  ssid=\\\"%s\\\"\n  psk=\\\"%s\\\"\\n}\\n\" " +
+		region + " " +
+	        ssid + " " +
 		psk + " " +
 		" > /tmp/wpa_supplicant.conf; " +
 		"sudo mv /tmp/wpa_supplicant.conf /etc/wpa_supplicant/; " +

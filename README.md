@@ -65,14 +65,10 @@ So far, this is a project and not a finished product. The current prototype is o
 1. Put in any slot (slot 7 preferred as it is the first to boot)
 2. Turn on your Apple II
 3. Wait for the RPi to start up (will show ... until it connects)
-4. After ProDOS boots, type `-SHELL`
-5. Type `sudo vim /etc/wpa_supplicant/wpa_supplicant.conf`
-6. Use `h j k l` keys to navigate, `i` to insert text and `ESC` to go back to navigation more
-7. Enter your wifi information
-8. Press `ESC:wq` to save and quit
-9. Type `sudo reboot`
-10. Restart Apple II
-11. Star and Watch this repo on GitHub for the latest updates
+4. After ProDOS boots, type `-RPI.COMMAND`
+5. Type `RPI a2wifi list`
+6. Type `RPI a2wifi select YOUR_SSID YOUR_WIFI_PASSWORD YOUR_TWO_LETTER_COUNTRY_CODE`
+7. Star and Watch this repo on GitHub for the latest updates
 
 ## Update
 1. Restart Apple II

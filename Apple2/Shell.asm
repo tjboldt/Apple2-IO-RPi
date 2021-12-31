@@ -11,13 +11,10 @@ IOError = $27
 NoDevice = $28
 WriteProtect = $2B
 
-; hard code slot to 7 for now, will make it auto-detect later
-SLOT = 7
-
-InputByte = $c08e+SLOT*$10
-OutputByte = $c08d+SLOT*$10
-InputFlags = $c08b+SLOT*$10
-OutputFlags = $c087+SLOT*$10
+InputByte = $c08e
+OutputByte = $c08d
+InputFlags = $c08b
+OutputFlags = $c087
 
 ResetCommand = $00
 ReadBlockCommand = $01
@@ -49,11 +46,46 @@ htab80 = $057b
 BasCalc = $fbc1
 
 LastChar = $06
-
+SlotL = $fe
+SlotH = $ff
 ESC = $9b
 
  .org $2000
+ ldx #$07 ; start at slot 7
+DetectSlot:
+ ldy #$00
+ lda #$fc
+ sta SlotL
+ txa
+ ora #$c0
+ sta SlotH 
+ lda (SlotL),y
+ bne nextSlot
+ iny
+ lda (SlotL),y
+ bne nextSlot
+ iny 
+ lda (SlotL),y
+ cmp #$17
+ bne nextSlot
+ iny
+ lda (SlotL),y
+ cmp #$14
+ bne nextSlot
+ txa
+ asl
+ asl
+ asl
+ asl
+ tax
+ clc
+ bcc Start
+nextSlot:
+ dex
+ bne DetectSlot
+ rts 
 Start:
+ lda #$8d
  jsr $c300 ; force 80 columns
  lda LastChar
  pha
@@ -134,46 +166,46 @@ moveUp:
 SendByte:
  pha 
 waitWrite: 
- lda InputFlags
+ lda InputFlags,x
  rol
  rol 
  bcs waitWrite
  pla
- sta OutputByte
+ sta OutputByte,x
  lda #$1e ; set bit 0 low to indicate write started
- sta OutputFlags 
+ sta OutputFlags,x 
 finishWrite:
- lda InputFlags
+ lda InputFlags,x
  rol
  rol
  bcc finishWrite
  lda #$1f
- sta OutputFlags
+ sta OutputFlags,x
  rts
 
 GetByte:
  bit Keyboard ; skip byte read if key pressed
  bcc keyPressed
  lda #$1d ;set read flag low
- sta OutputFlags
+ sta OutputFlags,x
 waitRead:
- lda InputFlags
+ lda InputFlags,x
  rol
  bcc readByte
  bit Keyboard ;keypress will abort waiting to read
  bpl waitRead
 keyPressed:
  lda #$1f ;set all flags high and exit
- sta OutputFlags
+ sta OutputFlags,x
  sec ;failure
  rts 
 readByte:
- lda InputByte
+ lda InputByte,x
  pha
  lda #$1f ;set all flags high
- sta OutputFlags
+ sta OutputFlags,x
 finishRead:
- lda InputFlags
+ lda InputFlags,x
  rol
  bcc finishRead
  pla

@@ -75,8 +75,7 @@ func ptyOut(stdout io.ReadCloser, outputComplete chan bool, userCancelled chan b
 				outputComplete <- true
 				fmt.Printf("stdout closed\n")
 				return
-			}
-			if n > 0 {
+			} else if n > 0 {
 				b := bb[0]
 				comm.SendCharacter(b)
 			}

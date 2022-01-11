@@ -95,6 +95,8 @@ Start:
  lda #ShellCommand
  jsr SendByte
  jsr DumpOutput
+ lda #ResetCommand
+ jsr SendByte 
  pla
  sta LastChar
  rts

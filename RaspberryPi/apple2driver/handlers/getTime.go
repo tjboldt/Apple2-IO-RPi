@@ -1,8 +1,8 @@
-// Copyright Terence J. Boldt (c)2020-2021
+// Copyright Terence J. Boldt (c)2020-2022
 // Use of this source code is governed by an MIT
 // license that can be found in the LICENSE file.
 
-// This file is contains the handler for retrieving the ProDOS timestamp
+// This file contains the handler for retrieving the ProDOS timestamp
 // based on the current time
 
 package handlers

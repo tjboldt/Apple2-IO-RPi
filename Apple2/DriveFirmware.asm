@@ -1,3 +1,12 @@
+; Copyright Terence J. Boldt (c)2020-2022
+; Use of this source code is governed by an MIT
+; license that can be found in the LICENSE file.
+
+; This file contains the source for the firmware
+; that allows the Apple II to boot from the card
+; and for ProDOS to recognize the card as two
+; hard drivers
+
 ;ProDOS Zero Page
 Command = $42 ;ProDOS Command
 Unit = $43 ;ProDOS unit (SDDD0000)

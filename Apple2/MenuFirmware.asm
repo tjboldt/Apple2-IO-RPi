@@ -1,3 +1,12 @@
+; Copyright Terence J. Boldt (c)2020-2022
+; Use of this source code is governed by an MIT
+; license that can be found in the LICENSE file.
+
+; This file contains the source for the firmware
+; that displays the copyright message on boot
+; and checks for the RPi status to be ready before
+; attempting to boot
+
 ;ProDOS Zero Page
 Command = $42 ;ProDOS Command
 Unit = $43 ;ProDOS unit (SDDD0000)

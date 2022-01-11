@@ -1,3 +1,10 @@
+// Copyright Terence J. Boldt (c)2020-2022
+// Use of this source code is governed by an MIT
+// license that can be found in the LICENSE file.
+
+// This file contains the test for the handler for
+// displaying the menu of choices on the Apple II
+
 package handlers
 
 import (

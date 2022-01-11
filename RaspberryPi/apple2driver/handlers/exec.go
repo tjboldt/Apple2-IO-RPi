@@ -1,8 +1,8 @@
-// Copyright Terence J. Boldt (c)2020-2021
+// Copyright Terence J. Boldt (c)2020-2022
 // Use of this source code is governed by an MIT
 // license that can be found in the LICENSE file.
 
-// This file is contains the handler for executing Linux and internal
+// This file contains the handler for executing Linux and internal
 // commands
 
 package handlers
@@ -219,7 +219,7 @@ func a2wifiSelect(linuxCommand string) (string, error) {
 	region := params[4]
 	linuxCommand = "printf \"country=%s\\nupdate_config=1\\nctrl_interface=/var/run/wpa_supplicant\\n\\nnetwork={\\n  scan_ssid=1\\n  ssid=\\\"%s\\\"\n  psk=\\\"%s\\\"\\n}\\n\" " +
 		region + " " +
-	        ssid + " " +
+		ssid + " " +
 		psk + " " +
 		" > /tmp/wpa_supplicant.conf; " +
 		"sudo mv /tmp/wpa_supplicant.conf /etc/wpa_supplicant/; " +

@@ -1,3 +1,12 @@
+; Copyright Terence J. Boldt (c)2021-2022
+; Use of this source code is governed by an MIT
+; license that can be found in the LICENSE file.
+
+; This file contains the source for the RPI.COMMAND
+; application that runs on the Apple II and extends
+; ProDOS BASIC.SYSTEM to add the RPI command which
+; allows commands to be executed on the Raspberry Pi
+
             .ORG  $300
 INBUF      =  $200     ;GETLN input buffer.
 WAIT       =  $FCA8    ;Monitor wait routine.

@@ -1,6 +1,6 @@
 name: Enhancement Request
 description: Suggest an improvement for this project
-labels: ["enhancement"}
+labels: ["enhancement"]
 assignees: 
   - tjboldt
 body:

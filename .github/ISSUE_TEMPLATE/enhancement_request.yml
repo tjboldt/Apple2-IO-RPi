@@ -1,0 +1,17 @@
+name: Enhancement Request
+description: Suggest an improvement for this project
+labels: ["enhancement"}
+assignees: 
+  - tjboldt
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your suggestions for improvements!
+  - type: textarea
+    id: enhancement-idea
+    attributes:
+      label: What do suggest for improvement?
+      placeholder: Describe the enhancement.
+    validations:
+      required: true

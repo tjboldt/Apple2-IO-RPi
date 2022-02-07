@@ -17,10 +17,10 @@ XLEN       =  $BE52    ;length of command string-1.
 XCNUM      =  $BE53    ;CI cmd no. (ext cmd - 0).
 PBITS      =  $BE54    ;Command parameter bits.
 XRETURN    =  $FF58    ;Known RTS instruction.
-InputByte = $c0fe
-OutputByte = $c0fd
-InputFlags = $c0fb
-OutputFlags = $c0f7
+InputByte = $c08e
+OutputByte = $c08d
+InputFlags = $c08b
+OutputFlags = $c087
 
 ReadBlockCommand = $01
 WriteBlockCommand = $02
@@ -37,6 +37,62 @@ Keyboard = $c000
 ClearKeyboard = $c010
 Wait = $fca8
 
+LastChar = $06
+SlotL = $fe
+SlotH = $ff
+ESC = $9b
+
+ .org $2000
+ ldx #$07 ; start at slot 7
+DetectSlot:
+ ldy #$00
+ lda #$fc
+ sta SlotL
+ txa
+ ora #$c0
+ sta SlotH 
+ lda (SlotL),y
+ bne nextSlot
+ iny
+ lda (SlotL),y
+ bne nextSlot
+ iny 
+ lda (SlotL),y
+ cmp #$17
+ bne nextSlot
+ iny
+ lda (SlotL),y
+ cmp #$14
+ bne nextSlot
+ txa
+ asl
+ asl
+ asl
+ asl
+ tax
+ clc
+ bcc Start
+nextSlot:
+ dex
+ bne DetectSlot
+ rts 
+Start:
+ stx slotx + $1e01 ;set the slot for the driver
+ ldx #$00
+copyDriver:
+ lda $2100,x
+ sta $0300,x
+ inx
+ cpx #$e6
+ bne copyDriver
+end:
+ jmp $0300
+
+.repeat	253-<end
+.byte 0
+.endrepeat
+
+.org $0300
  ;
  ; FIRST SAVE THE EXTERNAL COMMAND ADDRESS SO YOU WON'T
  ; DISCONNECT ANY PREVIOUSLY CONNECTED COMMAND.
@@ -77,6 +133,7 @@ Wait = $fca8
             STA  PBITS+1     ; to be parsed.
             lda #$8d
             jsr $fded
+slotx:      ldx #$70        ; set x to slot # in high nibble
             clc
             bcc SendCommand
   ;
@@ -126,43 +183,43 @@ HelpCommand:
 SendByte:
  pha 
 waitWrite: 
- lda InputFlags
+ lda InputFlags,x
  rol
  rol 
  bcs waitWrite
  pla
- sta OutputByte
+ sta OutputByte,x
  lda #$1e ; set bit 0 low to indicate write started
- sta OutputFlags 
+ sta OutputFlags,x 
 finishWrite:
- lda InputFlags
+ lda InputFlags,x
  rol
  rol
  bcc finishWrite
  lda #$1f
- sta OutputFlags
+ sta OutputFlags,x
  rts
 
 GetByte:
  lda #$1d ;set read flag low
- sta OutputFlags
+ sta OutputFlags,x
 waitRead:
- lda InputFlags
+ lda InputFlags,x
  rol
  bcc readByte
  bit Keyboard ;keypress will abort waiting to read
  bpl waitRead
  lda #$1f ;set all flags high and exit
- sta OutputFlags
+ sta OutputFlags,x
  sec ;failure
  rts 
 readByte:
- lda InputByte
+ lda InputByte,x
  pha
  lda #$1f ;set all flags high
- sta OutputFlags
+ sta OutputFlags,x
 finishRead:
- lda InputFlags
+ lda InputFlags,x
  rol
  bcc finishRead
  pla
@@ -182,3 +239,5 @@ CMD:   aschi   "rpi"
  ;
  NXTCMD:    .byte    0,0           ; STORE THE NEXT EXT CMD'S
                              ; ADDRESS HERE.
+
+

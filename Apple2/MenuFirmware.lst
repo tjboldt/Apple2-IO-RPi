@@ -1,7 +1,16 @@
-ca65 V2.17 - Raspbian 2.17-1
+ca65 V2.18 - N/A
 Main file   : MenuFirmware.asm
 Current file: MenuFirmware.asm
 
+000000r 1               ; Copyright Terence J. Boldt (c)2020-2022
+000000r 1               ; Use of this source code is governed by an MIT
+000000r 1               ; license that can be found in the LICENSE file.
+000000r 1               
+000000r 1               ; This file contains the source for the firmware
+000000r 1               ; that displays the copyright message on boot
+000000r 1               ; and checks for the RPi status to be ready before
+000000r 1               ; attempting to boot
+000000r 1               
 000000r 1               ;ProDOS Zero Page
 000000r 1               Command = $42 ;ProDOS Command
 000000r 1               Unit = $43 ;ProDOS unit (SDDD0000)

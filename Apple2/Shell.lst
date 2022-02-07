@@ -1,7 +1,15 @@
-ca65 V2.17 - Raspbian 2.17-1
+ca65 V2.18 - N/A
 Main file   : Shell.asm
 Current file: Shell.asm
 
+000000r 1               ; Copyright Terence J. Boldt (c)2021-2022
+000000r 1               ; Use of this source code is governed by an MIT
+000000r 1               ; license that can be found in the LICENSE file.
+000000r 1               
+000000r 1               ; This file contains the source for the SHELL
+000000r 1               ; application that runs on the Apple II to talk
+000000r 1               ; to the Raspberry Pi
+000000r 1               
 000000r 1               ;ProDOS Zero Page
 000000r 1               Command = $42 ;ProDOS Command
 000000r 1               Unit = $43 ;ProDOS unit (SDDD0000)

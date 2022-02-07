@@ -57,5 +57,5 @@ rm FileAccessFirmware.bin
 
 ProDOS-Utilities -d ../RaspberryPi/Apple2-IO-RPi.hdv -c put -i AT28C64B.bin -p /APPLE2.IO.RPI/AT28C64B.BIN || exit 1
 ProDOS-Utilities -d ../RaspberryPi/Apple2-IO-RPi.hdv -c put -i Shell.bin -p /APPLE2.IO.RPI/SHELL || exit 1
-ProDOS-Utilities -d ../RaspberryPi/Apple2-IO-RPi.hdv -c put -i RPi.Command.bin -p /APPLE2.IO.RPI/RPI.COMMAND -a 0x0300 || exit 1
+ProDOS-Utilities -d ../RaspberryPi/Apple2-IO-RPi.hdv -c put -i RPi.Command.bin -p /APPLE2.IO.RPI/RPI.COMMAND -a 0x2000 || exit 1
 ProDOS-Utilities -d ../RaspberryPi/Apple2-IO-RPi.hdv -c ls

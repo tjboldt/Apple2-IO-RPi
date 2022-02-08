@@ -6,4 +6,6 @@
 
 package info
 
+// Version is the hexadecimal version number that
+// should be incremented with each driver update
 const Version = "0022"

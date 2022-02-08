@@ -22,12 +22,32 @@ body:
       label: Hardware Version
       description: What version of the hardware are you running?
       options:
-        - Fourth Prototype (Purchased from Terence)
-        - Fourth Prototype (Purchased from third party)
-        - Fourth Prototype (Self-assembled)
         - Fifth Prototype (Purchased from Terence)
-        - Fifth Prototype (Purchased from third party)
         - Fifth Prototype (Self-assembled)
+        - Fifth Prototype (Purchased from third party)
+        - Fourth Prototype (Purchased from Terence)
+        - Fourth Prototype (Self-assembled)
+        - Fourth Prototype (Purchased from third party)
+    validations:
+      required: true
+  - type: dropdown
+    id: firmware-version
+    attributes:
+      label: Firmware Version
+      description: What version of the firmware are you running? (shown on boot screen)
+      options:
+        - 000F
+        - Older (not shown on boot, pre-2022-Feb-07)
+    validations:
+      required: true
+  - type: dropdown
+    id: driver-version
+    attributes:
+      label: Driver Version
+      description: What version of the driver are you running? Check with `RPI a2version`
+      options:
+        - 0022
+        - Older (error calling RPI a2version, pre-2022-Feb-07)
     validations:
       required: true
   - type: dropdown

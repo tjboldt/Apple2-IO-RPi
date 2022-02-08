@@ -17,6 +17,7 @@ import (
 
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/handlers"
+	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/info"
 )
 
 const resetCommand = 0
@@ -33,7 +34,7 @@ const shellCommand = 9
 func main() {
 	drive1, drive2 := getDriveFiles()
 
-	fmt.Printf("Starting Apple II RPi...\n")
+	fmt.Printf("Starting Apple II RPi v%s...\n", info.Version)
 
 	comm := a2io.A2Gpio{}
 

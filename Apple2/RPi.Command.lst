@@ -92,13 +92,13 @@ Current file: RPi.Command.asm
 002041  1               end:
 002041  1  4C 00 03      jmp $0300
 002044  1               
-002044  1  00 00 00 00  .repeat	255-<end
+002044  1  00 00 00 00  .repeat	253-<end
 002048  1  00 00 00 00  
 00204C  1  00 00 00 00  
-002102  1               .byte 0
-002102  1               .endrepeat
-002102  1               
-002102  1               .org $0300
+002100  1               .byte 0
+002100  1               .endrepeat
+002100  1               
+002100  1               .org $0300
 000300  1                ;
 000300  1                ; FIRST SAVE THE EXTERNAL COMMAND ADDRESS SO YOU WON'T
 000300  1                ; DISCONNECT ANY PREVIOUSLY CONNECTED COMMAND.

@@ -14,6 +14,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/info"
 )
 
 var forceLowercase = false
@@ -44,6 +46,10 @@ func ExecCommand() {
 			return
 		}
 		comm.WriteString("Working directory set\r")
+		return
+	}
+	if linuxCommand == "a2version" {
+		a2version()
 		return
 	}
 	if linuxCommand == "a2help" {
@@ -179,6 +185,10 @@ func getStdin(stdin io.WriteCloser, done chan bool, inputComplete chan bool, use
 			}
 		}
 	}
+}
+
+func a2version() {
+	comm.WriteString("\rVersion: " + info.Version + "\r")
 }
 
 func a2help() {

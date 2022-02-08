@@ -195,6 +195,7 @@ func a2help() {
 	comm.WriteString("\r" +
 		"Built-in commands:\r" +
 		"------------------\r" +
+		"a2version - display version number\r" +
 		"a2help - display this message\r" +
 		"a2wifi - set up wifi\r" +
 		"A2LOWER - force lowercase for II+\r" +

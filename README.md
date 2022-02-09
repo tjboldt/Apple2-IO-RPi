@@ -16,15 +16,16 @@ The purpose of this project is to provide I/O for an Apple II series 8 bit compu
 7. Supports "RPI" command from BASIC to execute Linux commands from the command prompt or inside BASIC programs: `10 PRINT CHR$(4);"RPI ls -al /"`
 
 ## Project Status
-So far, this is a project and not a finished product. The current prototype is on the fifth revision and about 20 have been assembled and tested. It is now possible for the Apple II to boot from and write to virutal hard drive images stored on the RPi in any slot (except slot 3) and run a bash shell on the RPi via the Apple II. The code has very few tests and is incomplete. Note that currently the firmware assumes an 80 column card is in slot 3 and than you have lowercase support. Most testing has been done with an enhanced Apple //e with the card in slot 7. If you have other drive controllers earlier in the boot cycle, you can still boot from the Apple2-IO-RPi. For example, if the card was in slot 4, you could type `PR#4` from the BASIC prompt to boot the card. If you have a problem or idea for enhancement, log an issue [here](https://github.com/tjboldt/Apple2-IO-RPi/issues). I recommend starring/watching the project for updates on GitHub. You are welcome to fork the project and submit pull requests which I will review.
+So far, this is a project and not a finished product. The current prototype is on the fifth revision and about 20 have been assembled and tested. It is now possible for the Apple II to boot from and write to virtual hard drive images stored on the RPi in any slot (except slot 3), execute Linux commands from Applesoft BASIC and run a bash shell with VT100 emulation. The code has very few tests and is incomplete. Note that currently the firmware assumes an 80 column card is in slot 3 and than you have lowercase support. Most development has been done with an enhanced Apple //e with the card in slot 7. If you have other drive controllers earlier in the boot cycle, you can still boot from the Apple2-IO-RPi. For example, if the card was in slot 4, you could type `PR#4` from the BASIC prompt to boot the card. Note that the Raspberry Pi Zero W (and W 2) consume about 1/4 of all available power to the expansion slots when idle and close to all available power when busy. It is not recommended to have a lot of other cards in the system at the same time. If you have a problem or idea for enhancement, log an issue [here](https://github.com/tjboldt/Apple2-IO-RPi/issues). I recommend starring/watching the project for updates on GitHub. You are welcome to fork the project and submit pull requests which I will review.
 
 ## Roadmap
-1. Allow more than two virutal hard drives at a time
-2. In-memory virutal drive representing current working directory in Linux for ease of copying files between Linux and ProDOS
-3. Proper ProDOS clock driver (currently just directly sets values on block reads)
-4. Bi-directional image conversion between common formats and HIRES
-5. Remote code execution 
-6. Proxy VNC connection, rendering as Apple II compatible graphics
+1. Allow more than two virtual hard drives at a time
+2. In-memory virtual drive representing current working directory in Linux for ease of copying files between Linux and ProDOS
+3. Update GPIO library to reduce power consumption (remove busy-wait loops and use edge triggering)
+4. Proper ProDOS clock driver (currently just directly sets values on block reads)
+5. Bi-directional image conversion between common formats and HIRES
+6. Remote code execution 
+7. Proxy VNC connection, rendering as Apple II compatible graphics
 
 ## Setup
 [Setup card from scratch](https://github.com/tjboldt/Apple2-IO-RPi/discussions/63)

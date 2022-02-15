@@ -13,37 +13,35 @@ import (
 	"fmt"
 	"time"
 
-	"periph.io/x/periph/conn/gpio"
-	"periph.io/x/periph/conn/gpio/gpioreg"
-	"periph.io/x/periph/host"
+	"github.com/stianeikeland/go-rpio/v4"
 )
 
 var edgeTimeout time.Duration
 
-var outWrite gpio.PinIO
-var outRead gpio.PinIO
-var outReserved2 gpio.PinIO
-var outReserved1 gpio.PinIO
-var outBit7 gpio.PinIO
-var outBit6 gpio.PinIO
-var outBit5 gpio.PinIO
-var outBit4 gpio.PinIO
-var outBit3 gpio.PinIO
-var outBit2 gpio.PinIO
-var outBit1 gpio.PinIO
-var outBit0 gpio.PinIO
-var inWrite gpio.PinIO
-var inRead gpio.PinIO
-var inReserved2 gpio.PinIO
-var inReserved1 gpio.PinIO
-var inBit7 gpio.PinIO
-var inBit6 gpio.PinIO
-var inBit5 gpio.PinIO
-var inBit4 gpio.PinIO
-var inBit3 gpio.PinIO
-var inBit2 gpio.PinIO
-var inBit1 gpio.PinIO
-var inBit0 gpio.PinIO
+var outWrite rpio.Pin
+var outRead rpio.Pin
+var outReserved2 rpio.Pin
+var outReserved1 rpio.Pin
+var outBit7 rpio.Pin
+var outBit6 rpio.Pin
+var outBit5 rpio.Pin
+var outBit4 rpio.Pin
+var outBit3 rpio.Pin
+var outBit2 rpio.Pin
+var outBit1 rpio.Pin
+var outBit0 rpio.Pin
+var inWrite rpio.Pin
+var inRead rpio.Pin
+var inReserved2 rpio.Pin
+var inReserved1 rpio.Pin
+var inBit7 rpio.Pin
+var inBit6 rpio.Pin
+var inBit5 rpio.Pin
+var inBit4 rpio.Pin
+var inBit3 rpio.Pin
+var inBit2 rpio.Pin
+var inBit1 rpio.Pin
+var inBit0 rpio.Pin
 
 // A2Gpio is the live implementation of A2Io interface
 type A2Gpio struct {
@@ -51,47 +49,50 @@ type A2Gpio struct {
 
 // Init initializes the GPIO ports on the Raspberry Pi
 func (a2 A2Gpio) Init() {
-	host.Init()
+	err := rpio.Open()
+	if err != nil {
+		panic("failed to open gpio")
+	}
 
-	outWrite = gpioreg.ByName("GPIO24")
-	outRead = gpioreg.ByName("GPIO25")
-	outReserved2 = gpioreg.ByName("GPIO7") //note GPIO7 and CPIO8 require extra effort to use
-	outReserved1 = gpioreg.ByName("GPIO8")
-	outBit7 = gpioreg.ByName("GPIO5")
-	outBit6 = gpioreg.ByName("GPIO11")
-	outBit5 = gpioreg.ByName("GPIO9")
-	outBit4 = gpioreg.ByName("GPIO10")
-	outBit3 = gpioreg.ByName("GPIO22")
-	outBit2 = gpioreg.ByName("GPIO27")
-	outBit1 = gpioreg.ByName("GPIO17")
-	outBit0 = gpioreg.ByName("GPIO4")
-	inWrite = gpioreg.ByName("GPIO23")
-	inRead = gpioreg.ByName("GPIO18")
-	inReserved2 = gpioreg.ByName("GPIO14")
-	inReserved1 = gpioreg.ByName("GPIO15")
-	inBit7 = gpioreg.ByName("GPIO12")
-	inBit6 = gpioreg.ByName("GPIO16")
-	inBit5 = gpioreg.ByName("GPIO20")
-	inBit4 = gpioreg.ByName("GPIO21")
-	inBit3 = gpioreg.ByName("GPIO26")
-	inBit2 = gpioreg.ByName("GPIO19")
-	inBit1 = gpioreg.ByName("GPIO13")
-	inBit0 = gpioreg.ByName("GPIO6")
+	outWrite = rpio.Pin(24)
+	outRead = rpio.Pin(25)
+	outReserved2 = rpio.Pin(7) //note GPIO7 and CPIO8 require extra effort to use
+	outReserved1 = rpio.Pin(8)
+	outBit7 = rpio.Pin(5)
+	outBit6 = rpio.Pin(11)
+	outBit5 = rpio.Pin(9)
+	outBit4 = rpio.Pin(10)
+	outBit3 = rpio.Pin(22)
+	outBit2 = rpio.Pin(27)
+	outBit1 = rpio.Pin(17)
+	outBit0 = rpio.Pin(4)
+	inWrite = rpio.Pin(23)
+	inRead = rpio.Pin(18)
+	inReserved2 = rpio.Pin(14)
+	inReserved1 = rpio.Pin(15)
+	inBit7 = rpio.Pin(12)
+	inBit6 = rpio.Pin(16)
+	inBit5 = rpio.Pin(20)
+	inBit4 = rpio.Pin(21)
+	inBit3 = rpio.Pin(26)
+	inBit2 = rpio.Pin(19)
+	inBit1 = rpio.Pin(13)
+	inBit0 = rpio.Pin(6)
 
-	inWrite.In(gpio.PullDown, gpio.BothEdges)
-	inRead.In(gpio.PullDown, gpio.BothEdges)
-	outReserved1.Out(gpio.High)
-	outReserved2.Out(gpio.High)
-	outRead.Out(gpio.High)
-	outWrite.Out(gpio.High)
-	outBit7.Out(gpio.Low)
-	outBit6.Out(gpio.Low)
-	outBit5.Out(gpio.Low)
-	outBit4.Out(gpio.Low)
-	outBit3.Out(gpio.Low)
-	outBit2.Out(gpio.Low)
-	outBit1.Out(gpio.Low)
-	outBit0.Out(gpio.Low)
+	inWrite.PullDown()
+	inRead.PullDown()
+	outReserved1.High()
+	outReserved2.High()
+	outRead.High()
+	outWrite.High()
+	outBit7.Low()
+	outBit6.Low()
+	outBit5.Low()
+	outBit4.Low()
+	outBit3.Low()
+	outBit2.Low()
+	outBit1.Low()
+	outBit0.Low()
 
 	edgeTimeout = time.Second
 }
@@ -128,13 +129,13 @@ func (a2 A2Gpio) WriteString(outString string) error {
 // ReadByte reads a byte from the Apple II via Raspberry Pi's GPIO ports
 func (a2 A2Gpio) ReadByte() (byte, error) {
 	// let the Apple II know we are ready to read
-	outRead.Out(gpio.Low)
+	outRead.Low()
 
 	// wait for the Apple II to write
 	startTime := time.Now()
-	for inWrite.Read() == gpio.High {
+	for inWrite.Read() == 1 {
 		if time.Since(startTime) > edgeTimeout {
-			outRead.Out(gpio.High)
+			outRead.High()
 			return 0, errors.New("timed out reading byte -- write stuck high")
 		}
 	}
@@ -151,39 +152,39 @@ func (a2 A2Gpio) ReadByte() (byte, error) {
 	bit1 := inBit1.Read()
 	bit0 := inBit0.Read()
 
-	if bit7 == gpio.High {
+	if bit7 == 1 {
 		data += 128
 	}
-	if bit6 == gpio.High {
+	if bit6 == 1 {
 		data += 64
 	}
-	if bit5 == gpio.High {
+	if bit5 == 1 {
 		data += 32
 	}
-	if bit4 == gpio.High {
+	if bit4 == 1 {
 		data += 16
 	}
-	if bit3 == gpio.High {
+	if bit3 == 1 {
 		data += 8
 	}
-	if bit2 == gpio.High {
+	if bit2 == 1 {
 		data += 4
 	}
-	if bit1 == gpio.High {
+	if bit1 == 1 {
 		data += 2
 	}
-	if bit0 == gpio.High {
+	if bit0 == 1 {
 		data++
 	}
 
 	// let the Apple II know we are done reading
 	//fmt.Printf("let the Apple II know we are done reading\n")
-	outRead.Out(gpio.High)
+	outRead.High()
 
 	// wait for the Apple II to finish writing
 	//fmt.Printf("wait for the Apple II to finish writing\n")
 	startTime = time.Now()
-	for inWrite.Read() == gpio.Low {
+	for inWrite.Read() == 0 {
 		if time.Since(startTime) > edgeTimeout {
 			return 0, errors.New("timed out reading byte -- write stuck low")
 		}
@@ -195,84 +196,83 @@ func (a2 A2Gpio) ReadByte() (byte, error) {
 // WriteByte writes a byte to the Apple II via Raspberry Pi's GPIO ports
 func (a2 A2Gpio) WriteByte(data byte) error {
 	// check if the Apple II wants to send a byte to us first
-	if inWrite.Read() == gpio.Low {
-		outWrite.Out(gpio.High)
+	if inWrite.Read() == 0 {
+		outWrite.High()
 		return errors.New("can't write byte while byte is incoming")
 	}
 
 	// wait for the Apple II to be ready to read
 	startTime := time.Now()
-	for inRead.Read() == gpio.High {
+	for inRead.Read() == 1 {
 		if time.Since(startTime) > edgeTimeout {
-			outWrite.Out(gpio.High)
+			outWrite.High()
 			return errors.New("timed out writing byte -- read stuck high")
 		}
 	}
 
-	bit7 := gpio.Low
-	bit6 := gpio.Low
-	bit5 := gpio.Low
-	bit4 := gpio.Low
-	bit3 := gpio.Low
-	bit2 := gpio.Low
-	bit1 := gpio.Low
-	bit0 := gpio.Low
-
 	if ((data & 128) >> 7) == 1 {
-		bit7 = gpio.High
+		outBit7.High()
+	} else {
+		outBit7.Low()
 	}
-	outBit7.Out(bit7)
 
 	if ((data & 64) >> 6) == 1 {
-		bit6 = gpio.High
+		outBit6.High()
+	} else {
+		outBit6.Low()
 	}
-	outBit6.Out(bit6)
 
 	if ((data & 32) >> 5) == 1 {
-		bit5 = gpio.High
+		outBit5.High()
+	} else {
+		outBit5.Low()
 	}
-	outBit5.Out(bit5)
 
 	if ((data & 16) >> 4) == 1 {
-		bit4 = gpio.High
+		outBit4.High()
+	} else {
+		outBit4.Low()
 	}
-	outBit4.Out(bit4)
 
 	if ((data & 8) >> 3) == 1 {
-		bit3 = gpio.High
+		outBit3.High()
+	} else {
+		outBit3.Low()
 	}
-	outBit3.Out(bit3)
 
 	if ((data & 4) >> 2) == 1 {
-		bit2 = gpio.High
+		outBit2.High()
+	} else {
+		outBit2.Low()
 	}
-	outBit2.Out(bit2)
 
 	if ((data & 2) >> 1) == 1 {
-		bit1 = gpio.High
+		outBit1.High()
+	} else {
+		outBit1.Low()
 	}
-	outBit1.Out(bit1)
 
 	if (data & 1) == 1 {
-		bit0 = gpio.High
+		outBit0.High()
+	} else {
+		outBit0.Low()
 	}
-	outBit0.Out(bit0)
 
 	// let Apple II know we're writing
-	outWrite.Out(gpio.Low)
+	outWrite.Low()
 
 	// wait for the Apple II to finsih reading
 	//fmt.Printf("wait for the Apple II to finsih reading\n")
 	startTime = time.Now()
-	for inRead.Read() == gpio.Low {
+	for inRead.Read() == 0 {
 		if time.Since(startTime) > edgeTimeout {
-			outWrite.Out(gpio.High)
+			outWrite.High()
 			return errors.New("timed out writing byte -- read stuck low")
 		}
 	}
 
 	// let the Apple II know we are done writing
-	outWrite.Out(gpio.High)
+	outWrite.High()
 	return nil
 }
 

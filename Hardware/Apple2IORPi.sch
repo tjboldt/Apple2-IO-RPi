@@ -5,12 +5,12 @@ $Descr USLedger 17000 11000
 encoding utf-8
 Sheet 1 1
 Title "Apple II I/O RPi"
-Date "2021-07-20"
-Rev "5"
+Date "2022-02-16"
+Rev "6"
 Comp "Terence J. Boldt"
-Comment1 "Fifth Prototype"
+Comment1 "Sixth Prototype"
 Comment2 "Provides storage and network for the Apple ]["
-Comment3 "Raspberry Pi Zero W as a daughter board"
+Comment3 "Raspberry Pi Zero W 2 as a daughter board"
 Comment4 "Expansion card for Apple ][ computers"
 $EndDescr
 $Comp
@@ -203,8 +203,6 @@ Wire Wire Line
 Wire Wire Line
 	4150 7850 4700 7850
 Connection ~ 4150 7850
-Wire Wire Line
-	4150 1400 6150 1400
 Wire Wire Line
 	4150 1400 4150 2550
 Wire Wire Line
@@ -735,10 +733,6 @@ Wire Wire Line
 	6450 4600 7350 4600
 Wire Wire Line
 	6350 2800 7350 2800
-Wire Wire Line
-	6150 1400 6150 1100
-Wire Wire Line
-	6150 1100 11600 1100
 Wire Wire Line
 	11600 1100 11600 1350
 Wire Wire Line
@@ -1380,4 +1374,23 @@ Wire Wire Line
 	8750 7400 8750 10300
 Wire Wire Line
 	1550 7850 4150 7850
+$Comp
+L Jumper:Jumper_2_Bridged JPINTPWR1
+U 1 1 6215898B
+P 6700 1100
+F 0 "JPINTPWR1" H 6700 1335 50  0000 C CNN
+F 1 "Open for USB power, close for bus power" H 6700 1244 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 6700 1100 50  0001 C CNN
+F 3 "~" H 6700 1100 50  0001 C CNN
+	1    6700 1100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6900 1100 11600 1100
+Wire Wire Line
+	6500 1100 5750 1100
+Wire Wire Line
+	5750 1100 5750 1400
+Wire Wire Line
+	4150 1400 5750 1400
 $EndSCHEMATC

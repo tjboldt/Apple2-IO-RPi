@@ -1,12 +1,12 @@
-G04 #@! TF.GenerationSoftware,KiCad,Pcbnew,(5.1.10-1-10_14)*
-G04 #@! TF.CreationDate,2021-07-20T17:57:18-04:00*
-G04 #@! TF.ProjectId,Apple2IORPi,4170706c-6532-4494-9f52-50692e6b6963,0.4*
+G04 #@! TF.GenerationSoftware,KiCad,Pcbnew,(5.1.12-1-10_14)*
+G04 #@! TF.CreationDate,2022-02-16T21:29:44-05:00*
+G04 #@! TF.ProjectId,Apple2IORPi,4170706c-6532-4494-9f52-50692e6b6963,0.5*
 G04 #@! TF.SameCoordinates,Original*
 G04 #@! TF.FileFunction,Soldermask,Bot*
 G04 #@! TF.FilePolarity,Negative*
 %FSLAX46Y46*%
 G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
-G04 Created by KiCad (PCBNEW (5.1.10-1-10_14)) date 2021-07-20 17:57:18*
+G04 Created by KiCad (PCBNEW (5.1.12-1-10_14)) date 2022-02-16 21:29:44*
 %MOMM*%
 %LPD*%
 G01*
@@ -880,4 +880,8 @@ X123825000Y-90805000D03*
 D11*
 X121285000Y-50125000D03*
 X121285000Y-47625000D03*
+D14*
+X117500400Y-107238800D03*
+D15*
+X117500400Y-104698800D03*
 M02*

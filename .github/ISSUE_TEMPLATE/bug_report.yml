@@ -22,6 +22,9 @@ body:
       label: Hardware Version
       description: What version of the hardware are you running?
       options:
+        - Sixth Prototype (Purchased from Terence)
+        - Sixth Prototype (Self-assembled)
+        - Sixth Prototype (Purchased from third party)
         - Fifth Prototype (Purchased from Terence)
         - Fifth Prototype (Self-assembled)
         - Fifth Prototype (Purchased from third party)

@@ -454,6 +454,27 @@ X ~ 2 0 -150 110 U 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
+# Jumper_Jumper_2_Bridged
+#
+DEF Jumper_Jumper_2_Bridged JP 0 0 Y N 1 F N
+F0 "JP" 0 75 50 H V C CNN
+F1 "Jumper_Jumper_2_Bridged" 0 -100 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+$FPLIST
+ Jumper*
+ TestPoint*2Pads*
+ TestPoint*Bridge*
+$ENDFPLIST
+DRAW
+A 0 -70 100 1269 531 0 1 0 N -60 10 60 10
+C -80 0 20 0 0 0 N
+C 80 0 20 0 0 0 N
+X A 1 -200 0 100 R 50 50 1 1 P
+X B 2 200 0 100 L 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
 # Memory_EPROM_27C256
 #
 DEF Memory_EPROM_27C256 U 0 20 Y Y 1 F N

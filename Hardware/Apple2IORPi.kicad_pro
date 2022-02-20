@@ -366,9 +366,7 @@
         "microvia_diameter": 0.3,
         "microvia_drill": 0.1,
         "name": "3V3",
-        "nets": [
-          "Net-(C5-Pad1)"
-        ],
+        "nets": [],
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.3556,
@@ -387,7 +385,6 @@
         "microvia_drill": 0.1,
         "name": "5V",
         "nets": [
-          "Net-(C1-Pad1)",
           "Net-(J1-Pad2)"
         ],
         "pcb_color": "rgba(0, 0, 0, 0.000)",
@@ -407,9 +404,7 @@
         "microvia_diameter": 0.3,
         "microvia_drill": 0.1,
         "name": "Ground",
-        "nets": [
-          "Net-(C1-Pad2)"
-        ],
+        "nets": [],
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.8128,

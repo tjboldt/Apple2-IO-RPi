@@ -41,7 +41,7 @@ If you have a problem or idea for enhancement, log an issue [here](https://githu
 ## Contributions/Thanks
 - Hans Hübner ([@hanshuebner](https://github.com/hanshuebner)) for help cleaning up schematics
 - Scott ([@figital](https://github.com/figital)) for assembling early prototypes and recommending the AT28C64B chip
-- Philip A. for help with 3.3V conversion
+- Brokencodez for help with 3.3V conversion
 - David Schmenk ([@dschmenk](https://github.com/dschmenk)) for creating his Apple2Pi project, proving that Raspberry Pi can be powered by the Apple II expansion bus
 - Wyatt Wong ([@wyatt-wong](https://github.com/wyatt-wong)) for testing with multiple cards
 - ([@Abysmal](https://github.com/Abysmal)) for shell and rpi.command testing

@@ -1,4 +1,4 @@
-ca65 V2.18 - N/A
+ca65 V2.18 - Raspbian 2.19-1
 Main file   : Shell.asm
 Current file: Shell.asm
 
@@ -103,172 +103,173 @@ Current file: Shell.asm
 002038  1  48            pha
 002039  1  2C 10 C0      bit ClearKeyboard
 00203C  1  A9 00         lda #ResetCommand
-00203E  1  20 D7 20      jsr SendByte
+00203E  1  20 C2 20      jsr SendByte
 002041  1  A9 09         lda #ShellCommand
-002043  1  20 D7 20      jsr SendByte
+002043  1  20 C2 20      jsr SendByte
 002046  1  20 52 20      jsr DumpOutput
 002049  1  A9 00         lda #ResetCommand
-00204B  1  20 D7 20      jsr SendByte
+00204B  1  20 C2 20      jsr SendByte
 00204E  1  68            pla
 00204F  1  85 06         sta LastChar
 002051  1  60            rts
 002052  1               
 002052  1               DumpOutput:
-002052  1  20 F5 20      jsr GetByte
-002055  1  B0 2A         bcs checkInput
-002057  1  C9 00         cmp #$00
-002059  1  F0 39         beq endOutput
-00205B  1  48            pha
-00205C  1  20 54 21      jsr ClearCursor
-00205F  1  68            pla
-002060  1  C9 48         cmp #'H'
-002062  1  F0 3A         beq setColumn
-002064  1  C9 56         cmp #'V'
-002066  1  F0 44         beq setRow
-002068  1  C9 43         cmp #'C'
-00206A  1  F0 29         beq clearScreen
-00206C  1  C9 54         cmp #'T'
-00206E  1  F0 4A         beq setTop
-002070  1  C9 42         cmp #'B'
-002072  1  F0 4E         beq setBottom
-002074  1  C9 55         cmp #'U'
-002076  1  F0 52         beq moveUp
-002078  1  20 ED FD      jsr PrintChar
-00207B  1  20 23 21      jsr SetCursor
-00207E  1  4C 52 20      jmp DumpOutput
-002081  1               checkInput:
-002081  1  2C 00 C0      bit Keyboard ;check for keypress
-002084  1  10 CC         bpl DumpOutput ;keep dumping output if no keypress
-002086  1  AD 00 C0      lda Keyboard ;send keypress to RPi
-002089  1  29 7F         and #$7f
-00208B  1  20 D7 20      jsr SendByte
-00208E  1  2C 10 C0      bit ClearKeyboard
-002091  1  4C 52 20      jmp DumpOutput
-002094  1               endOutput:
-002094  1  60            rts
-002095  1               clearScreen:
-002095  1  20 58 FC      jsr Home
-002098  1  20 23 21      jsr SetCursor
-00209B  1  4C 52 20      jmp DumpOutput
-00209E  1               setColumn:
-00209E  1  20 F5 20      jsr GetByte
-0020A1  1  85 24         sta htab
-0020A3  1  8D 7B 05      sta htab80
-0020A6  1  20 23 21      jsr SetCursor
-0020A9  1  4C 52 20      jmp DumpOutput
-0020AC  1               setRow:
-0020AC  1  20 F5 20      jsr GetByte
-0020AF  1  85 25         sta vtab
-0020B1  1  20 C1 FB      jsr BasCalc
-0020B4  1  20 23 21      jsr SetCursor
-0020B7  1  4C 52 20      jmp DumpOutput
-0020BA  1               setTop:
-0020BA  1  20 F5 20      jsr GetByte
-0020BD  1  85 22         sta $22
+002052  1  20 E0 20      jsr GetByte
+002055  1  C9 00         cmp #$00
+002057  1  F0 26         beq endOutput
+002059  1  48            pha
+00205A  1  20 57 21      jsr ClearCursor
+00205D  1  68            pla
+00205E  1  C9 48         cmp #'H'
+002060  1  F0 27         beq setColumn
+002062  1  C9 56         cmp #'V'
+002064  1  F0 31         beq setRow
+002066  1  C9 43         cmp #'C'
+002068  1  F0 16         beq clearScreen
+00206A  1  C9 54         cmp #'T'
+00206C  1  F0 37         beq setTop
+00206E  1  C9 42         cmp #'B'
+002070  1  F0 3B         beq setBottom
+002072  1  C9 55         cmp #'U'
+002074  1  F0 3F         beq moveUp
+002076  1  20 ED FD      jsr PrintChar
+002079  1  20 26 21      jsr SetCursor
+00207C  1  4C 52 20      jmp DumpOutput
+00207F  1               endOutput:
+00207F  1  60            rts
+002080  1               clearScreen:
+002080  1  20 58 FC      jsr Home
+002083  1  20 26 21      jsr SetCursor
+002086  1  4C 52 20      jmp DumpOutput
+002089  1               setColumn:
+002089  1  20 E0 20      jsr GetByte
+00208C  1  85 24         sta htab
+00208E  1  8D 7B 05      sta htab80
+002091  1  20 26 21      jsr SetCursor
+002094  1  4C 52 20      jmp DumpOutput
+002097  1               setRow:
+002097  1  20 E0 20      jsr GetByte
+00209A  1  85 25         sta vtab
+00209C  1  20 C1 FB      jsr BasCalc
+00209F  1  20 26 21      jsr SetCursor
+0020A2  1  4C 52 20      jmp DumpOutput
+0020A5  1               setTop:
+0020A5  1  20 E0 20      jsr GetByte
+0020A8  1  85 22         sta $22
+0020AA  1  4C 52 20      jmp DumpOutput
+0020AD  1               setBottom:
+0020AD  1  20 E0 20      jsr GetByte
+0020B0  1  85 23         sta $23
+0020B2  1  4C 52 20      jmp DumpOutput
+0020B5  1               moveUp:
+0020B5  1  C6 25         dec vtab
+0020B7  1  A5 25         lda vtab
+0020B9  1  20 C1 FB      jsr BasCalc
+0020BC  1  20 26 21      jsr SetCursor
 0020BF  1  4C 52 20      jmp DumpOutput
-0020C2  1               setBottom:
-0020C2  1  20 F5 20      jsr GetByte
-0020C5  1  85 23         sta $23
-0020C7  1  4C 52 20      jmp DumpOutput
-0020CA  1               moveUp:
-0020CA  1  C6 25         dec vtab
-0020CC  1  A5 25         lda vtab
-0020CE  1  20 C1 FB      jsr BasCalc
-0020D1  1  20 23 21      jsr SetCursor
-0020D4  1  4C 52 20      jmp DumpOutput
-0020D7  1               
-0020D7  1               SendByte:
-0020D7  1  48            pha
-0020D8  1               waitWrite:
-0020D8  1  BD 8B C0      lda InputFlags,x
-0020DB  1  2A            rol
-0020DC  1  2A            rol
-0020DD  1  B0 F9         bcs waitWrite
-0020DF  1  68            pla
-0020E0  1  9D 8D C0      sta OutputByte,x
-0020E3  1  A9 1E         lda #$1e ; set bit 0 low to indicate write started
-0020E5  1  9D 87 C0      sta OutputFlags,x
-0020E8  1               finishWrite:
-0020E8  1  BD 8B C0      lda InputFlags,x
-0020EB  1  2A            rol
-0020EC  1  2A            rol
-0020ED  1  90 F9         bcc finishWrite
-0020EF  1  A9 1F         lda #$1f
-0020F1  1  9D 87 C0      sta OutputFlags,x
-0020F4  1  60            rts
-0020F5  1               
-0020F5  1               GetByte:
-0020F5  1  2C 00 C0      bit Keyboard ; skip byte read if key pressed
-0020F8  1  90 10         bcc keyPressed
-0020FA  1  A9 1D         lda #$1d ;set read flag low
-0020FC  1  9D 87 C0      sta OutputFlags,x
-0020FF  1               waitRead:
-0020FF  1  BD 8B C0      lda InputFlags,x
-002102  1  2A            rol
-002103  1  90 0C         bcc readByte
-002105  1  2C 00 C0      bit Keyboard ;keypress will abort waiting to read
-002108  1  10 F5         bpl waitRead
-00210A  1               keyPressed:
-00210A  1  A9 1F         lda #$1f ;set all flags high and exit
-00210C  1  9D 87 C0      sta OutputFlags,x
-00210F  1  38            sec ;failure
-002110  1  60            rts
-002111  1               readByte:
-002111  1  BD 8E C0      lda InputByte,x
-002114  1  48            pha
-002115  1  A9 1F         lda #$1f ;set all flags high
-002117  1  9D 87 C0      sta OutputFlags,x
-00211A  1               finishRead:
-00211A  1  BD 8B C0      lda InputFlags,x
-00211D  1  2A            rol
-00211E  1  90 FA         bcc finishRead
-002120  1  68            pla
-002121  1  18            clc ;success
-002122  1               end:
-002122  1  60            rts
-002123  1               
-002123  1               SetCursor:
-002123  1  AD 7B 05      lda htab80 ;get horizontal location / 2
-002126  1  4A            lsr
-002127  1  A8            tay
-002128  1  AD 55 C0      lda TextPage2
-00212B  1  90 03         bcc setChar
-00212D  1  AD 54 C0      lda TextPage1
-002130  1               setChar:
-002130  1  B1 28         lda (BasL),y
-002132  1  85 06         sta LastChar ; save so ClearCursor will pick it up
-002134  1  C9 E0         cmp #$e0
-002136  1  10 0C         bpl lowerCase
-002138  1  C9 C0         cmp #$c0
-00213A  1  10 0D         bpl upperCase
-00213C  1  C9 A0         cmp #$a0
-00213E  1  10 04         bpl symbol
-002140  1  C9 80         cmp #$80
-002142  1  10 0A         bpl noop
-002144  1               symbol:
-002144  1               lowerCase:
-002144  1               invert:
-002144  1  49 80         eor #$80
-002146  1  4C 4E 21      jmp storeChar
-002149  1               upperCase:
-002149  1  29 1F         and #$1f
-00214B  1  4C 4E 21      jmp storeChar
-00214E  1               noop:
-00214E  1               storeChar:
-00214E  1  91 28         sta (BasL),y
-002150  1  AD 54 C0      lda TextPage1
-002153  1  60            rts
-002154  1               
-002154  1               ClearCursor:
-002154  1  AD 7B 05      lda htab80 ;get horizontal location / 2
-002157  1  4A            lsr
-002158  1  A8            tay
-002159  1  AD 55 C0      lda TextPage2
-00215C  1  90 03         bcc restoreChar
-00215E  1  AD 54 C0      lda TextPage1
-002161  1               restoreChar:
-002161  1  A5 06         lda LastChar
-002163  1  91 28         sta (BasL),y
-002165  1  AD 54 C0      lda TextPage1
-002168  1  60            rts
-002168  1               
+0020C2  1               
+0020C2  1               SendByte:
+0020C2  1  48            pha
+0020C3  1               waitWrite:
+0020C3  1  BD 8B C0      lda InputFlags,x
+0020C6  1  2A            rol
+0020C7  1  2A            rol
+0020C8  1  B0 F9         bcs waitWrite
+0020CA  1  68            pla
+0020CB  1  9D 8D C0      sta OutputByte,x
+0020CE  1  A9 1E         lda #$1e ; set bit 0 low to indicate write started
+0020D0  1  9D 87 C0      sta OutputFlags,x
+0020D3  1               finishWrite:
+0020D3  1  BD 8B C0      lda InputFlags,x
+0020D6  1  2A            rol
+0020D7  1  2A            rol
+0020D8  1  90 F9         bcc finishWrite
+0020DA  1  A9 1F         lda #$1f
+0020DC  1  9D 87 C0      sta OutputFlags,x
+0020DF  1  60            rts
+0020E0  1               
+0020E0  1               GetByte:
+0020E0  1  2C 00 C0      bit Keyboard ; skip byte read if key pressed
+0020E3  1  90 10         bcc keyPressed
+0020E5  1  A9 1D         lda #$1d ;set read flag low
+0020E7  1  9D 87 C0      sta OutputFlags,x
+0020EA  1               waitRead:
+0020EA  1  BD 8B C0      lda InputFlags,x
+0020ED  1  2A            rol
+0020EE  1  90 24         bcc readByte
+0020F0  1  2C 00 C0      bit Keyboard ;keypress will abort waiting to read
+0020F3  1  10 F5         bpl waitRead
+0020F5  1               keyPressed:
+0020F5  1  AD 00 C0      lda Keyboard ;send keypress to RPi
+0020F8  1  29 7F         and #$7f
+0020FA  1  9D 8D C0      sta OutputByte,x
+0020FD  1  2C 10 C0      bit ClearKeyboard
+002100  1  A9 1C         lda #$1c ;set write flag low too
+002102  1  9D 87 C0      sta OutputFlags,x
+002105  1               finishKeyPress:
+002105  1  BD 8B C0      lda InputFlags,x
+002108  1  2A            rol
+002109  1  2A            rol
+00210A  1  90 F9         bcc finishKeyPress
+00210C  1  A9 1D         lda #$1d ;set flags back for reading
+00210E  1  9D 87 C0      sta OutputFlags,x
+002111  1  4C EA 20      jmp waitRead
+002114  1               readByte:
+002114  1  BD 8E C0      lda InputByte,x
+002117  1  48            pha
+002118  1  A9 1F         lda #$1f ;set all flags high
+00211A  1  9D 87 C0      sta OutputFlags,x
+00211D  1               finishRead:
+00211D  1  BD 8B C0      lda InputFlags,x
+002120  1  2A            rol
+002121  1  90 FA         bcc finishRead
+002123  1  68            pla
+002124  1  18            clc ;success
+002125  1               end:
+002125  1  60            rts
+002126  1               
+002126  1               SetCursor:
+002126  1  AD 7B 05      lda htab80 ;get horizontal location / 2
+002129  1  4A            lsr
+00212A  1  A8            tay
+00212B  1  AD 55 C0      lda TextPage2
+00212E  1  90 03         bcc setChar
+002130  1  AD 54 C0      lda TextPage1
+002133  1               setChar:
+002133  1  B1 28         lda (BasL),y
+002135  1  85 06         sta LastChar ; save so ClearCursor will pick it up
+002137  1  C9 E0         cmp #$e0
+002139  1  10 0C         bpl lowerCase
+00213B  1  C9 C0         cmp #$c0
+00213D  1  10 0D         bpl upperCase
+00213F  1  C9 A0         cmp #$a0
+002141  1  10 04         bpl symbol
+002143  1  C9 80         cmp #$80
+002145  1  10 0A         bpl noop
+002147  1               symbol:
+002147  1               lowerCase:
+002147  1               invert:
+002147  1  49 80         eor #$80
+002149  1  4C 51 21      jmp storeChar
+00214C  1               upperCase:
+00214C  1  29 1F         and #$1f
+00214E  1  4C 51 21      jmp storeChar
+002151  1               noop:
+002151  1               storeChar:
+002151  1  91 28         sta (BasL),y
+002153  1  AD 54 C0      lda TextPage1
+002156  1  60            rts
+002157  1               
+002157  1               ClearCursor:
+002157  1  AD 7B 05      lda htab80 ;get horizontal location / 2
+00215A  1  4A            lsr
+00215B  1  A8            tay
+00215C  1  AD 55 C0      lda TextPage2
+00215F  1  90 03         bcc restoreChar
+002161  1  AD 54 C0      lda TextPage1
+002164  1               restoreChar:
+002164  1  A5 06         lda LastChar
+002166  1  91 28         sta (BasL),y
+002168  1  AD 54 C0      lda TextPage1
+00216B  1  60            rts
+00216B  1               

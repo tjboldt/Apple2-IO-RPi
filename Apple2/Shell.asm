@@ -111,7 +111,6 @@ Start:
 
 DumpOutput:
  jsr GetByte
- bcs checkInput
  cmp #$00
  beq endOutput
  pha
@@ -131,14 +130,6 @@ DumpOutput:
  beq moveUp
  jsr PrintChar
  jsr SetCursor
- jmp DumpOutput
-checkInput:
- bit Keyboard ;check for keypress
- bpl DumpOutput ;keep dumping output if no keypress
- lda Keyboard ;send keypress to RPi
- and #$7f
- jsr SendByte
- bit ClearKeyboard
  jmp DumpOutput
 endOutput:
  rts
@@ -205,10 +196,20 @@ waitRead:
  bit Keyboard ;keypress will abort waiting to read
  bpl waitRead
 keyPressed:
- lda #$1f ;set all flags high and exit
+ lda Keyboard ;send keypress to RPi
+ and #$7f
+ sta OutputByte,x
+ bit ClearKeyboard
+ lda #$1c ;set write flag low too
  sta OutputFlags,x
- sec ;failure
- rts 
+finishKeyPress:
+ lda InputFlags,x
+ rol
+ rol
+ bcc finishKeyPress
+ lda #$1d ;set flags back for reading
+ sta OutputFlags,x
+ jmp waitRead
 readByte:
  lda InputByte,x
  pha

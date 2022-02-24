@@ -185,8 +185,6 @@ finishWrite:
  rts
 
 GetByte:
- bit Keyboard ; skip byte read if key pressed
- bcc keyPressed
  lda #$1d ;set read flag low
  sta OutputFlags,x
 waitRead:

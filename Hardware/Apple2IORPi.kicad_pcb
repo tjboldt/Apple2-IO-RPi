@@ -40,7 +40,7 @@
     (pad_to_mask_clearance 0)
     (pcbplotparams
       (layerselection 0x00010f0_ffffffff)
-      (disableapertmacros false)
+      (disableapertmacros true)
       (usegerberextensions false)
       (usegerberattributes false)
       (usegerberadvancedattributes false)

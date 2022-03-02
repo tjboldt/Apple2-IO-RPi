@@ -4,6 +4,7 @@
 
 | Hardware Version | Supported          |
 | ---------------- | ------------------ |
+| Prototype 6      | :white_check_mark: |
 | Prototype 5      | :white_check_mark: |
 | Prototype 4      | :white_check_mark: |
 | Older prototypes | :x:                |

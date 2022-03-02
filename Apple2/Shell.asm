@@ -87,14 +87,26 @@ DetectSlot:
  asl
  tax
  clc
- bcc Start
+ bcc Init
 nextSlot:
  dex
  bne DetectSlot
  rts 
-Start:
+
+Init:
  lda #$8d
  jsr $c300 ; force 80 columns
+
+ ldy #$00
+PrintString:
+ lda Text,y
+ beq Start
+ ora #$80
+ jsr PrintChar
+ iny
+ bne PrintString
+
+Start:
  lda LastChar
  pha
  bit ClearKeyboard
@@ -266,3 +278,9 @@ restoreChar:
  sta (BasL),y
  lda TextPage1
  rts
+
+Text:
+.byte	"Apple2-IO-RPi Shell Version 000D",$8d
+.byte	"(c)2020-2022 Terence J. Boldt",$8d
+.byte   $8d
+.byte   $00

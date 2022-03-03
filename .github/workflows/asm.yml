@@ -18,4 +18,9 @@ jobs:
         export PATH=$PATH:$(pwd)/.cicd
         cd Apple2
         ./assemble.sh
-        
+
+    - name: Compare binaries
+      run: |
+        export PATH=$PATH:$(pwd)/.cicd 
+        cd Apple2
+        ./compare.sh

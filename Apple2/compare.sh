@@ -54,4 +54,4 @@ diff RPi.Command.bin RPi.Command.bin.new || exit 1
 diff AT28C64B.bin AT28C64B.bin.new || exit 1
 diff Shell.bin Shell.bin.new || exit 1
 
-rm *.new
+rm ./*.new

@@ -91,19 +91,19 @@ Current file: RPi.Command.asm
 002031  1  8E 31 21      stx slotx + $1e01 ;set the slot for the driver
 002034  1  A0 00          ldy #$00
 002036  1               PrintString:
-002036  1  B9 67 20      lda Text,y
+002036  1  B9 93 20      lda Text,y
 002039  1  F0 08         beq copyDriver
 00203B  1  09 80         ora #$80
 00203D  1  20 ED FD      jsr PrintChar
 002040  1  C8            iny
 002041  1  D0 F3         bne PrintString
 002043  1               copyDriver:
-002043  1  A2 00         ldx #$00
+002043  1  A0 00         ldy #$00
 002045  1               copyDriverByte:
-002045  1  BD 00 21      lda $2100,x
-002048  1  9D 00 03      sta $0300,x
-00204B  1  E8            inx
-00204C  1  E0 E6         cpx #$e6
+002045  1  B9 00 21      lda $2100,y
+002048  1  99 00 03      sta $0300,y
+00204B  1  C8            iny
+00204C  1  C0 E6         cpy #$e6
 00204E  1  D0 F5         bne copyDriverByte
 002050  1                ;
 002050  1                ; FIRST SAVE THE EXTERNAL COMMAND ADDRESS SO YOU WON'T
@@ -118,20 +118,43 @@ Current file: RPi.Command.asm
 00205E  1  8D 07 BE                 STA  EXTRNCMD+1  ; command handler in the
 002061  1  A9 03                    LDA  #>RPI      ; external command JMP
 002063  1  8D 08 BE                 STA  EXTRNCMD+2  ; vector.
-002066  1  60                       RTS
-002067  1                ;
-002067  1               
-002067  1               Text:
-002067  1  D2 D0 C9 A0   aschi	"RPI command v000D"
-00206B  1  E3 EF ED ED  
-00206F  1  E1 EE E4 A0  
-002078  1  8D            .byte   $8d
-002079  1               end:
-002079  1  00            .byte   $00
-00207A  1               
-00207A  1  00 00 00 00  .repeat	255-<end
-00207E  1  00 00 00 00  
-002082  1  00 00 00 00  
+002066  1               
+002066  1  A9 05         lda #ExecCommand
+002068  1  20 6F 03      jsr SendByte
+00206B  1  A0 00         ldy #$00
+00206D  1               nextCommandByte:
+00206D  1  B9 8C 20      lda a2help, y
+002070  1  F0 07         beq finishCommand
+002072  1  20 6F 03      jsr SendByte
+002075  1  C8            iny
+002076  1  4C 6D 20      jmp nextCommandByte
+002079  1               finishCommand:
+002079  1  A9 00         lda #$00
+00207B  1  20 6F 03      jsr SendByte
+00207E  1               showVersion:
+00207E  1  20 8D 03      jsr GetByte
+002081  1  C9 00         cmp #$00
+002083  1  F0 06         beq FinishDriver
+002085  1  20 ED FD      jsr PrintChar
+002088  1  4C 7E 20      jmp showVersion
+00208B  1               FinishDriver:
+00208B  1  60            rts
+00208C  1               
+00208C  1               a2help:
+00208C  1  61 32 68 65   .byte "a2help", $00
+002090  1  6C 70 00     
+002093  1               
+002093  1               Text:
+002093  1  D2 D0 C9 A0   aschi "RPI command version: 000E"
+002097  1  E3 EF ED ED  
+00209B  1  E1 EE E4 A0  
+0020AC  1  8D            .byte $8d
+0020AD  1               end:
+0020AD  1  00            .byte $00
+0020AE  1               
+0020AE  1  00 00 00 00  .repeat	255-<end
+0020B2  1  00 00 00 00  
+0020B6  1  00 00 00 00  
 002100  1               .byte 0
 002100  1               .endrepeat
 002100  1               

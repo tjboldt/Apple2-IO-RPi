@@ -140,19 +140,26 @@ func execCommand(linuxCommand string, workingDirectory string) {
 }
 
 func a2version() {
-	comm.WriteString("\rVersion: " + info.Version + "\r")
+	comm.WriteString("\rDriver version: " + info.Version + "\r")
 }
 
 func a2help() {
-	comm.WriteString("\r" +
-		"Built-in commands:\r" +
-		"------------------\r" +
+	comm.WriteString("\rDriver version: " + info.Version + "\r" +
+		"\r" +
+		"Example from ] prompt:\r" +
+		"]RPI ls /home/pi\r" +
+		"\r" +
+		"Example from Applesoft BASIC:\r" +
+		"]10 PRINT CHR$(4)\"RPI ping apple.com\"\r" +
+		"]RUN\r" +
+		"\r" +
+		"Driver commands called with RPI:\r" +
 		"a2help - display this message\r" +
-		"a2version - display version number\r" +
+		"a2version - display driver version\r" +
 		"a2wifi - set up wifi\r" +
 		"a2timeout - seconds to timeout commands\r" +
 		"A2LOWER - force lowercase for II+\r" +
-		"a2lower - disable force lowercase for II+\r" +
+		"a2lower - disable force lowercase\r" +
 		"\r")
 }
 
@@ -161,14 +168,14 @@ func a2timeout(linuxCommand string) {
 
 	switch len(params) {
 	case 1:
-		comm.WriteString("\rCommand timeout: " + strconv.FormatInt(int64(execTimeoutSeconds),10) + "\r")
+		comm.WriteString("\rCommand timeout: " + strconv.FormatInt(int64(execTimeoutSeconds), 10) + "\r")
 	case 2:
 		timeoutSeconds, err := strconv.ParseInt(params[1], 10, 32)
 		if err != nil {
 			comm.WriteString("\rFailed to parse timeout\r")
 		} else {
 			execTimeoutSeconds = int(timeoutSeconds)
-			comm.WriteString("\rCommand timeout set to: " + strconv.FormatInt(int64(execTimeoutSeconds),10) + "\r")
+			comm.WriteString("\rCommand timeout set to: " + strconv.FormatInt(int64(execTimeoutSeconds), 10) + "\r")
 		}
 	default:
 		comm.WriteString("\rToo many parameters\n")

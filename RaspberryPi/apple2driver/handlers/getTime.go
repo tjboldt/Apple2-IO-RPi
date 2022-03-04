@@ -16,12 +16,12 @@ import (
 
 // GetTimeCommand handles the request to get ProDOS time bytes
 func GetTimeCommand() {
-	fmt.Printf("Sending date/time...\n")
+	fmt.Printf("Sending date/time...")
 	prodosTime := prodos.DateTimeToProDOS(time.Now())
 
 	for i := 0; i < len(prodosTime); i++ {
 		comm.WriteByte(prodosTime[i])
 	}
 
-	fmt.Printf("Send time complete\n")
+	fmt.Printf("%02X %02X %02X %02X\n", prodosTime[0], prodosTime[1], prodosTime[2], prodosTime[3])
 }

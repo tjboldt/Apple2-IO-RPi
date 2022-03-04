@@ -13,8 +13,6 @@ import (
 	"github.com/tjboldt/ProDOS-Utilities/prodos"
 )
 
-var oldFirmware = false
-
 // ReadBlockCommand handles requests to read ProDOS blocks
 func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
 	blockLow, _ := comm.ReadByte()
@@ -22,33 +20,38 @@ func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
 	var driveUnit byte
 	var err error
 
-	if !oldFirmware {
-		driveUnit, err = comm.ReadByte()
-		fmt.Printf("Drive unit: %0X\n", driveUnit)
+	driveUnit, err = comm.ReadByte()
 
-		if err != nil {
-			fmt.Printf("Drive unit not sent, assuming older firmware")
-			oldFirmware = true
-		}
+	if err != nil {
+		fmt.Printf("Failed to read block")
+		return
 	}
 
 	file := drive1
+	driveNumber := 1
 
 	if driveUnit >= 128 {
 		file = drive2
+		driveNumber = 2
 	}
+
+	slotNumber := driveUnit &0x7F >> 4
 
 	block := int(blockHigh)*256 + int(blockLow)
 
-	fmt.Printf("Read block %d\n", block)
+	fmt.Printf("Read block %04X in slot %d, drive %d...", block, slotNumber, driveNumber)
 
-	buffer := prodos.ReadBlock(file, block)
+	buffer,err := prodos.ReadBlock(file, block)
+	if err != nil {
+		fmt.Printf("failed %s\n",err)
+		return
+	}
 
 	err = comm.WriteBlock(buffer)
 	if err == nil {
-		fmt.Printf("Read block completed\n")
+		fmt.Printf("succeeded\n")
 	} else {
-		fmt.Printf("Failed to read block\n")
+		fmt.Printf("failed %s\n",err)
 	}
 }
 
@@ -60,27 +63,39 @@ func WriteBlockCommand(drive1 *os.File, drive2 *os.File) {
 	var driveUnit byte
 	var err error
 
-	if !oldFirmware {
-		driveUnit, err = comm.ReadByte()
-		if err != nil {
-			fmt.Printf("Drive unit not sent, assuming older firmware")
-			oldFirmware = true
-		}
+	driveUnit, err = comm.ReadByte()
+	if err != nil {
+		fmt.Printf("Failed to write block")
+		return
 	}
 
 	file := drive1
+	driveNumber := 1
 
 	if driveUnit >= 128 {
 		file = drive2
+		driveNumber = 2
 	}
 
 	buffer := make([]byte, 512)
 
 	block := int(blockHigh)*256 + int(blockLow)
 
-	fmt.Printf("Write block %d\n", block)
+	slotNumber := driveUnit &0x7F >> 4
 
-	comm.ReadBlock(buffer)
-	prodos.WriteBlock(file, block, buffer)
-	fmt.Printf("Write block completed\n")
+	fmt.Printf("Write block %04X in slot %d, drive %d...", block, slotNumber, driveNumber)
+
+	err = comm.ReadBlock(buffer)
+	if err != nil {
+		fmt.Printf("failed %s\n",err)
+		return
+	}
+	fmt.Printf("...")
+
+	err = prodos.WriteBlock(file, block, buffer)
+	if err == nil {
+		fmt.Printf("succeeded\n")
+	} else {
+		fmt.Printf("failed\n")
+	}
 }

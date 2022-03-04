@@ -94,12 +94,12 @@ PrintString:
  iny
  bne PrintString
 copyDriver: 
- ldx #$00
+ ldy #$00
 copyDriverByte:
- lda $2100,x
- sta $0300,x
- inx
- cpx #$e6
+ lda $2100,y
+ sta $0300,y
+ iny
+ cpy #$e6
  bne copyDriverByte
  ;
  ; FIRST SAVE THE EXTERNAL COMMAND ADDRESS SO YOU WON'T
@@ -114,14 +114,36 @@ copyDriverByte:
             STA  EXTRNCMD+1  ; command handler in the
             LDA  #>RPI      ; external command JMP
             STA  EXTRNCMD+2  ; vector.
-            RTS
- ;
+
+ lda #ExecCommand
+ jsr SendByte
+ ldy #$00
+nextCommandByte:
+ lda a2help, y
+ beq finishCommand
+ jsr SendByte
+ iny
+ jmp nextCommandByte
+finishCommand:
+ lda #$00
+ jsr SendByte
+showVersion:
+ jsr GetByte
+ cmp #$00
+ beq FinishDriver
+ jsr PrintChar
+ jmp showVersion
+FinishDriver:
+ rts
+
+a2help:
+ .byte "a2help", $00
 
 Text:
- aschi	"RPI command v000D"
- .byte   $8d
+ aschi "RPI command version: 000E"
+ .byte $8d
 end:
- .byte   $00 
+ .byte $00 
 
 .repeat	255-<end
 .byte 0

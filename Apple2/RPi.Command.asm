@@ -42,6 +42,13 @@ SlotL = $fe
 SlotH = $ff
 ESC = $9b
 
+;macro for string with high-bit set
+.macro aschi str
+.repeat .strlen (str), c
+.byte .strat (str, c) | $80
+.endrep
+.endmacro
+
  .org $2000
  ldx #$07 ; start at slot 7
 DetectSlot:
@@ -78,21 +85,22 @@ nextSlot:
  rts 
 Start:
  stx slotx + $1e01 ;set the slot for the driver
+  ldy #$00
+PrintString:
+ lda Text,y
+ beq copyDriver
+ ora #$80
+ jsr PrintChar
+ iny
+ bne PrintString
+copyDriver: 
  ldx #$00
-copyDriver:
+copyDriverByte:
  lda $2100,x
  sta $0300,x
  inx
  cpx #$e6
- bne copyDriver
-end:
- jmp $0300
-
-.repeat	253-<end
-.byte 0
-.endrepeat
-
-.org $0300
+ bne copyDriverByte
  ;
  ; FIRST SAVE THE EXTERNAL COMMAND ADDRESS SO YOU WON'T
  ; DISCONNECT ANY PREVIOUSLY CONNECTED COMMAND.
@@ -108,6 +116,18 @@ end:
             STA  EXTRNCMD+2  ; vector.
             RTS
  ;
+
+Text:
+ aschi	"RPI command v000D"
+ .byte   $8d
+end:
+ .byte   $00 
+
+.repeat	255-<end
+.byte 0
+.endrepeat
+
+.org $0300
  RPI:       LDX  #0          ;Check for our command.
  NXTCHR:     LDA  INBUF,X     ;Get first character.
             ora  #$20        ;Make it lower case
@@ -159,18 +179,9 @@ sendNullTerminator:
  jsr SendByte
 DumpOutput:
  jsr GetByte
- bcs skipOutput
  cmp #$00
  beq endOutput
  jsr PrintChar
-skipOutput:
- bit Keyboard ;check for keypress
- bpl DumpOutput ;keep dumping output if no keypress
- lda Keyboard ;send keypress to RPi
- jsr PrintChar
- and #$7f
- jsr SendByte
- bit ClearKeyboard
  clc
  bcc DumpOutput
 endOutput:
@@ -206,13 +217,7 @@ GetByte:
 waitRead:
  lda InputFlags,x
  rol
- bcc readByte
- bit Keyboard ;keypress will abort waiting to read
- bpl waitRead
- lda #$1f ;set all flags high and exit
- sta OutputFlags,x
- sec ;failure
- rts 
+ bcs waitRead
 readByte:
  lda InputByte,x
  pha
@@ -226,13 +231,6 @@ finishRead:
  clc ;success
  rts
 
-
-;macro for string with high-bit set
-.macro aschi str
-.repeat .strlen (str), c
-.byte .strat (str, c) | $80
-.endrep
-.endmacro
 
 CMD:   aschi   "rpi"
  CMDLEN     =  3       ;Our command length

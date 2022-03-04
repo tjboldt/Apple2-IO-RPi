@@ -10,15 +10,17 @@ package handlers
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/info"
 )
 
 var forceLowercase = false
+var execTimeoutSeconds = int(10)
 
 // ExecCommand handles requests for the Apple II executing Linux commands
 func ExecCommand() {
@@ -68,6 +70,10 @@ func ExecCommand() {
 		a2wifi()
 		return
 	}
+	if strings.HasPrefix(linuxCommand, "a2timeout") {
+		a2timeout(linuxCommand)
+		return
+	}
 	if linuxCommand == "a2prompt" {
 		prompt := fmt.Sprintf("A2IO:%s ", workingDirectory)
 		comm.WriteString(prompt)
@@ -100,14 +106,7 @@ func execCommand(linuxCommand string, workingDirectory string) {
 		comm.WriteString("Failed to set stdout\r")
 		return
 	}
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		fmt.Printf("Failed to set stdin\n")
-		comm.WriteString("Failed to set stdin\r")
-		return
-	}
 
-	fmt.Printf("Command output:\n")
 	err = cmd.Start()
 	if err != nil {
 		fmt.Printf("Failed to start command\n")
@@ -115,73 +114,26 @@ func execCommand(linuxCommand string, workingDirectory string) {
 		return
 	}
 
-	outputComplete := make(chan bool)
-	inputComplete := make(chan bool)
-	userCancelled := make(chan bool)
-
-	go getStdin(stdin, outputComplete, inputComplete, userCancelled)
-	go getStdout(stdout, outputComplete, userCancelled)
+	timeout := time.After(time.Duration(execTimeoutSeconds) * time.Second)
 
 	for {
 		select {
-		case <-outputComplete:
-			outputComplete <- true
-			cmd.Wait()
-			comm.WriteByte(0)
-			return
-		case <-userCancelled:
-			userCancelled <- true
+		case <-timeout:
+			comm.WriteString("\rCancelled by apple2driver\r")
 			cmd.Process.Kill()
-			return
-		case <-inputComplete:
-			cmd.Wait()
-			comm.WriteByte(0)
-			return
-		}
-	}
-}
-
-func getStdout(stdout io.ReadCloser, outputComplete chan bool, userCancelled chan bool) {
-	for {
-		select {
-		case <-userCancelled:
-			fmt.Printf("User Cancelled stdout\n")
-			stdout.Close()
 			return
 		default:
 			bb := make([]byte, 1)
-			n, err := stdout.Read(bb)
-			if err != nil {
-				stdout.Close()
-				outputComplete <- true
-				return
-			}
-			if n > 0 {
-				b := bb[0]
-				comm.SendCharacter(b)
-			}
-		}
-	}
-}
-
-func getStdin(stdin io.WriteCloser, done chan bool, inputComplete chan bool, userCancelled chan bool) {
-	for {
-		select {
-		case <-done:
-			stdin.Close()
-			inputComplete <- true
-			return
-		default:
-			b, err := comm.ReadByte()
-			if err == nil {
-				if b == 0x00 || b == 0x03 {
-					stdin.Close()
-					userCancelled <- true
-					fmt.Printf("\nUser cancelled stdin\n")
-					return
+			n, stdOutErr := stdout.Read(bb)
+			if stdOutErr == nil {
+				if n > 0 {
+					b := bb[0]
+					comm.SendCharacter(b)
 				}
-				bb := make([]byte, 1)
-				stdin.Write(bb)
+			} else {
+				comm.WriteByte(0)
+				cmd.Wait()
+				return
 			}
 		}
 	}
@@ -195,12 +147,32 @@ func a2help() {
 	comm.WriteString("\r" +
 		"Built-in commands:\r" +
 		"------------------\r" +
-		"a2version - display version number\r" +
 		"a2help - display this message\r" +
+		"a2version - display version number\r" +
 		"a2wifi - set up wifi\r" +
+		"a2timeout - seconds to timeout commands\r" +
 		"A2LOWER - force lowercase for II+\r" +
 		"a2lower - disable force lowercase for II+\r" +
 		"\r")
+}
+
+func a2timeout(linuxCommand string) {
+	params := strings.Fields(linuxCommand)
+
+	switch len(params) {
+	case 1:
+		comm.WriteString("\rCommand timeout: " + strconv.FormatInt(int64(execTimeoutSeconds),10) + "\r")
+	case 2:
+		timeoutSeconds, err := strconv.ParseInt(params[1], 10, 32)
+		if err != nil {
+			comm.WriteString("\rFailed to parse timeout\r")
+		} else {
+			execTimeoutSeconds = int(timeoutSeconds)
+			comm.WriteString("\rCommand timeout set to: " + strconv.FormatInt(int64(execTimeoutSeconds),10) + "\r")
+		}
+	default:
+		comm.WriteString("\rToo many parameters\n")
+	}
 }
 
 func a2lower(enable bool) {

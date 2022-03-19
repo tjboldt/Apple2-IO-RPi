@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sudo apt install git
+sudo apt install git -y
 wget https://golang.org/dl/go1.17.3.linux-armv6l.tar.gz
 sudo tar -C /usr/local -xzf go1.17.3.linux-armv6l.tar.gz
 sudo ln -s /usr/local/go/bin/go /usr/bin/go
@@ -12,7 +12,7 @@ sudo ln -s /home/pi/ProDOS-Utilities/ProDOS-Utilities /usr/bin/ProDOS-Utilities
 git clone https://github.com/tjboldt/Apple2-IO-RPi.git
 cd Apple2-IO-RPi/RaspberryPi/apple2driver
 go build
-sudo apt install cc65
+sudo apt install cc65 vim -y
 cd ~
 sudo bash -c 'cat > /boot/config.txt << EOF
 disable_splash=1

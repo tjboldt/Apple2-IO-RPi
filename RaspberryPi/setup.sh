@@ -5,15 +5,15 @@ wget https://golang.org/dl/go1.17.3.linux-armv6l.tar.gz
 sudo tar -C /usr/local -xzf go1.17.3.linux-armv6l.tar.gz
 sudo ln -s /usr/local/go/bin/go /usr/bin/go
 git clone https://github.com/tjboldt/ProDOS-Utilities.git
-cd ProDOS-Utilities
+cd ProDOS-Utilities || exit
 go build
-cd ~
+cd ~ || exit
 sudo ln -s /home/pi/ProDOS-Utilities/ProDOS-Utilities /usr/bin/ProDOS-Utilities
 git clone https://github.com/tjboldt/Apple2-IO-RPi.git
-cd Apple2-IO-RPi/RaspberryPi/apple2driver
+cd Apple2-IO-RPi/RaspberryPi/apple2driver || exit
 go build
 sudo apt install cc65 vim -y
-cd ~
+cd ~ || exit
 sudo bash -c 'cat > /boot/config.txt << EOF
 disable_splash=1
 dtoverlay=disable-bt

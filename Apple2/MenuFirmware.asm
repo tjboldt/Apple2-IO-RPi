@@ -156,15 +156,19 @@ finishRead:
  rol
  bcc finishRead
  pla
-end:
  rts
 
-; NOTE: The text below exactly fills the remaining 256 bytes of firmware
 Text:
 .byte	"Apple2-IO-RPi",$8d
 .byte	"(c)2020-2022 Terence J. Boldt",$8d
 .byte   $8d
-.byte	"Waiting for RPi FW:000F...",$00
+.byte	"Waiting for RPi FW:000F..."
+end:
+.byte	$00
+
+.repeat	251-<end
+.byte 0
+.endrepeat
 
 .byte      0,0     ;0000 blocks = check status
 .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)

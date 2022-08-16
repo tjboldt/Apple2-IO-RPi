@@ -127,21 +127,14 @@ HelpCommand:
  .byte "a2help",$00
 
 SendByte:
- pha 
-waitWrite: 
- lda InputFlags
- rol
- rol 
- bcs waitWrite
- pla
+ bit InputFlags
+ bvs SendByte
  sta OutputByte
  lda #$1e ; set bit 0 low to indicate write started
  sta OutputFlags 
 finishWrite:
- lda InputFlags
- rol
- rol
- bcc finishWrite
+ bit InputFlags
+ bvc finishWrite
  lda #$1f
  sta OutputFlags
  rts
@@ -150,9 +143,8 @@ GetByte:
  lda #$1d ;set read flag low
  sta OutputFlags
 waitRead:
- lda InputFlags
- rol
- bcc readByte
+ bit InputFlags
+ bpl readByte
  bit Keyboard ;keypress will abort waiting to read
  bpl waitRead
  lda #$1f ;set all flags high and exit
@@ -165,9 +157,8 @@ readByte:
  lda #$1f ;set all flags high
  sta OutputFlags
 finishRead:
- lda InputFlags
- rol
- bcc finishRead
+ bit InputFlags
+ bpl finishRead
  pla
  clc ;success
 end:

@@ -161,21 +161,14 @@ write256:
  rts
 
 SendByte:
- pha 
-waitWrite: 
- lda InputFlags
- rol
- rol 
- bcs waitWrite
- pla
+ bit InputFlags
+ bvs SendByte
  sta OutputByte
  lda #$0e ; set bit 0 low to indicate write started
  sta OutputFlags
 finishWrite:
- lda InputFlags
- rol
- rol
- bcc finishWrite
+ bit InputFlags
+ bvc finishWrite
  lda #$0f
  sta OutputFlags
  rts
@@ -184,17 +177,15 @@ GetByte:
  lda #$0d ;set read flag low
  sta OutputFlags
 waitRead:
- lda InputFlags
- rol
- bcs waitRead
+ bit InputFlags
+ bmi waitRead
  lda InputByte
  pha
  lda #$0f ;set all flags high
  sta OutputFlags
 finishRead:
- lda InputFlags
- rol
- bcc finishRead
+ bit InputFlags
+ bpl finishRead
  pla
 end:
  rts

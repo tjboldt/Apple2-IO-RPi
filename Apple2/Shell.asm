@@ -211,6 +211,10 @@ waitRead:
  bit Keyboard ;keypress will abort waiting to read
  bpl waitRead
 keyPressed:
+ lda InputFlags,x
+ rol
+ rol
+ bcs keyPressed
  lda Keyboard ;send keypress to RPi
  and #$7f
  sta OutputByte,x

@@ -134,19 +134,17 @@ finishWrite:
  rts
 
 GetByte:
- lda #$3d ;set read flag low
- sta OutputFlags
+ ldx #$3d ;set read flag low
+ stx OutputFlags
 waitRead:
  bit InputFlags
  bmi waitRead
  lda InputByte
- pha
- lda #$3f ;set all flags high
- sta OutputFlags
+ ldx #$3f ;set all flags high
+ stx OutputFlags
 finishRead:
  bit InputFlags
  bpl finishRead
- pla
  rts
 
 Text:

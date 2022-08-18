@@ -228,6 +228,7 @@ waitWrite:
  bcs waitWrite
  pla
  sta OutputByte,x
+.if HW_TYPE = 0
  lda #$1e ; set bit 0 low to indicate write started
  sta OutputFlags,x 
 finishWrite:
@@ -237,17 +238,21 @@ finishWrite:
  bcc finishWrite
  lda #$1f
  sta OutputFlags,x
+.endif
  rts
 
 GetByte:
+.if HW_TYPE = 0
  lda #$1d ;set read flag low
  sta OutputFlags,x
+.endif
 waitRead:
  lda InputFlags,x
  rol
  bcs waitRead
 readByte:
  lda InputByte,x
+.if HW_TYPE = 0
  pha
  lda #$1f ;set all flags high
  sta OutputFlags,x
@@ -256,6 +261,7 @@ finishRead:
  rol
  bcc finishRead
  pla
+.endif
  clc ;success
  rts
 

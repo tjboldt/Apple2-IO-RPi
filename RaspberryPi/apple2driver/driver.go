@@ -9,11 +9,14 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 	"time"
+
+	"go.bug.st/serial"
 
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/handlers"
@@ -32,11 +35,16 @@ const menuCommand = 8
 const shellCommand = 9
 
 func main() {
-	drive1, drive2 := getDriveFiles()
+	drive1, drive2, cdc := getFlags()
 
 	fmt.Printf("Starting Apple II RPi v%s...\n", info.Version)
 
-	comm := a2io.A2Gpio{}
+	var comm a2io.A2Io
+	if cdc {
+		comm = a2io.CDCio{}
+	} else {
+		comm = a2io.A2Gpio{}
+	}
 
 	handlers.SetCommunication(comm)
 	comm.Init()
@@ -68,6 +76,13 @@ func main() {
 			case shellCommand:
 				handlers.ShellCommand()
 			}
+			// the A2Io interface should be extended in one way or another
+			// to encapsulate this, e.g. by a ReadByte variant / parameter 
+		} else if cdc {
+			var portErr *serial.PortError
+			if errors.As(err, &portErr) && portErr.Code() == serial.PortClosed {
+				comm.Init()
+			}
 			// temporary workaround for busy wait loop heating up the RPi
 		} else if time.Since(lastCommandTime) > time.Millisecond*100 {
 			time.Sleep(time.Millisecond * 100)
@@ -75,9 +90,10 @@ func main() {
 	}
 }
 
-func getDriveFiles() (*os.File, *os.File) {
+func getFlags() (*os.File, *os.File, bool) {
 	var drive1Name string
 	var drive2Name string
+	var cdc bool
 
 	execName, _ := os.Executable()
 	path := filepath.Dir(execName)
@@ -87,6 +103,7 @@ func getDriveFiles() (*os.File, *os.File) {
 
 	flag.StringVar(&drive1Name, "d1", "", "A ProDOS format drive image for drive 1")
 	flag.StringVar(&drive2Name, "d2", defaultFileName, "A ProDOS format drive image for drive 2 and will be used for drive 1 if drive 1 empty")
+	flag.BoolVar(&cdc, "cdc", false, "Use ACM CDC serial device")
 	flag.Parse()
 
 	var drive1 *os.File
@@ -125,5 +142,5 @@ func getDriveFiles() (*os.File, *os.File) {
 		os.Exit(1)
 	}
 
-	return drive1, drive2
+	return drive1, drive2, cdc
 }

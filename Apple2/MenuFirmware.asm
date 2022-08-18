@@ -85,10 +85,11 @@ PrintString:
  iny
  bne PrintString
 
+.if HW_TYPE = 0
+
 WaitForRPi:
- lda InputFlags
- rol
- bcs Reset
+ bit InputFlags
+ bmi Reset
  lda #$ff
  jsr Wait
  lda #'.'+$80
@@ -108,6 +109,37 @@ Reset:
  beq Ok
  jmp Reset
 
+.else
+
+WaitForRPi:
+@1:
+ bit InputFlags
+ bmi @2 
+ lda InputByte
+ jmp @1
+@2:
+ bit InputFlags
+ bpl @4
+ bvs @3
+ lda #ResetCommand
+ sta OutputByte
+@3:
+ lda #$ff
+ jsr Wait
+ lda #'.'+$80
+ jsr PrintChar
+ jmp @2
+@4:
+ lda #$ff
+ jsr Wait
+@5:
+ bit InputFlags
+ bmi Ok 
+ lda InputByte
+ jmp @5
+
+.endif
+
 Ok:
  lda #$8D
  jsr PrintChar
@@ -124,6 +156,7 @@ SendByte:
  bit InputFlags
  bvs SendByte
  sta OutputByte
+.if HW_TYPE = 0
  lda #$3e ; set bit 0 low to indicate write started
  sta OutputFlags 
 finishWrite:
@@ -131,20 +164,25 @@ finishWrite:
  bvc finishWrite
  lda #$3f
  sta OutputFlags
+.endif
  rts
 
 GetByte:
+.if HW_TYPE = 0
  ldx #$3d ;set read flag low
  stx OutputFlags
+.endif
 waitRead:
  bit InputFlags
  bmi waitRead
  lda InputByte
+.if HW_TYPE = 0
  ldx #$3f ;set all flags high
  stx OutputFlags
 finishRead:
  bit InputFlags
  bpl finishRead
+.endif
  rts
 
 Text:

@@ -130,6 +130,7 @@ SendByte:
  bit InputFlags
  bvs SendByte
  sta OutputByte
+.if HW_TYPE = 0
  lda #$1e ; set bit 0 low to indicate write started
  sta OutputFlags 
 finishWrite:
@@ -137,27 +138,34 @@ finishWrite:
  bvc finishWrite
  lda #$1f
  sta OutputFlags
+.endif
  rts
 
 GetByte:
+.if HW_TYPE = 0
  ldx #$1d ;set read flag low
  stx OutputFlags
+.endif
 waitRead:
  bit InputFlags
  bpl readByte
  bit Keyboard ;keypress will abort waiting to read
  bpl waitRead
+.if HW_TYPE = 0
  lda #$1f ;set all flags high and exit
  sta OutputFlags
+.endif
  sec ;failure
  rts 
 readByte:
  lda InputByte
+.if HW_TYPE = 0
  ldx #$1f ;set all flags high
  stx OutputFlags
 finishRead:
  bit InputFlags
  bpl finishRead
+.endif
  clc ;success
 end:
  rts

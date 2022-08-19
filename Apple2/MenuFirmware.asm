@@ -73,10 +73,11 @@ Start:
  lda #$fd
  sta $37
  ;jsr Home	;clear screen and show menu options
- lda #$10
+ lda #$02
  sta vtab
  jsr BasCalc
  ldy #$00
+ sty htab
 PrintString:
  lda Text,y
  beq WaitForRPi

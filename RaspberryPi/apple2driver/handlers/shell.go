@@ -45,12 +45,13 @@ func ShellCommand() {
 		case <-outputComplete:
 			ptmx.Close()
 			comm.WriteByte(0)
-			return
+//			return
+			break
 		case <-userCancelled:
 			fmt.Printf("User cancelled, killing process\n")
 			ptmx.Close()
 			cmd.Process.Kill()
-			comm.WriteByte(0)
+//			comm.WriteByte(0)
 			return
 		case <-inputComplete:
 			cmd.Wait()

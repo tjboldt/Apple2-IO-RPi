@@ -1,0 +1,206 @@
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+
+MIT License
+
+Copyright (c) 2022 Oliver Schmidt (https://a2retro.de/)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+///////////////////////////////////////////////////////////////////////////////
+
+.define public gpio_addr    2   // 12 pins
+.define public gpio_rw      14
+.define public gpio_data    15  //  8 pins
+.define public gpio_led     25
+.define public gpio_enbl    26  // DEVSEL | IOSEL | IOSTRB
+.define public gpio_irq     27
+.define public gpio_rdy     28
+
+.define public size_addr    13  // incl. R/W
+.define public size_data    8
+
+.define public sm_enbl      0
+.define public sm_read      1   // from Apple II perspective
+.define public sm_write     2   // from Apple II perspective
+
+.define irq_write           4
+
+/*
+
+Implementation of the Apple II peripheral bus protocol:
+
+- /DEVSEL, /IOSEL and /IOSTRB are supposed to combined to ENBL via an AND gate.
+
+- On the falling edge of ENBL, the lines A0-A11 and R/W are sampled and pushed
+  into the 'enable' state machine RX FIFO.
+
+- In case of an Apple II write cycle, the lines D0-D7 are sampled ~300ns later
+  and pushed into the 'write' state machine RX FIFO.
+
+- If a byte is pushed into the 'read' state machine TX FIFO, it is driven out
+  to the lines D0-D7 until the rising edge of ENBL.
+
+*/
+
+///////////////////////////////////////////////////////////////////////////////
+
+.program enbl
+
+.wrap_target
+
+idle:
+    wait 1 gpio gpio_enbl       // wait for ENBL to rise
+    wait 0 gpio gpio_enbl       // wait for ENBL to fall
+
+    in pins, size_addr          // shift A0-A11 + R/W into ISR
+
+    jmp pin idle                // jump to idle if R/W is high
+
+    irq irq_write               // Set 'write' IRQ
+
+.wrap
+
+% c-sdk {
+static inline void enbl_program_init(uint offset) {
+    pio_sm_config c = enbl_program_get_default_config(offset);
+
+    // in_base:         gpio_addr
+    sm_config_set_in_pins(&c, gpio_addr);
+
+    // shift_right:     false
+    // autopush:        true
+    // push_threshold:  size_addr
+    sm_config_set_in_shift(&c, false, true, size_addr);
+
+    // pin:             gpio_rw
+    sm_config_set_jmp_pin(&c, gpio_rw);
+
+    // state_machine:   sm_enbl
+    // initial_pc:      offset
+    pio_sm_init(pio0, sm_enbl, offset, &c);
+
+    // state_machine:   sm_enbl
+    pio_sm_set_enabled(pio0, sm_enbl, true);
+}
+%}
+
+///////////////////////////////////////////////////////////////////////////////
+
+.program write
+
+.wrap_target
+
+    wait 1 irq irq_write [31]   // wait for 'write' IRQ to be set and clear it
+                                //   [31 cycles to allow 6502 to set up D0-D7]
+
+    in pins, size_data          // shift D0-D7 into ISR
+
+.wrap
+
+% c-sdk {
+static inline void write_program_init(uint offset) {
+    pio_sm_config c = write_program_get_default_config(offset);
+
+    // in_base:         gpio_data
+    sm_config_set_in_pins(&c, gpio_data);
+
+    // shift_right:     false
+    // autopush:        true
+    // push_threshold:  size_data
+    sm_config_set_in_shift(&c, false, true, size_data);
+
+    // state_machine:   sm_write
+    // initial_pc:      offset
+    pio_sm_init(pio0, sm_write, offset, &c);
+
+    // state_machine:   sm_write
+    pio_sm_set_enabled(pio0, sm_write, true);
+}
+%}
+
+///////////////////////////////////////////////////////////////////////////////
+
+.program read
+
+/*
+
+Both set and set-side are limited to 5 pins each. So both set and side-set are
+configured to set (the direction of) 4 pins. This approach allows to set the
+direction of D0-D7 in one operation.
+
+Note: The naive approach would have been
+    mov osr, ~x                 // move 0xFFFFFFFF to OSR
+    out pindirs, size_data      // enable output of D0-D7
+    [...]
+    mov osr, x                  // move 0x00000000 to OSR
+    out pindirs, size_data      // disable output of D0-D7
+but this would have required two operations and destroyed OSR.
+
+*/
+
+.side_set (size_data / 2) opt pindirs
+
+.wrap_target
+
+    pull block                  // pull data into OSR, block on empty FIFO
+
+    out pins, size_data         // shift OSR out to D0-D7
+
+    set pindirs, 15 side 15     // enable output of D0-D7
+
+    wait 1 gpio gpio_enbl       // wait for ENBL to rise
+
+    set pindirs, 0 side 0       // disable output of D0-D7
+
+.wrap
+
+% c-sdk {
+static inline void read_program_init(uint offset) {
+    pio_sm_config c = read_program_get_default_config(offset);
+
+    // out_base:        gpio_data
+    // out_count:       size_data
+    sm_config_set_out_pins(&c, gpio_data, size_data);
+
+    // shift_right:     true
+    // autopull:        false
+    // pull_threshold:  size_data
+    sm_config_set_out_shift(&c, true, false, size_data);
+
+    // set_base:        gpio_data
+    // set_count:       size_data / 2
+    sm_config_set_set_pins(&c, gpio_data, size_data / 2);
+
+    // sideset_base:    gpio_data + size_data / 2
+    sm_config_set_sideset_pins(&c, gpio_data + size_data / 2);
+
+    // state_machine:   sm_read
+    // initial_pc:      offset
+    pio_sm_init(pio0, sm_read, offset, &c);
+
+    // state_machine:   sm_read
+    pio_sm_set_enabled(pio0, sm_read, true);
+}
+%}
+
+///////////////////////////////////////////////////////////////////////////////

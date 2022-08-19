@@ -110,8 +110,8 @@ Start:
  lda LastChar
  pha
  bit ClearKeyboard
- lda #ResetCommand
- jsr SendByte
+; lda #ResetCommand
+; jsr SendByte
  lda #ShellCommand
  jsr SendByte
  jsr DumpOutput

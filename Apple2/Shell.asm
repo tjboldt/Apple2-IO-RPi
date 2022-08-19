@@ -19,14 +19,10 @@ IOError = $27
 NoDevice = $28
 WriteProtect = $2B
 
-; have 6502 absolute indexed access phantom reads 
-; happen on page $bf to avoid unwanted i/o access
-IndexOffset = $8f
-
-InputByte = $c08e - IndexOffset
-OutputByte = $c08d - IndexOffset
-InputFlags = $c08b - IndexOffset
-OutputFlags = $c087 - IndexOffset
+InputByte = $c08e
+OutputByte = $c08d
+InputFlags = $c08b
+OutputFlags = $c087
 
 ResetCommand = $00
 ReadBlockCommand = $01
@@ -89,10 +85,9 @@ DetectSlot:
  asl
  asl
  asl
- clc
- adc #IndexOffset
  tax
- bcc Init ;always
+ clc
+ bcc Init
 nextSlot:
  dex
  bne DetectSlot

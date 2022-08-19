@@ -17,15 +17,10 @@ XLEN       =  $BE52    ;length of command string-1.
 XCNUM      =  $BE53    ;CI cmd no. (ext cmd - 0).
 PBITS      =  $BE54    ;Command parameter bits.
 XRETURN    =  $FF58    ;Known RTS instruction.
-
-; have 6502 absolute indexed access phantom reads 
-; happen on page $bf to avoid unwanted i/o access
-IndexOffset = $8f
-
-InputByte = $c08e - IndexOffset
-OutputByte = $c08d - IndexOffset
-InputFlags = $c08b - IndexOffset
-OutputFlags = $c087 - IndexOffset
+InputByte = $c08e
+OutputByte = $c08d
+InputFlags = $c08b
+OutputFlags = $c087
 
 ReadBlockCommand = $01
 WriteBlockCommand = $02
@@ -81,10 +76,9 @@ DetectSlot:
  asl
  asl
  asl
- clc
- adc #IndexOffset
  tax
- bcc Start ;always
+ clc
+ bcc Start
 nextSlot:
  dex
  bne DetectSlot

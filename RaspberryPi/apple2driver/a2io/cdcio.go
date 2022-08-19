@@ -11,6 +11,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"go.bug.st/serial"
@@ -28,18 +29,19 @@ func (a2 CDCio) Init() {
 	name := ""
 	for {
 		portInfos, err := enumerator.GetDetailedPortsList()
-		if err != nil {
-			panic(err)
-		}
-		for _, portInfo := range portInfos {
-			if portInfo.IsUSB && portInfo.VID == "2E8A" && portInfo.PID == "000A" {
-				name = portInfo.Name
-				fmt.Printf("Found CDC port %s\n", name)
+		if err == nil {
+			for _, portInfo := range portInfos {
+				if portInfo.IsUSB && 
+				        strings.ToUpper(portInfo.VID) == "2E8A" &&
+					strings.ToUpper(portInfo.PID) == "000A" {
+					name = portInfo.Name
+					fmt.Printf("Found CDC port %s\n", name)
+					break
+				}
+			}
+			if name != "" {
 				break
 			}
-		}
-		if name != "" {
-			break
 		}
 		time.Sleep(time.Millisecond)
 	}
@@ -51,7 +53,9 @@ func (a2 CDCio) Init() {
 			break;
 		}
 		var portErr *serial.PortError
-		if !errors.As(err, &portErr) || portErr.Code() != serial.PortNotFound {
+		if !errors.As(err, &portErr) || 
+			portErr.Code() != serial.PortNotFound &&
+			portErr.Code() != serial.PermissionDenied {
 			panic(err)
 		}
 		time.Sleep(time.Millisecond)

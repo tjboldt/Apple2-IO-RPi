@@ -18,7 +18,7 @@ See the [upstream repo](https://github.com/tjboldt/Apple2-IO-RPi) for the origin
 
 ## Building
 
-1. Execute `assemble 1` in `/Apple2` (requires [cc65](https://cc65.github.io/)).
+1. Execute `assemble 1` in `/Apple2` (requires [cc65](https://cc65.github.io/) and the [ProDOS-Utilities](https://github.com/oliverschmidt/ProDOS-Utilities)).
 
 2. Build the project in `/RaspberryPiPico` (requires the [Raspberry Pico C/C++ SDK](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html)).
 

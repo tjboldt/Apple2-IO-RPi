@@ -1,23 +1,20 @@
 #!/bin/sh
 
+sudo apt install git -y
 wget https://golang.org/dl/go1.19.linux-armv6l.tar.gz
 sudo tar -C /usr/local -xzf go1.19.linux-armv6l.tar.gz
 sudo ln -s /usr/local/go/bin/go /usr/bin/go
-wget https://github.com/oliverschmidt/ProDOS-Utilities/archive/refs/heads/main.zip -O ProDOS-Utilities.zip
-unzip ProDOS-Utilities.zip
-mv ProDOS-Utilities-main ProDOS-Utilities
+git clone https://github.com/oliverschmidt/ProDOS-Utilities.git
 cd ProDOS-Utilities || exit
 go mod tidy
 go build
 cd ~ || exit
 sudo ln -s $HOME/ProDOS-Utilities/ProDOS-Utilities /usr/bin/ProDOS-Utilities
-wget https://github.com/oliverschmidt/Apple2-IO-RPi/archive/refs/heads/main.zip -O Apple2-IO-RPi.zip
-unzip Apple2-IO-RPi.zip
-mv Apple2-IO-RPi-main Apple2-IO-RPi
+git clone https://github.com/oliverschmidt/Apple2-IO-RPi.git
 cd Apple2-IO-RPi/RaspberryPi/apple2driver || exit
 go mod tidy
 go build
-sudo apt install cc65 -y
+sudo apt install cc65 vim -y
 cd ~ || exit
 sudo bash -c 'cat > /boot/config.txt << EOF
 disable_splash=1

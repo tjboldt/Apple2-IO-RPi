@@ -3,4 +3,5 @@
 *.DS_Store
 RaspberryPi/apple2driver/apple2driver
 RaspberryPi/Apple2-IO-RPi.log
+RaspberryPiPico/build/
 Hardware/Apple2IORPi-backups/

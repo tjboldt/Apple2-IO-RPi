@@ -28,11 +28,43 @@ SOFTWARE.
 
 #include "bus.pio.h"
 
+#include "board.h"
+
 extern const __attribute__((aligned(4))) uint8_t firmware[];
 
 static uint32_t __not_in_flash("page") page;
 
-void __not_in_flash_func(board)() {
+void __not_in_flash_func(board)(void) {
+    for (uint gpio = gpio_addr; gpio < gpio_addr + size_addr; gpio++) {
+        gpio_init(gpio);
+        gpio_set_pulls(gpio, false, false);  // floating
+    }
+
+    for (uint gpio = gpio_data; gpio < gpio_data + size_data; gpio++) {
+        pio_gpio_init(pio0, gpio);
+        gpio_set_pulls(gpio, false, false);  // floating
+    }
+
+    gpio_init(gpio_enbl);
+    gpio_pull_up(gpio_enbl);
+
+    gpio_init(gpio_irq);
+    gpio_pull_up(gpio_irq);
+
+    gpio_init(gpio_nmi);
+    gpio_pull_up(gpio_nmi);
+
+    uint offset;
+
+    offset = pio_add_program(pio0, &enbl_program);
+    enbl_program_init(offset);
+
+    offset = pio_add_program(pio0, &write_program);
+    write_program_init(offset);
+
+    offset = pio_add_program(pio0, &read_program);
+    read_program_init(offset);
+
     while (true) {
         uint32_t enbl = pio_sm_get_blocking(pio0, sm_enbl);
         uint32_t addr = enbl & 0x0FFF;

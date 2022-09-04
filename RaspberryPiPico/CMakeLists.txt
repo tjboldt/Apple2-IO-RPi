@@ -25,3 +25,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         pico_multicore
         hardware_pio
         )
+
+if(${PICO_BOARD} STREQUAL "pico_w")
+target_link_libraries(${PROJECT_NAME} PRIVATE
+        pico_cyw43_arch_none
+        )
+endif()

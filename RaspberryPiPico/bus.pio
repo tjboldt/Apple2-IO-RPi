@@ -31,10 +31,9 @@ SOFTWARE.
 .define public gpio_addr    2   // 12 pins
 .define public gpio_rw      14
 .define public gpio_data    15  //  8 pins
-.define public gpio_led     25
 .define public gpio_enbl    26  // DEVSEL | IOSEL | IOSTRB
 .define public gpio_irq     27
-.define public gpio_rdy     28
+.define public gpio_nmi     28
 
 .define public size_addr    13  // incl. R/W
 .define public size_data    8
@@ -74,9 +73,9 @@ idle:
 
     in pins, size_addr          // shift A0-A11 + R/W into ISR
 
-    jmp pin idle                // jump to idle if R/W is high
+    jmp pin idle                // jump to 'idle' if R/W is high
 
-    irq irq_write               // Set 'write' IRQ
+    irq irq_write               // set 'write' IRQ
 
 .wrap
 

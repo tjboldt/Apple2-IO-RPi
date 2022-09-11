@@ -32,9 +32,9 @@ SOFTWARE.
 
 extern const __attribute__((aligned(4))) uint8_t firmware[];
 
-static uint32_t __not_in_flash("page") page;
+static uint32_t page;
 
-void __not_in_flash_func(board)(void) {
+void __time_critical_func(board)(void) {
     for (uint gpio = gpio_addr; gpio < gpio_addr + size_addr; gpio++) {
         gpio_init(gpio);
         gpio_set_pulls(gpio, false, false);  // floating
@@ -46,13 +46,7 @@ void __not_in_flash_func(board)(void) {
     }
 
     gpio_init(gpio_enbl);
-    gpio_pull_up(gpio_enbl);
-
-    gpio_init(gpio_irq);
-    gpio_pull_up(gpio_irq);
-
-    gpio_init(gpio_nmi);
-    gpio_pull_up(gpio_nmi);
+    gpio_set_pulls(gpio_enbl, false, false);  // floating
 
     uint offset;
 
@@ -65,6 +59,8 @@ void __not_in_flash_func(board)(void) {
     offset = pio_add_program(pio0, &read_program);
     read_program_init(offset);
 
+    page = 0;
+
     while (true) {
         uint32_t enbl = pio_sm_get_blocking(pio0, sm_enbl);
         uint32_t addr = enbl & 0x0FFF;
@@ -73,7 +69,7 @@ void __not_in_flash_func(board)(void) {
         uint32_t read = enbl & 0x1000;  // R/W
 
         if (read) {
-            if (!io) {
+            if (!io) {  // DEVSEL
                 switch (addr & 0x7) {
                     case 0x3:
                         pio_sm_put(pio0, sm_read, !multicore_fifo_rvalid() << 7 |
@@ -90,7 +86,7 @@ void __not_in_flash_func(board)(void) {
             }
         } else {
             uint32_t data = pio_sm_get_blocking(pio0, sm_write);
-            if (!io) {
+            if (!io) {  // DEVSEL
                 switch (addr & 0x7) {
                     case 0x5:
                         sio_hw->fifo_wr = data;

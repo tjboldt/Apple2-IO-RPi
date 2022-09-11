@@ -33,7 +33,7 @@ SOFTWARE.
 .define public gpio_data    15  //  8 pins
 .define public gpio_enbl    26  // DEVSEL | IOSEL | IOSTRB
 .define public gpio_irq     27
-.define public gpio_nmi     28
+.define public gpio_res     28
 
 .define public size_addr    13  // incl. R/W
 .define public size_data    8

@@ -32,6 +32,7 @@ SOFTWARE.
 #include "pico/cyw43_arch.h"
 #endif
 
+#include "bus.pio.h"
 #include "board.h"
 
 #ifdef TRACE
@@ -48,6 +49,9 @@ void uart_printf(uart_inst_t *uart, const char *format, ...) {
 }
 #endif
 
+void res_callback(uint gpio, uint32_t events) {
+}
+
 void main(void) {
     multicore_launch_core1(board);
 
@@ -57,6 +61,12 @@ void main(void) {
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 #endif
+
+    gpio_init(gpio_irq);
+    gpio_pull_up(gpio_irq);
+
+    gpio_init(gpio_res);
+    gpio_set_irq_enabled_with_callback(gpio_res, GPIO_IRQ_EDGE_RISE, true, &res_callback);
 
     stdio_init_all();
     stdio_set_translate_crlf(&stdio_usb, false);

@@ -22,13 +22,13 @@ dtoverlay=disable-bt
 boot_delay=0
 EOF'
 sudo bash -c 'echo " quiet" >> /boot/cmdline.txt'
-wget https://archive.org/download/TotalReplay/Total%20Replay%20v5.0-alpha.4.hdv -O TotalReplay.hdv
+wget hhttps://github.com/2a-4am/4cade/releases/latest/download/Total.Replay.hdv
 sudo --preserve-env=HOME --preserve-env=USER bash -c 'cat > /etc/systemd/system/apple2driver.service << EOF
 [Unit]
 Description=Apple2-IO-RPi Driver
 
 [Service]
-ExecStart=$HOME/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver -cdc -d1 $HOME/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.hdv -d2 $HOME/TotalReplay.hdv
+ExecStart=$HOME/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver -cdc -d1 $HOME/Apple2-IO-RPi/RaspberryPi/Apple2-IO-RPi.hdv -d2 $HOME/Total.Replay.hdv
 SyslogIdentifier=apple2driver
 User=$USER
 Group=$USER

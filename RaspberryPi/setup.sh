@@ -22,7 +22,7 @@ dtoverlay=disable-bt
 boot_delay=0
 EOF'
 sudo bash -c 'echo " quiet" >> /boot/cmdline.txt'
-wget hhttps://github.com/2a-4am/4cade/releases/latest/download/Total.Replay.hdv
+wget https://github.com/a2-4am/4cade/releases/latest/download/Total.Replay.hdv
 sudo --preserve-env=HOME --preserve-env=USER bash -c 'cat > /etc/systemd/system/apple2driver.service << EOF
 [Unit]
 Description=Apple2-IO-RPi Driver

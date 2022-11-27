@@ -4,7 +4,7 @@ sudo apt install git -y
 wget https://golang.org/dl/go1.19.linux-armv6l.tar.gz
 sudo tar -C /usr/local -xzf go1.19.linux-armv6l.tar.gz
 sudo ln -s /usr/local/go/bin/go /usr/bin/go
-git clone https://github.com/oliverschmidt/ProDOS-Utilities.git
+git clone https://github.com/tjboldt/ProDOS-Utilities.git
 cd ProDOS-Utilities || exit
 go mod tidy
 go build

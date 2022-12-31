@@ -13,7 +13,7 @@ import (
 )
 
 // ReadBlockCommand handles requests to read ProDOS blocks
-func ReadBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt) {
+func ReadBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt) (int, error) {
 	blockLow, _ := comm.ReadByte()
 	blockHigh, _ := comm.ReadByte()
 	var driveUnit byte
@@ -23,7 +23,7 @@ func ReadBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt
 
 	if err != nil {
 		fmt.Printf("Failed to read block")
-		return
+		return 0, err
 	}
 
 	file := drive1
@@ -43,7 +43,7 @@ func ReadBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt
 	buffer, err := prodos.ReadBlock(file, block)
 	if err != nil {
 		fmt.Printf("failed %s\n", err)
-		return
+		return 0, err
 	}
 
 	err = comm.WriteBlock(buffer)
@@ -52,10 +52,12 @@ func ReadBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt
 	} else {
 		fmt.Printf("failed %s\n", err)
 	}
+
+	return block, nil
 }
 
 // WriteBlockCommand handles requests to write ProDOS blocks
-func WriteBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt) {
+func WriteBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt) error {
 	blockLow, _ := comm.ReadByte()
 	blockHigh, _ := comm.ReadByte()
 
@@ -65,7 +67,7 @@ func WriteBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterA
 	driveUnit, err = comm.ReadByte()
 	if err != nil {
 		fmt.Printf("Failed to write block")
-		return
+		return err
 	}
 
 	file := drive1
@@ -87,7 +89,7 @@ func WriteBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterA
 	err = comm.ReadBlock(buffer)
 	if err != nil {
 		fmt.Printf("failed %s\n", err)
-		return
+		return err
 	}
 	fmt.Printf("...")
 
@@ -97,4 +99,6 @@ func WriteBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterA
 	} else {
 		fmt.Printf("failed\n")
 	}
+
+	return nil
 }

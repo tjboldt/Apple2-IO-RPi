@@ -67,7 +67,7 @@ func main() {
 				newCwd, _ := os.Getwd()
 				if newCwd != cwd {
 					cwd = newCwd
-					generateDrive1FromCwd()
+					drive1, err = generateDrive1FromCwd()
 				}
 			case loadFileCommand:
 				handlers.LoadFileCommand()
@@ -83,7 +83,7 @@ func main() {
 	}
 }
 
-func getDriveFiles() (*os.File, *os.File) {
+func getDriveFiles() (prodos.ReaderWriterAt, prodos.ReaderWriterAt) {
 	var drive1Name string
 	var drive2Name string
 
@@ -96,8 +96,8 @@ func getDriveFiles() (*os.File, *os.File) {
 	flag.StringVar(&drive2Name, "d2", "", "A ProDOS format drive image for drive 2 and will be used for drive 1 if drive 1 empty")
 	flag.Parse()
 
-	var drive1 *os.File
-	var drive2 *os.File
+	var drive1 prodos.ReaderWriterAt
+	var drive2 prodos.ReaderWriterAt
 	var err error
 
 	if len(drive1Name) > 0 {
@@ -114,7 +114,7 @@ func getDriveFiles() (*os.File, *os.File) {
 		cwd := filepath.Dir(exec)
 		err = os.Chdir(filepath.Join(cwd, "../driveimage"))
 		logAndExitOnErr(err)
-		err = generateDrive1FromCwd()
+		drive1, err = generateDrive1FromCwd()
 		logAndExitOnErr(err)
 	}
 
@@ -134,14 +134,14 @@ func logAndExitOnErr(err error) {
 	}
 }
 
-func generateDrive1FromCwd() error {
+func generateDrive1FromCwd() (prodos.ReaderWriterAt, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	drive1 := prodos.NewMemoryFile(0x2000000)
 	fmt.Printf("Generating Drive 1 in memory from: %s\n", cwd)
 	prodos.CreateVolume(drive1, "APPLE2.IO.RPI", 65535)
 	err = prodos.AddFilesFromHostDirectory(drive1, cwd)
-	return err
+	return drive1, err
 }

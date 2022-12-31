@@ -41,13 +41,13 @@ ld65 FileAccessSlot0.o FileAccessSlot1.o FileAccessSlot2.o FileAccessSlot3.o Fil
 
 cat \
 DriveFirmware.bin CommandFirmware.bin FileAccessFirmware.bin MenuFirmware.bin \
-> AT28C64B.bin
+> ../RaspberryPi/driveimage/AT28C64B.bin
 
 ca65 Shell.asm -o Shell.o --listing Shell.lst || exit 1
-ld65 Shell.o -o Shell.bin -C ../.cicd/none.cfg  || exit 1
+ld65 Shell.o -o ../RaspberryPi/driveimage/Shell.bin -C ../.cicd/none.cfg  || exit 1
 
 ca65 RPi.Command.asm -o RPi.Command.o --listing RPi.Command.lst || exit 1
-ld65 RPi.Command.o -o RPi.Command.bin -C ../.cicd/none.cfg  || exit 1
+ld65 RPi.Command.o -o ../RaspberryPi/driveimage/RPi.Command.bin -C ../.cicd/none.cfg  || exit 1
 
 rm ./*.o
 rm DriveFirmware.bin
@@ -55,7 +55,5 @@ rm MenuFirmware.bin
 rm CommandFirmware.bin
 rm FileAccessFirmware.bin
 
-ProDOS-Utilities -d ../RaspberryPi/Apple2-IO-RPi.hdv -c put -i AT28C64B.bin -p /APPLE2.IO.RPI/AT28C64B.BIN || exit 1
-ProDOS-Utilities -d ../RaspberryPi/Apple2-IO-RPi.hdv -c put -i Shell.bin -p /APPLE2.IO.RPI/SHELL || exit 1
-ProDOS-Utilities -d ../RaspberryPi/Apple2-IO-RPi.hdv -c put -i RPi.Command.bin -p /APPLE2.IO.RPI/RPI.COMMAND -a 0x2000 || exit 1
-ProDOS-Utilities -d ../RaspberryPi/Apple2-IO-RPi.hdv -c ls
+cp Update.Firmware.bas ../RaspberryPi/driveimage/
+cp Startup.bas ../RaspberryPi/driveimage/

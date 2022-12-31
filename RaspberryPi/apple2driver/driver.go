@@ -18,6 +18,7 @@ import (
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/handlers"
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/info"
+	"github.com/tjboldt/ProDOS-Utilities/prodos"
 )
 
 const resetCommand = 0
@@ -46,6 +47,8 @@ func main() {
 	// In case Apple II is waiting, send 0 byte to start
 	comm.WriteByte(0)
 
+	cwd, _ := os.Getwd()
+
 	for {
 		command, err := comm.ReadByte()
 		if err == nil {
@@ -61,6 +64,11 @@ func main() {
 				handlers.GetTimeCommand()
 			case execCommand:
 				handlers.ExecCommand()
+				newCwd, _ := os.Getwd()
+				if newCwd != cwd {
+					cwd = newCwd
+					generateDrive1FromCwd()
+				}
 			case loadFileCommand:
 				handlers.LoadFileCommand()
 			case menuCommand:
@@ -83,10 +91,9 @@ func getDriveFiles() (*os.File, *os.File) {
 	path := filepath.Dir(execName)
 	path = filepath.Join(path, "..")
 	path, _ = filepath.EvalSymlinks(path)
-	defaultFileName := filepath.Join(path, "Apple2-IO-RPi.hdv")
 
 	flag.StringVar(&drive1Name, "d1", "", "A ProDOS format drive image for drive 1")
-	flag.StringVar(&drive2Name, "d2", defaultFileName, "A ProDOS format drive image for drive 2 and will be used for drive 1 if drive 1 empty")
+	flag.StringVar(&drive2Name, "d2", "", "A ProDOS format drive image for drive 2 and will be used for drive 1 if drive 1 empty")
 	flag.Parse()
 
 	var drive1 *os.File
@@ -96,34 +103,45 @@ func getDriveFiles() (*os.File, *os.File) {
 	if len(drive1Name) > 0 {
 		fmt.Printf("Opening Drive 1 as: %s\n", drive1Name)
 		drive1, err = os.OpenFile(drive1Name, os.O_RDWR, 0755)
+		logAndExitOnErr(err)
+	} else {
+		var exec string
+		exec, err = os.Executable()
 		if err != nil {
 			fmt.Printf("ERROR: %s", err.Error())
 			os.Exit(1)
 		}
+		cwd := filepath.Dir(exec)
+		err = os.Chdir(filepath.Join(cwd, "../driveimage"))
+		logAndExitOnErr(err)
+		err = generateDrive1FromCwd()
+		logAndExitOnErr(err)
 	}
 
 	if len(drive2Name) > 0 {
-		if drive1 == nil {
-			fmt.Printf("Opening Drive 1 as: %s because Drive 1 was empty\n", drive2Name)
-			drive1, err = os.OpenFile(drive2Name, os.O_RDWR, 0755)
-			if err != nil {
-				fmt.Printf("ERROR: %s", err.Error())
-				os.Exit(1)
-			}
-		} else {
-			fmt.Printf("Opening Drive 2 as: %s\n", drive2Name)
-			drive2, err = os.OpenFile(drive2Name, os.O_RDWR, 0755)
-			if err != nil {
-				fmt.Printf("ERROR: %s", err.Error())
-				os.Exit(1)
-			}
-		}
-	}
-
-	if drive1 == nil {
-		flag.PrintDefaults()
-		os.Exit(1)
+		fmt.Printf("Opening Drive 2 as: %s\n", drive2Name)
+		drive2, err = os.OpenFile(drive2Name, os.O_RDWR, 0755)
+		logAndExitOnErr(err)
 	}
 
 	return drive1, drive2
+}
+
+func logAndExitOnErr(err error) {
+	if err != nil {
+		fmt.Printf("ERROR: %s", err.Error())
+		os.Exit(1)
+	}
+}
+
+func generateDrive1FromCwd() error {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	drive1 := prodos.NewMemoryFile(0x2000000)
+	fmt.Printf("Generating Drive 1 in memory from: %s\n", cwd)
+	prodos.CreateVolume(drive1, "APPLE2.IO.RPI", 65535)
+	err = prodos.AddFilesFromHostDirectory(drive1, cwd)
+	return err
 }

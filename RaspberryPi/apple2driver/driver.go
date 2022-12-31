@@ -57,7 +57,12 @@ func main() {
 			case resetCommand:
 				handlers.ResetCommand()
 			case readBlockCommand:
-				handlers.ReadBlockCommand(drive1, drive2)
+				var block int
+				block, err = handlers.ReadBlockCommand(drive1, drive2)
+				if err == nil && block == 0 {
+					resetCwd()
+					drive1, _ = generateDriveFromCwd()
+				}
 			case writeBlockCommand:
 				handlers.WriteBlockCommand(drive1, drive2)
 			case getTimeCommand:
@@ -67,7 +72,7 @@ func main() {
 				newCwd, _ := os.Getwd()
 				if newCwd != cwd {
 					cwd = newCwd
-					drive1, err = generateDrive1FromCwd()
+					drive1, _ = generateDriveFromCwd()
 				}
 			case loadFileCommand:
 				handlers.LoadFileCommand()
@@ -105,16 +110,7 @@ func getDriveFiles() (prodos.ReaderWriterAt, prodos.ReaderWriterAt) {
 		drive1, err = os.OpenFile(drive1Name, os.O_RDWR, 0755)
 		logAndExitOnErr(err)
 	} else {
-		var exec string
-		exec, err = os.Executable()
-		if err != nil {
-			fmt.Printf("ERROR: %s", err.Error())
-			os.Exit(1)
-		}
-		cwd := filepath.Dir(exec)
-		err = os.Chdir(filepath.Join(cwd, "../driveimage"))
-		logAndExitOnErr(err)
-		drive1, err = generateDrive1FromCwd()
+		drive1, err = generateDriveFromCwd()
 		logAndExitOnErr(err)
 	}
 
@@ -134,14 +130,25 @@ func logAndExitOnErr(err error) {
 	}
 }
 
-func generateDrive1FromCwd() (prodos.ReaderWriterAt, error) {
+func resetCwd() {
+	exec, err := os.Executable()
+	if err != nil {
+		fmt.Printf("ERROR: %s", err.Error())
+		os.Exit(1)
+	}
+	cwd := filepath.Dir(exec)
+	err = os.Chdir(filepath.Join(cwd, "../driveimage"))
+	logAndExitOnErr(err)
+}
+
+func generateDriveFromCwd() (prodos.ReaderWriterAt, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
-	drive1 := prodos.NewMemoryFile(0x2000000)
-	fmt.Printf("Generating Drive 1 in memory from: %s\n", cwd)
-	prodos.CreateVolume(drive1, "APPLE2.IO.RPI", 65535)
-	err = prodos.AddFilesFromHostDirectory(drive1, cwd)
-	return drive1, err
+	drive := prodos.NewMemoryFile(0x2000000)
+	fmt.Printf("Generating Drive in memory from: %s\n", cwd)
+	prodos.CreateVolume(drive, "APPLE2.IO.RPI", 65535)
+	err = prodos.AddFilesFromHostDirectory(drive, cwd)
+	return drive, err
 }

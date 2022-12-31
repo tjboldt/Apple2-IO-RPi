@@ -8,13 +8,12 @@ package handlers
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/tjboldt/ProDOS-Utilities/prodos"
 )
 
 // ReadBlockCommand handles requests to read ProDOS blocks
-func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
+func ReadBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt) {
 	blockLow, _ := comm.ReadByte()
 	blockHigh, _ := comm.ReadByte()
 	var driveUnit byte
@@ -35,15 +34,15 @@ func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
 		driveNumber = 2
 	}
 
-	slotNumber := driveUnit &0x7F >> 4
+	slotNumber := driveUnit & 0x7F >> 4
 
 	block := int(blockHigh)*256 + int(blockLow)
 
 	fmt.Printf("Read block %04X in slot %d, drive %d...", block, slotNumber, driveNumber)
 
-	buffer,err := prodos.ReadBlock(file, block)
+	buffer, err := prodos.ReadBlock(file, block)
 	if err != nil {
-		fmt.Printf("failed %s\n",err)
+		fmt.Printf("failed %s\n", err)
 		return
 	}
 
@@ -51,12 +50,12 @@ func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
 	if err == nil {
 		fmt.Printf("succeeded\n")
 	} else {
-		fmt.Printf("failed %s\n",err)
+		fmt.Printf("failed %s\n", err)
 	}
 }
 
 // WriteBlockCommand handles requests to write ProDOS blocks
-func WriteBlockCommand(drive1 *os.File, drive2 *os.File) {
+func WriteBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt) {
 	blockLow, _ := comm.ReadByte()
 	blockHigh, _ := comm.ReadByte()
 
@@ -81,13 +80,13 @@ func WriteBlockCommand(drive1 *os.File, drive2 *os.File) {
 
 	block := int(blockHigh)*256 + int(blockLow)
 
-	slotNumber := driveUnit &0x7F >> 4
+	slotNumber := driveUnit & 0x7F >> 4
 
 	fmt.Printf("Write block %04X in slot %d, drive %d...", block, slotNumber, driveNumber)
 
 	err = comm.ReadBlock(buffer)
 	if err != nil {
-		fmt.Printf("failed %s\n",err)
+		fmt.Printf("failed %s\n", err)
 		return
 	}
 	fmt.Printf("...")

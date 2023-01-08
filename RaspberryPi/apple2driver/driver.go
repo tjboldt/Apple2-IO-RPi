@@ -33,7 +33,8 @@ const menuCommand = 8
 const shellCommand = 9
 
 func main() {
-	drive1, drive2 := getDriveFiles()
+	drive1Name, drive2Name := getFlags()
+	drive1, drive2 := getDriveFiles(drive1Name, drive2Name)
 
 	fmt.Printf("Starting Apple II RPi v%s...\n", info.Version)
 
@@ -59,7 +60,7 @@ func main() {
 			case readBlockCommand:
 				var block int
 				block, err = handlers.ReadBlockCommand(drive1, drive2)
-				if err == nil && block == 0 {
+				if err == nil && block == 0 && len(drive1Name) == 0 {
 					resetCwd()
 					drive1, _ = generateDriveFromCwd()
 				}
@@ -72,7 +73,9 @@ func main() {
 				newCwd, _ := os.Getwd()
 				if newCwd != cwd {
 					cwd = newCwd
-					drive1, _ = generateDriveFromCwd()
+					if len(drive1Name) == 0 {
+						drive1, _ = generateDriveFromCwd()
+					}
 				}
 			case loadFileCommand:
 				handlers.LoadFileCommand()
@@ -88,7 +91,7 @@ func main() {
 	}
 }
 
-func getDriveFiles() (prodos.ReaderWriterAt, prodos.ReaderWriterAt) {
+func getFlags() (string, string) {
 	var drive1Name string
 	var drive2Name string
 
@@ -101,6 +104,10 @@ func getDriveFiles() (prodos.ReaderWriterAt, prodos.ReaderWriterAt) {
 	flag.StringVar(&drive2Name, "d2", "", "A ProDOS format drive image for drive 2 and will be used for drive 1 if drive 1 empty")
 	flag.Parse()
 
+	return drive1Name, drive2Name
+}
+
+func getDriveFiles(drive1Name string, drive2Name string) (prodos.ReaderWriterAt, prodos.ReaderWriterAt) {
 	var drive1 prodos.ReaderWriterAt
 	var drive2 prodos.ReaderWriterAt
 	var err error

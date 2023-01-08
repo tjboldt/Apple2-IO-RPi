@@ -4,3 +4,5 @@ github.com/stianeikeland/go-rpio/v4 v4.6.0 h1:eAJgtw3jTtvn/CqwbC82ntcS+dtzUTgo5q
 github.com/stianeikeland/go-rpio/v4 v4.6.0/go.mod h1:A3GvHxC1Om5zaId+HqB3HKqx4K/AqeckxB7qRjxMK7o=
 github.com/tjboldt/ProDOS-Utilities v0.4.1 h1:tbXgLFXO4xh7t4XAuMgPwM9wXUcEAxH7/ByffjvgsPk=
 github.com/tjboldt/ProDOS-Utilities v0.4.1/go.mod h1:eBQRf0U+goRbBOxzFCwRW+FZmALC8dfYaqCwcqwzi74=
+github.com/tjboldt/ProDOS-Utilities v0.4.2 h1:0F02Ddhyc/su3twFNXg57boHsV0pnXKxwCPThrrSdMI=
+github.com/tjboldt/ProDOS-Utilities v0.4.2/go.mod h1:eBQRf0U+goRbBOxzFCwRW+FZmALC8dfYaqCwcqwzi74=

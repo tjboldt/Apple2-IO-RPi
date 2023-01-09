@@ -10,7 +10,7 @@ The purpose of this project is to provide I/O for an Apple II series 8 bit compu
 1. Boot message which waits for RPi to be ready
 2. ProDOS bootable drive from image stored on RPi
 3. Linux bash shell to the RPi from the Apple II including some VT100 support via `-SHELL` from ProDOS
-4. Load binary files directly from the RPi to the II (temporarily removed from firmware but will come back as a utility or dynamic virtual drive
+4. Load binary files directly from the RPi to the II (via dynamic virtual drive of current working directory on the RPi)
 5. Update Apple II firmware in place from image on RPi (note, this is done per slot)
 6. Supports two drive images at the same time
 7. Supports "RPI" command from BASIC to execute Linux commands from the command prompt or inside BASIC programs: `10 PRINT CHR$(4);"RPI ls -al /"`

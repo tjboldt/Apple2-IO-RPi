@@ -1,4 +1,4 @@
-; Copyright Terence J. Boldt (c)2020-2022
+; Copyright Terence J. Boldt (c)2020-2023
 ; Use of this source code is governed by an MIT
 ; license that can be found in the LICENSE file.
 
@@ -162,7 +162,7 @@ end:
 ; NOTE: The text below exactly fills the remaining 256 bytes of firmware
 Text:
 .byte	"Apple2-IO-RPi",$8d
-.byte	"(c)2020-2022 Terence J. Boldt",$8d
+.byte	"(c)2020-2023 Terence J. Boldt",$8d
 .byte   $8d
 .byte	"Waiting for RPi FW:000F...",$00
 

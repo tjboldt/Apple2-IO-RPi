@@ -287,7 +287,7 @@ Current file: Shell.asm
 002176  1  41 70 70 6C  .byte	"Apple2-IO-RPi Shell Version 000D",$8d
 00217A  1  65 32 2D 49  
 00217E  1  4F 2D 52 50  
-002197  1  28 63 29 32  .byte	"(c)2020-2022 Terence J. Boldt",$8d
+002197  1  28 63 29 32  .byte	"(c)2020-2023 Terence J. Boldt",$8d
 00219B  1  30 32 30 2D  
 00219F  1  32 30 32 32  
 0021B5  1  8D           .byte   $8d

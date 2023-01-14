@@ -1,4 +1,4 @@
-; Copyright Terence J. Boldt (c)2021-2022
+; Copyright Terence J. Boldt (c)2021-2023
 ; Use of this source code is governed by an MIT
 ; license that can be found in the LICENSE file.
 
@@ -281,6 +281,6 @@ restoreChar:
 
 Text:
 .byte	"Apple2-IO-RPi Shell Version 000D",$8d
-.byte	"(c)2020-2022 Terence J. Boldt",$8d
+.byte	"(c)2020-2023 Terence J. Boldt",$8d
 .byte   $8d
 .byte   $00

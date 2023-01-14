@@ -2,7 +2,7 @@ ca65 V2.18 - Raspbian 2.19-1
 Main file   : CommandFirmware.asm
 Current file: CommandFirmware.asm
 
-000000r 1               ; Copyright Terence J. Boldt (c)2020-2022
+000000r 1               ; Copyright Terence J. Boldt (c)2020-2023
 000000r 1               ; Use of this source code is governed by an MIT
 000000r 1               ; license that can be found in the LICENSE file.
 000000r 1               

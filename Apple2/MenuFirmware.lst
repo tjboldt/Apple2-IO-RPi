@@ -2,7 +2,7 @@ ca65 V2.18 - Raspbian 2.19-1
 Main file   : MenuFirmware.asm
 Current file: MenuFirmware.asm
 
-000000r 1               ; Copyright Terence J. Boldt (c)2020-2022
+000000r 1               ; Copyright Terence J. Boldt (c)2020-2023
 000000r 1               ; Use of this source code is governed by an MIT
 000000r 1               ; license that can be found in the LICENSE file.
 000000r 1               
@@ -169,7 +169,7 @@ Current file: MenuFirmware.asm
 00C7B8  1  65 32 2D 49  
 00C7BC  1  4F 2D 52 50  
 00C7C0  1  69 8D        
-00C7C2  1  28 63 29 32  .byte	"(c)2020-2022 Terence J. Boldt",$8d
+00C7C2  1  28 63 29 32  .byte	"(c)2020-2023 Terence J. Boldt",$8d
 00C7C6  1  30 32 30 2D  
 00C7CA  1  32 30 32 32  
 00C7CE  1  20 54 65 72  

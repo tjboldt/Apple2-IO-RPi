@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
+	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/drive"
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/handlers"
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/info"
 	"github.com/tjboldt/ProDOS-Utilities/prodos"
@@ -48,8 +49,6 @@ func main() {
 	// In case Apple II is waiting, send 0 byte to start
 	comm.WriteByte(0)
 
-	cwd, _ := os.Getwd()
-
 	for {
 		command, err := comm.ReadByte()
 		if err == nil {
@@ -58,25 +57,13 @@ func main() {
 			case resetCommand:
 				handlers.ResetCommand()
 			case readBlockCommand:
-				var block int
-				block, err = handlers.ReadBlockCommand(drive1, drive2)
-				if err == nil && block == 0 && len(drive1Name) == 0 {
-					resetCwd()
-					drive1, _ = generateDriveFromCwd()
-				}
+				handlers.ReadBlockCommand(drive1, drive2)
 			case writeBlockCommand:
 				handlers.WriteBlockCommand(drive1, drive2)
 			case getTimeCommand:
 				handlers.GetTimeCommand()
 			case execCommand:
-				handlers.ExecCommand()
-				newCwd, _ := os.Getwd()
-				if newCwd != cwd {
-					cwd = newCwd
-					if len(drive1Name) == 0 {
-						drive1, _ = generateDriveFromCwd()
-					}
-				}
+				handlers.ExecCommand(&drive1, &drive2)
 			case loadFileCommand:
 				handlers.LoadFileCommand()
 			case menuCommand:
@@ -117,7 +104,9 @@ func getDriveFiles(drive1Name string, drive2Name string) (prodos.ReaderWriterAt,
 		drive1, err = os.OpenFile(drive1Name, os.O_RDWR, 0755)
 		logAndExitOnErr(err)
 	} else {
-		drive1, err = generateDriveFromCwd()
+		directory, err := drive.GetDriveImageDirectory()
+		logAndExitOnErr(err)
+		drive1, err = drive.GenerateDriveFromDirectory("APPLE2.IO.RPI", directory)
 		logAndExitOnErr(err)
 	}
 
@@ -135,27 +124,4 @@ func logAndExitOnErr(err error) {
 		fmt.Printf("ERROR: %s", err.Error())
 		os.Exit(1)
 	}
-}
-
-func resetCwd() {
-	exec, err := os.Executable()
-	if err != nil {
-		fmt.Printf("ERROR: %s", err.Error())
-		os.Exit(1)
-	}
-	cwd := filepath.Dir(exec)
-	err = os.Chdir(filepath.Join(cwd, "../driveimage"))
-	logAndExitOnErr(err)
-}
-
-func generateDriveFromCwd() (prodos.ReaderWriterAt, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return nil, err
-	}
-	drive := prodos.NewMemoryFile(0x2000000)
-	fmt.Printf("Generating Drive in memory from: %s\n", cwd)
-	prodos.CreateVolume(drive, "APPLE2.IO.RPI", 65535)
-	err = prodos.AddFilesFromHostDirectory(drive, cwd)
-	return drive, err
 }

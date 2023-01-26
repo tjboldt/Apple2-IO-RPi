@@ -16,14 +16,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/drive"
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/info"
+	"github.com/tjboldt/ProDOS-Utilities/prodos"
 )
 
 var forceLowercase = false
 var execTimeoutSeconds = int(10)
 
 // ExecCommand handles requests for the Apple II executing Linux commands
-func ExecCommand() {
+func ExecCommand(drive1 *prodos.ReaderWriterAt, drive2 *prodos.ReaderWriterAt) {
 	workingDirectory, err := os.Getwd()
 	if err != nil {
 		workingDirectory = "/home"
@@ -72,6 +74,10 @@ func ExecCommand() {
 	}
 	if strings.HasPrefix(linuxCommand, "a2timeout") {
 		a2timeout(linuxCommand)
+		return
+	}
+	if strings.HasPrefix(linuxCommand, "a2drive") {
+		a2drive(linuxCommand, drive1, drive2)
 		return
 	}
 	if linuxCommand == "a2prompt" {
@@ -160,6 +166,7 @@ func a2help() {
 		"a2timeout - seconds to timeout commands\r" +
 		"A2LOWER - force lowercase for II+\r" +
 		"a2lower - disable force lowercase\r" +
+		"a2drive - change drive images\r" +
 		"\r")
 }
 
@@ -180,6 +187,57 @@ func a2timeout(linuxCommand string) {
 	default:
 		comm.WriteString("\rToo many parameters\n")
 	}
+}
+
+func a2drive(linuxCommand string, drive1 *prodos.ReaderWriterAt, drive2 *prodos.ReaderWriterAt) {
+	params := strings.Fields(linuxCommand)
+
+	if len(params) < 3 {
+		showa2DriveUsage()
+		return
+	}
+
+	driveNumber, err := strconv.ParseInt(params[1], 10, 32)
+	if err != nil {
+		comm.WriteString("\rFailed to parse drive number\r")
+		showa2DriveUsage()
+		return
+	}
+
+	if params[2] == "regen" {
+		directory, err := drive.GetDriveImageDirectory()
+		if err != nil {
+			comm.WriteString("\rFailed to parse source directory\r")
+			return
+		}
+		if len(params) > 3 {
+			directory = params[3]
+		}
+		switch driveNumber {
+		case 1:
+			*drive1, err = drive.GenerateDriveFromDirectory("APPLE2.IO.RPI", directory)
+			if err != nil {
+				comm.WriteString("\rFailed to regenerate drive 1\r")
+				return
+			}
+			comm.WriteString("\rDrive 1 regenerated\r")
+		case 2:
+			*drive2, err = drive.GenerateDriveFromDirectory("APPLE2.IO.RPI2", directory)
+			if err != nil {
+				comm.WriteString("\rFailed to regenerate drive 2\r")
+				return
+			}
+			comm.WriteString("\rDrive 2 regenerated\r")
+		default:
+			comm.WriteString("\rOnly drives 1 or 2 are supported\r")
+			showa2DriveUsage()
+			return
+		}
+	}
+}
+
+func showa2DriveUsage() {
+	comm.WriteString("\rUsage: a2drive DRIVENUMBER [regen [PATH] | load FILENAME]\rExamples: a2drive 1 regen ~/Apple2-IO-RPi/RaspberryPi/driveimage\r          a2drive 2 load /home/pi/Games.hdv\r")
 }
 
 func a2lower(enable bool) {

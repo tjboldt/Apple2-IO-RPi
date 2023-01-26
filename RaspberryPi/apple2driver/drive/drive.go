@@ -14,6 +14,7 @@ import (
 	"github.com/tjboldt/ProDOS-Utilities/prodos"
 )
 
+// GetDriveImageDirectory gets the default directory for driveimage
 func GetDriveImageDirectory() (string, error) {
 	exec, err := os.Executable()
 	if err != nil {
@@ -25,6 +26,7 @@ func GetDriveImageDirectory() (string, error) {
 	return driveImageDirectory, nil
 }
 
+// GenerateDriveFromDirectory regenerates a ProDOS drive from a host directory
 func GenerateDriveFromDirectory(volumeName string, directory string) (prodos.ReaderWriterAt, error) {
 	drive := prodos.NewMemoryFile(0x2000000)
 	fmt.Printf("Generating Drive in memory from: %s\n", directory)

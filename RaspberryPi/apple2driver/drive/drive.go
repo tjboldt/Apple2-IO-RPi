@@ -21,7 +21,7 @@ func GetDriveImageDirectory() (string, error) {
 		return "", err
 	}
 	driveImageDirectory := filepath.Dir(exec)
-	err = os.Chdir(filepath.Join(driveImageDirectory, "../driveimage"))
+	err = os.Chdir(filepath.Join(driveImageDirectory, "..", "driveimage"))
 	if err != nil {
 		return "", err
 	}

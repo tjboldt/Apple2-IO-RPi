@@ -20,11 +20,8 @@ func GetDriveImageDirectory() (string, error) {
 		fmt.Printf("ERROR: %s", err.Error())
 		return "", err
 	}
-	driveImageDirectory := filepath.Dir(exec)
-	err = os.Chdir(filepath.Join(driveImageDirectory, "..", "driveimage"))
-	if err != nil {
-		return "", err
-	}
+	driveImageDirectory := filepath.Join(filepath.Dir(filepath.Dir(exec)), "driveimage")
+
 	return driveImageDirectory, nil
 }
 

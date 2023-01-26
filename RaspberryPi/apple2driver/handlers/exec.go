@@ -220,12 +220,14 @@ func a2drive(linuxCommand string, drive1 *prodos.ReaderWriterAt, drive2 *prodos.
 				comm.WriteString("\rFailed to regenerate drive 1\r")
 				return
 			}
+			comm.WriteString("\rDrive 1 regenerated\r")
 		case 2:
 			*drive2, err = drive.GenerateDriveFromDirectory("APPLE2.IO.RPI2", directory)
 			if err != nil {
 				comm.WriteString("\rFailed to regenerate drive 2\r")
 				return
 			}
+			comm.WriteString("\rDrive 2 regenerated\r")
 		default:
 			comm.WriteString("\rOnly drives 1 or 2 are supported\r")
 			showa2DriveUsage()
@@ -235,7 +237,7 @@ func a2drive(linuxCommand string, drive1 *prodos.ReaderWriterAt, drive2 *prodos.
 }
 
 func showa2DriveUsage() {
-	comm.WriteString("\rUsage: a2drive DRIVENUMBER [regen [PATH] | load FILENAME]\rExamples: a2drive 1 regen /home/pi/Apple2-IO-RPi/RaspberryPi/driveimage\r\r          a2drive 2 load /home/pi/Games.hdv\r")
+	comm.WriteString("\rUsage: a2drive DRIVENUMBER [regen [PATH] | load FILENAME]\rExamples: a2drive 1 regen ~/Apple2-IO-RPi/RaspberryPi/driveimage\r          a2drive 2 load /home/pi/Games.hdv\r")
 }
 
 func a2lower(enable bool) {

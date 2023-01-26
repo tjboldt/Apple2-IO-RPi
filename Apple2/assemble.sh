@@ -54,6 +54,3 @@ rm DriveFirmware.bin
 rm MenuFirmware.bin
 rm CommandFirmware.bin
 rm FileAccessFirmware.bin
-
-cp Update.Firmware.bas ../RaspberryPi/driveimage/
-cp Startup.bas ../RaspberryPi/driveimage/

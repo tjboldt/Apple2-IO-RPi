@@ -37,6 +37,11 @@ func main() {
 	drive1Name, drive2Name := getFlags()
 	drive1, drive2 := getDriveFiles(drive1Name, drive2Name)
 
+	driveImageDir, err := drive.GetDriveImageDirectory()
+	if err == nil {
+		os.Chdir(driveImageDir)
+	}
+
 	fmt.Printf("Starting Apple II RPi v%s...\n", info.Version)
 
 	comm := a2io.A2Gpio{}

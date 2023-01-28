@@ -23,7 +23,7 @@ The card enables the Apple II to boot from and write to virtual hard drive image
 If you have a problem or idea for enhancement, log an issue [here](https://github.com/tjboldt/Apple2-IO-RPi/issues) or start a [discussion](https://github.com/tjboldt/Apple2-IO-RPi/discussions/categories/general). I recommend starring/watching the project for updates on GitHub. You are welcome to fork the project and submit pull requests which I will review. The latest version has an in-memory virtual drive representing current working directory in Linux for ease of copying files between Linux and ProDOS when the drive 1 is not specified as a file.
 
 ## Roadmap
-See [List of Enhancements](https://github.com/tjboldt/Apple2-IO-RPi/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement+author%3Atjboldt) 
+See [List of issues tagged roadmap](https://github.com/tjboldt/Apple2-IO-RPi/issues?q=is%3Aissue+is%3Aopen+label%3Aroadmap+author%3Atjboldt) 
 
 ## Setup
 [Setup card from scratch](https://github.com/tjboldt/Apple2-IO-RPi/discussions/63)

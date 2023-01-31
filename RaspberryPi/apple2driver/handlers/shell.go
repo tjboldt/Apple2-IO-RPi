@@ -17,6 +17,7 @@ import (
 
 // ShellCommand handles requests for the Apple II executing a Linux shell
 func ShellCommand() {
+	fmt.Printf("Shell started\n")
 	cmd := exec.Command("bash", "-i")
 	cmd.Env = append(os.Environ(),
 		"TERM=vt100",
@@ -43,7 +44,10 @@ func ShellCommand() {
 	for {
 		select {
 		case <-outputComplete:
+			fmt.Printf("Shell output complete\n")
+			outputComplete <- true
 			ptmx.Close()
+			cmd.Wait()
 			comm.WriteByte(0)
 			return
 		case <-userCancelled:
@@ -53,6 +57,8 @@ func ShellCommand() {
 			comm.WriteByte(0)
 			return
 		case <-inputComplete:
+			fmt.Printf("Shell input complete\n")
+			ptmx.Close()
 			cmd.Wait()
 			comm.WriteByte(0)
 			return

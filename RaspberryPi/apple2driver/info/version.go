@@ -8,4 +8,4 @@ package info
 
 // Version is the hexadecimal version number that
 // should be incremented with each driver update
-const Version = "0028"
+const Version = "0029"

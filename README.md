@@ -16,19 +16,14 @@ The purpose of this project is to provide I/O for an Apple II series 8 bit compu
 7. Supports "RPI" command from BASIC to execute Linux commands from the command prompt or inside BASIC programs: `10 PRINT CHR$(4);"RPI ls -al /"`
 
 ## Project Status
-So far, this is still a project and not a finished product. The current prototype is on the sixth revision and about 30 of the previous prototypes have been assembled and tested. The sixth prototype is functionally equivalent to the fifth, other than a new jumper to select internal/external power.
+So far, this is still a project and not a finished product. The current prototype is on the sixth revision. I have sold about 60 boards including previous prototypes. There are more than 100 in the wild between self made and ones purchased in places like eBay that were made by others. The sixth prototype is functionally equivalent to the fifth, other than a new jumper to select internal/external power.
 
 The card enables the Apple II to boot from and write to virtual hard drive images stored on the RPi in any slot (except slot 3), execute Linux commands from Applesoft BASIC and run a bash shell with VT100 emulation. The code has very few tests and is incomplete. Note that currently the firmware assumes an 80 column card is in slot 3 and than you have lowercase support. Most development has been done with an enhanced Apple //e with the card in slot 7. If you have other drive controllers earlier in the boot cycle, you can still boot from the Apple2-IO-RPi. For example, if the card was in slot 4, you could type `PR#4` from the BASIC prompt to boot the card. Note that the Raspberry Pi Zero W (and W 2) consume 170 - 250 mA and there is only 500 mA available to all expansion slots according to Apple. It is not recommended to have a lot of other cards in the system at the same time. With the sixth revision of the prototype, it is possible to remove the power jumper and run the RPi on an external USB power source. If configured for external power, note that the card's firmware will hang on boot without USB power on as the latch chips are powered by the 3.3V output of the RPi. 
 
 If you have a problem or idea for enhancement, log an issue [here](https://github.com/tjboldt/Apple2-IO-RPi/issues) or start a [discussion](https://github.com/tjboldt/Apple2-IO-RPi/discussions/categories/general). I recommend starring/watching the project for updates on GitHub. You are welcome to fork the project and submit pull requests which I will review. The latest version has an in-memory virtual drive representing current working directory in Linux for ease of copying files between Linux and ProDOS when the drive 1 is not specified as a file.
 
 ## Roadmap
-1. Allow more than two virtual hard drives at a time
-2. Update GPIO library to reduce power consumption (remove busy-wait loops and use edge triggering)
-3. Proper ProDOS clock driver (currently just directly sets values on block reads)
-4. Bi-directional image conversion between common formats and HIRES
-5. Remote code execution 
-6. Proxy VNC connection, rendering as Apple II compatible graphics
+See [List of issues tagged roadmap](https://github.com/tjboldt/Apple2-IO-RPi/issues?q=is%3Aissue+is%3Aopen+label%3Aroadmap+author%3Atjboldt) 
 
 ## Setup
 [Setup card from scratch](https://github.com/tjboldt/Apple2-IO-RPi/discussions/63)

@@ -234,6 +234,38 @@ func a2drive(linuxCommand string, drive1 *prodos.ReaderWriterAt, drive2 *prodos.
 			return
 		}
 	}
+
+	if params[2] == "load" {
+
+		if len(params) != 4 {
+			comm.WriteString("\rMust specify a drive image to load\r")
+			showa2DriveUsage()
+			return
+		}
+
+		imageFileName := params[3]
+
+		switch driveNumber {
+		case 1:
+			*drive1, err = os.OpenFile(imageFileName, os.O_RDWR, 0755)
+			if err != nil {
+				comm.WriteString("\rFailed to load drive 1\r")
+				return
+			}
+			comm.WriteString("\rDrive 1 loaded\r")
+		case 2:
+			*drive2, err = os.OpenFile(imageFileName, os.O_RDWR, 0755)
+			if err != nil {
+				comm.WriteString("\rFailed to load drive 2\r")
+				return
+			}
+			comm.WriteString("\rDrive 2 loaded\r")
+		default:
+			comm.WriteString("\rOnly drives 1 or 2 are supported\r")
+			showa2DriveUsage()
+			return
+		}
+	}
 }
 
 func showa2DriveUsage() {

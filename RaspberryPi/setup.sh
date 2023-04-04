@@ -1,5 +1,6 @@
 #!/bin/sh
 
+sudo apt update
 sudo apt install git -y
 wget https://golang.org/dl/go1.17.3.linux-armv6l.tar.gz
 sudo tar -C /usr/local -xzf go1.17.3.linux-armv6l.tar.gz

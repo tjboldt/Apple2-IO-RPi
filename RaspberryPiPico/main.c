@@ -28,9 +28,6 @@ SOFTWARE.
 #include "pico/printf.h"
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
-#ifdef RASPBERRYPI_PICO_W
-#include "pico/cyw43_arch.h"
-#endif
 
 #include "bus.pio.h"
 #include "board.h"
@@ -49,24 +46,11 @@ void uart_printf(uart_inst_t *uart, const char *format, ...) {
 }
 #endif
 
-void res_callback(uint gpio, uint32_t events) {
-}
-
 void main(void) {
     multicore_launch_core1(board);
 
-#ifdef RASPBERRYPI_PICO_W
-    cyw43_arch_init();
-#elif defined(PICO_DEFAULT_LED_PIN)
-    gpio_init(PICO_DEFAULT_LED_PIN);
-    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
-#endif
-
     gpio_init(gpio_irq);
     gpio_pull_up(gpio_irq);
-
-    gpio_init(gpio_res);
-    gpio_set_irq_enabled_with_callback(gpio_res, GPIO_IRQ_EDGE_RISE, true, &res_callback);
 
     stdio_init_all();
     stdio_set_translate_crlf(&stdio_usb, false);
@@ -99,15 +83,5 @@ void main(void) {
 #endif
             }
         }
-
-#ifdef RASPBERRYPI_PICO_W
-        static bool last_conn;
-        if (conn != last_conn) {
-            cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, conn);
-            last_conn = conn;
-        }
-#elif defined(PICO_DEFAULT_LED_PIN)
-        gpio_put(PICO_DEFAULT_LED_PIN, conn);
-#endif
     }
 }

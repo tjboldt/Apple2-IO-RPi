@@ -75,7 +75,7 @@ func main() {
 			}
 			// temporary workaround for busy wait loop heating up the RPi
 		} else {
-			time.Sleep(time.Millisecond * 100)
+			time.Sleep(time.Millisecond * 200)
 		}
 	}
 }

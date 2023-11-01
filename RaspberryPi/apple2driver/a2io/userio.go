@@ -55,7 +55,7 @@ func (userIo UserIo) WriteBuffer(buffer []byte) error {
 }
 
 // ReadByte simulates reading to the Apple II but uses stdin instead
-func (userIo UserIo) ReadByte() (byte, error) {
+func (userIo UserIo) ReadByte(noDelay ...bool) (byte, error) {
 	fmt.Printf("ReadByte: ")
 	var b byte
 	fmt.Scanf("%x", &b)

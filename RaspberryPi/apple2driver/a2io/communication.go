@@ -15,7 +15,7 @@ type A2Io interface {
 	WriteString(outString string) error
 	WriteBlock(buffer []byte) error
 	WriteBuffer(buffer []byte) error
-	ReadByte() (byte, error)
+	ReadByte(noDelay ...bool) (byte, error)
 	ReadString() (string, error)
 	ReadBlock(buffer []byte) error
 	SendCharacter(character byte)

@@ -220,7 +220,7 @@ func sendCharacter(comm A2Io, b byte) {
 }
 
 func readCharacter(comm A2Io) (string, error) {
-	b, err := comm.ReadByte()
+	b, err := comm.ReadByte(true)
 	var s = string(b)
 	if err == nil {
 		if applicationMode {

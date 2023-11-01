@@ -160,10 +160,17 @@ func (a2 A2Gpio) ReadByte() (byte, error) {
 
 	// wait for the Apple II to write
 	startTime := time.Now()
+	lastSleepTime := time.Now()
+	sleepDuration := 10
 	for inWrite.Read() == 1 {
 		if time.Since(startTime) > edgeTimeout {
 			outRead.High()
 			return 0, errors.New("timed out reading byte -- write stuck high")
+		}
+		if time.Since(lastSleepTime) > edgeTimeout/10 {
+			sleepDuration *= 3;
+			time.Sleep(time.Millisecond * time.Duration(sleepDuration));
+			lastSleepTime = time.Now()
 		}
 	}
 
@@ -211,9 +218,16 @@ func (a2 A2Gpio) ReadByte() (byte, error) {
 	// wait for the Apple II to finish writing
 	//fmt.Printf("wait for the Apple II to finish writing\n")
 	startTime = time.Now()
+	lastSleepTime = time.Now()
+	sleepDuration = 10
 	for inWrite.Read() == 0 {
 		if time.Since(startTime) > edgeTimeout {
 			return 0, errors.New("timed out reading byte -- write stuck low")
+		}
+		if time.Since(lastSleepTime) > edgeTimeout/10 {
+			sleepDuration *= 3;
+			time.Sleep(time.Millisecond * time.Duration(sleepDuration));
+			lastSleepTime = time.Now()
 		}
 	}
 
@@ -230,10 +244,17 @@ func (a2 A2Gpio) WriteByte(data byte) error {
 
 	// wait for the Apple II to be ready to read
 	startTime := time.Now()
+	lastSleepTime := time.Now()
+	sleepDuration := 10
 	for inRead.Read() == 1 {
 		if time.Since(startTime) > edgeTimeout {
 			outWrite.High()
 			return errors.New("timed out writing byte -- read stuck high")
+		}
+		if time.Since(lastSleepTime) > edgeTimeout/10 {
+			sleepDuration *= 3;
+			time.Sleep(time.Millisecond * time.Duration(sleepDuration));
+			lastSleepTime = time.Now()
 		}
 	}
 
@@ -291,10 +312,17 @@ func (a2 A2Gpio) WriteByte(data byte) error {
 	// wait for the Apple II to finsih reading
 	//fmt.Printf("wait for the Apple II to finsih reading\n")
 	startTime = time.Now()
+	lastSleepTime = time.Now()
+	sleepDuration = 10
 	for inRead.Read() == 0 {
 		if time.Since(startTime) > edgeTimeout {
 			outWrite.High()
 			return errors.New("timed out writing byte -- read stuck low")
+		}
+		if time.Since(lastSleepTime) > edgeTimeout/10 {
+			sleepDuration *= 3;
+			time.Sleep(time.Millisecond * time.Duration(sleepDuration));
+			lastSleepTime = time.Now()
 		}
 	}
 

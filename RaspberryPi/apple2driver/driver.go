@@ -49,15 +49,12 @@ func main() {
 	handlers.SetCommunication(comm)
 	comm.Init()
 
-	lastCommandTime := time.Now()
-
 	// In case Apple II is waiting, send 0 byte to start
 	comm.WriteByte(0)
 
 	for {
 		command, err := comm.ReadByte()
 		if err == nil {
-			lastCommandTime = time.Now()
 			switch command {
 			case resetCommand:
 				handlers.ResetCommand()
@@ -77,7 +74,7 @@ func main() {
 				handlers.ShellCommand()
 			}
 			// temporary workaround for busy wait loop heating up the RPi
-		} else if time.Since(lastCommandTime) > time.Millisecond*100 {
+		} else {
 			time.Sleep(time.Millisecond * 100)
 		}
 	}

@@ -154,7 +154,7 @@ func (a2 A2Gpio) WriteString(outString string) error {
 }
 
 // ReadByte reads a byte from the Apple II via Raspberry Pi's GPIO ports
-func (a2 A2Gpio) ReadByte() (byte, error) {
+func (a2 A2Gpio) ReadByte(noDelay ...bool) (byte, error) {
 	// let the Apple II know we are ready to read
 	outRead.Low()
 
@@ -168,7 +168,9 @@ func (a2 A2Gpio) ReadByte() (byte, error) {
 			return 0, errors.New("timed out reading byte -- write stuck high")
 		}
 		if time.Since(lastSleepTime) > edgeTimeout/10 {
-			sleepDuration *= 3;
+			if len(noDelay) == 0 || !noDelay[0] {
+				sleepDuration *= 3;
+			}
 			time.Sleep(time.Millisecond * time.Duration(sleepDuration));
 			lastSleepTime = time.Now()
 		}
@@ -225,7 +227,9 @@ func (a2 A2Gpio) ReadByte() (byte, error) {
 			return 0, errors.New("timed out reading byte -- write stuck low")
 		}
 		if time.Since(lastSleepTime) > edgeTimeout/10 {
-			sleepDuration *= 3;
+			if len(noDelay) == 0 || !noDelay[0] {
+				sleepDuration *= 3;
+			}
 			time.Sleep(time.Millisecond * time.Duration(sleepDuration));
 			lastSleepTime = time.Now()
 		}

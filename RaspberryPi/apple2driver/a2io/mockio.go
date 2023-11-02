@@ -66,7 +66,7 @@ func (mockIo MockIo) WriteBuffer(buffer []byte) error {
 }
 
 // ReadByte mocks reading a byte from the Apple II
-func (mockIo MockIo) ReadByte() (byte, error) {
+func (mockIo MockIo) ReadByte(noDelay ...bool) (byte, error) {
 	b := mockIo.Data.BytesToRead[mockIo.Data.NumberBytesRead]
 	mockIo.Data.NumberBytesRead++
 	return b, mockIo.Data.ErrorToThrow

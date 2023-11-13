@@ -25,9 +25,9 @@ SOFTWARE.
 */
 
 #include <stdio.h>
-#include "pico/printf.h"
-#include "pico/stdlib.h"
-#include "pico/multicore.h"
+#include <pico/printf.h>
+#include <pico/stdlib.h>
+#include <pico/multicore.h>
 
 #include "bus.pio.h"
 #include "board.h"

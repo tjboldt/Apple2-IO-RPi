@@ -68,6 +68,7 @@ body:
       label: Shell Version
       description: What version of the shell are you running?`
       options:
+        - 000E (fix hang on exit)
         - 000D (added version info)
         - Older (pre-2022-Mar-01)
         - Not Applicable (bug not Shell related)

@@ -234,7 +234,7 @@ func readCharacter(comm A2Io) (string, error) {
 			case 0x08: // left
 				s = "\033OD"
 			case 0x0d: // return
-				s = string(byte(0x0a))
+				s = string(byte(0x0d))
 			}
 		} else {
 			switch b {
@@ -247,7 +247,7 @@ func readCharacter(comm A2Io) (string, error) {
 			case 0x08: // left
 				s = "\033[D"
 			case 0x0d: // return
-				s = string(byte(0x0a))
+				s = string(byte(0x0d))
 			}
 		}
 	}

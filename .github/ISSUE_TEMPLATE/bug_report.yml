@@ -49,6 +49,7 @@ body:
       label: Driver Version
       description: What version of the driver are you running? Check with `RPI a2version`
       options:
+        - 002C (fix nano editor)
         - 002B (fix keyboard delay)
         - 002A (reduce CPU usage)
         - 0029 (fix hang after shell exit)

@@ -4,7 +4,7 @@ See the [upstream repo](https://github.com/tjboldt/Apple2-IO-RPi) for the origin
 
 ## Installing
 
-1. Flash [Apple2-IO-RPi.uf2](https://github.com/oliverschmidt/Apple2-IO-RPi/releases/latest/download/Apple2-IO-RPi.uf2) to the Raspberry Pi Pico.
+1. Flash [Apple2-IO-RPi.uf2](https://github.com/oliverschmidt/apple2-io-rpi/releases/latest/download/Apple2-IO-RPi.uf2) to the Raspberry Pi Pico.
 
 2. Execute steps __4.)__ - __10.)__ and __12.)__ on [Setup new card from scratch](https://github.com/tjboldt/Apple2-IO-RPi/discussions/63).
 

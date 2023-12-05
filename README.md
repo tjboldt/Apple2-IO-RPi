@@ -8,7 +8,7 @@ See the [upstream repo](https://github.com/tjboldt/Apple2-IO-RPi) for the origin
 
 2. Execute steps __4.)__ - __10.)__ and __12.)__ on [Setup new card from scratch](https://github.com/tjboldt/Apple2-IO-RPi/discussions/63).
 
-3. Execute `wget --no-cache -O - https://raw.githubusercontent.com/oliverschmidt/Apple2-IO-RPi/main/RaspberryPi/setup.sh | bash`
+3. Execute `wget --no-cache -O - https://raw.githubusercontent.com/oliverschmidt/apple2-io-rpi/main/RaspberryPi/setup.sh | bash`
 
 ## Using
 

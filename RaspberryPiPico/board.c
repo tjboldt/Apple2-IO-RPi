@@ -24,9 +24,9 @@ SOFTWARE.
 
 */
 
-#include "pico/multicore.h"
+#include <pico/multicore.h>
 
-#include "bus.pio.h"
+#include <a2pico.h>
 
 #include "board.h"
 
@@ -35,57 +35,34 @@ extern const __attribute__((aligned(4))) uint8_t firmware[];
 static uint32_t page;
 
 void __time_critical_func(board)(void) {
-    for (uint gpio = gpio_addr; gpio < gpio_addr + size_addr; gpio++) {
-        gpio_init(gpio);
-        gpio_set_pulls(gpio, false, false);  // floating
-    }
 
-    for (uint gpio = gpio_data; gpio < gpio_data + size_data; gpio++) {
-        pio_gpio_init(pio0, gpio);
-        gpio_set_pulls(gpio, false, false);  // floating
-    }
-
-    gpio_init(gpio_enbl);
-    gpio_set_pulls(gpio_enbl, false, false);  // floating
-
-    uint offset;
-
-    offset = pio_add_program(pio0, &enbl_program);
-    enbl_program_init(offset);
-
-    offset = pio_add_program(pio0, &write_program);
-    write_program_init(offset);
-
-    offset = pio_add_program(pio0, &read_program);
-    read_program_init(offset);
-
-    page = 0;
+    a2pico_init(pio0);
 
     while (true) {
-        uint32_t enbl = pio_sm_get_blocking(pio0, sm_enbl);
-        uint32_t addr = enbl & 0x0FFF;
-        uint32_t io   = enbl & 0x0F00;  // IOSTRB or IOSEL
-        uint32_t strb = enbl & 0x0800;  // IOSTRB
-        uint32_t read = enbl & 0x1000;  // R/W
+        uint32_t pico = a2pico_getaddr(pio0);
+        uint32_t addr = pico & 0x0FFF;
+        uint32_t io   = pico & 0x0F00;  // IOSTRB or IOSEL
+        uint32_t strb = pico & 0x0800;  // IOSTRB
+        uint32_t read = pico & 0x1000;  // R/W
 
         if (read) {
             if (!io) {  // DEVSEL
                 switch (addr & 0x7) {
                     case 0x3:
-                        pio_sm_put(pio0, sm_read, !multicore_fifo_rvalid() << 7 |
-                                                  !multicore_fifo_wready() << 6);
+                        a2pico_putdata(pio0, !multicore_fifo_rvalid() << 7 |
+                                             !multicore_fifo_wready() << 6);
                         break;
                     case 0x6:
-                        pio_sm_put(pio0, sm_read, sio_hw->fifo_rd);
+                        a2pico_putdata(pio0, sio_hw->fifo_rd);
                         break;
                 }
             } else {
                 if (!strb) {
-                    pio_sm_put(pio0, sm_read, firmware[page | addr]);
+                    a2pico_putdata(pio0, firmware[page | addr]);
                 }
             }
         } else {
-            uint32_t data = pio_sm_get_blocking(pio0, sm_write);
+            uint32_t data = a2pico_getdata(pio0);
             if (!io) {  // DEVSEL
                 switch (addr & 0x7) {
                     case 0x5:

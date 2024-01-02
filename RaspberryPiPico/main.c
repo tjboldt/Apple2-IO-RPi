@@ -29,7 +29,6 @@ SOFTWARE.
 #include <pico/stdlib.h>
 #include <pico/multicore.h>
 
-#include "bus.pio.h"
 #include "board.h"
 
 #ifdef TRACE
@@ -49,17 +48,14 @@ void uart_printf(uart_inst_t *uart, const char *format, ...) {
 void main(void) {
     multicore_launch_core1(board);
 
-    gpio_init(gpio_irq);
-    gpio_pull_up(gpio_irq);
-
     stdio_init_all();
     stdio_set_translate_crlf(&stdio_usb, false);
 
 #ifdef TRACE
     uart_init(uart0, 115200);
     uart_set_translate_crlf(uart0, true);
-    gpio_set_function(0, GPIO_FUNC_UART);
-    gpio_set_function(1, GPIO_FUNC_UART);
+    gpio_set_function(PICO_DEFAULT_UART_TX_PIN, GPIO_FUNC_UART);
+    gpio_set_function(PICO_DEFAULT_UART_RX_PIN, GPIO_FUNC_UART);
 #endif
 
     while (true) {

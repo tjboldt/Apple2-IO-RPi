@@ -1,8 +1,8 @@
-ca65 V2.18 - N/A
+ca65 V2.18 - Debian 2.19-1
 Main file   : Shell.asm
 Current file: Shell.asm
 
-000000r 1               ; Copyright Terence J. Boldt (c)2021-2023
+000000r 1               ; Copyright Terence J. Boldt (c)2021-2024
 000000r 1               ; Use of this source code is governed by an MIT
 000000r 1               ; license that can be found in the LICENSE file.
 000000r 1               
@@ -285,9 +285,9 @@ Current file: Shell.asm
 002171  1  41 70 70 6C  .byte	"Apple2-IO-RPi Shell Version 000E",$8d
 002175  1  65 32 2D 49  
 002179  1  4F 2D 52 50  
-002192  1  28 63 29 32  .byte	"(c)2020-2023 Terence J. Boldt",$8d
+002192  1  28 63 29 32  .byte	"(c)2020-2024 Terence J. Boldt",$8d
 002196  1  30 32 30 2D  
-00219A  1  32 30 32 33  
+00219A  1  32 30 32 34  
 0021B0  1  8D           .byte   $8d
 0021B1  1  00           .byte   $00
 0021B1  1               

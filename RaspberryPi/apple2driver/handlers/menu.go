@@ -1,4 +1,4 @@
-// Copyright Terence J. Boldt (c)2020-2023
+// Copyright Terence J. Boldt (c)2020-2024
 // Use of this source code is governed by an MIT
 // license that can be found in the LICENSE file.
 
@@ -15,7 +15,7 @@ import (
 func MenuCommand() {
 	fmt.Printf("Sending menu...\n")
 	comm.WriteString("Apple2-IO-RPi\r" +
-		"(c)2020-2023 Terence J. Boldt\r" +
+		"(c)2020-2024 Terence J. Boldt\r" +
 		"\r" +
 		"Select an option:\r" +
 		"\r" +

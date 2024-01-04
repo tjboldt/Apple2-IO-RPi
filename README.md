@@ -1,6 +1,8 @@
 # Apple2-IO-RPi
 
-See the [upstream repo](https://github.com/tjboldt/Apple2-IO-RPi) for the original, full info.
+1. See the [upstream repo](https://github.com/tjboldt/Apple2-IO-RPi) for the original, full info.
+
+2. This fork is based on [A2Pico](https://github.com/oliverschmidt/a2pico).
 
 ## Installing
 

@@ -8,7 +8,7 @@
 
 1. Flash [Apple2-IO-RPi.uf2](https://github.com/oliverschmidt/apple2-io-rpi/releases/latest/download/Apple2-IO-RPi.uf2) to the Raspberry Pi Pico.
 
-2. Execute steps __4.)__ - __10.)__ and __12.)__ on [Setup new card from scratch](https://github.com/tjboldt/Apple2-IO-RPi/discussions/63).
+2. Execute steps __5.)__ - __8.)__ and __10.)__ on [Setup new card from scratch](https://github.com/tjboldt/Apple2-IO-RPi/discussions/63).
 
 3. Execute `wget --no-cache -O - https://raw.githubusercontent.com/oliverschmidt/apple2-io-rpi/main/RaspberryPi/setup.sh | bash`
 

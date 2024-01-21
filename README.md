@@ -20,8 +20,6 @@
 
 ## Building
 
-1. Execute `assemble 1` in `/Apple2` (requires [cc65](https://cc65.github.io/) and the [ProDOS-Utilities](https://github.com/tjboldt/ProDOS-Utilities)).
+1. Build the project in `/RaspberryPiPico` (requires the [Raspberry Pico C/C++ SDK](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html)).
 
-2. Build the project in `/RaspberryPiPico` (requires the [Raspberry Pico C/C++ SDK](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html)).
-
-3. Execute `go build` in `/RaspberryPi/apple2driver` (requires [Go](https://go.dev/)).
+2. Execute `go build` in `/RaspberryPi/apple2driver` (requires [Go](https://go.dev/)).

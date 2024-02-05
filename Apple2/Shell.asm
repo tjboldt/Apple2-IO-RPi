@@ -1,4 +1,4 @@
-; Copyright Terence J. Boldt (c)2021-2022
+; Copyright Terence J. Boldt (c)2021-2024
 ; Use of this source code is governed by an MIT
 ; license that can be found in the LICENSE file.
 
@@ -115,8 +115,6 @@ Start:
  lda #ShellCommand
  jsr SendByte
  jsr DumpOutput
- lda #ResetCommand
- jsr SendByte 
  pla
  sta LastChar
  rts
@@ -292,7 +290,7 @@ restoreChar:
  rts
 
 Text:
-.byte	"Apple2-IO-RPi Shell Version 000D",$8d
-.byte	"(c)2020-2022 Terence J. Boldt",$8d
+.byte	"Apple2-IO-RPi Shell Version 000E",$8d
+.byte	"(c)2020-2024 Terence J. Boldt",$8d
 .byte   $8d
 .byte   $00

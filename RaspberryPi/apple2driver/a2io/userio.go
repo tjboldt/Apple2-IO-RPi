@@ -1,4 +1,4 @@
-// Copyright Terence J. Boldt (c)2021-2022
+// Copyright Terence J. Boldt (c)2021-2024
 // Use of this source code is governed by an MIT
 // license that can be found in the LICENSE file.
 
@@ -55,7 +55,7 @@ func (userIo UserIo) WriteBuffer(buffer []byte) error {
 }
 
 // ReadByte simulates reading to the Apple II but uses stdin instead
-func (userIo UserIo) ReadByte() (byte, error) {
+func (userIo UserIo) ReadByte(noDelay ...bool) (byte, error) {
 	fmt.Printf("ReadByte: ")
 	var b byte
 	fmt.Scanf("%x", &b)

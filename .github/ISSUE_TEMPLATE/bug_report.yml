@@ -49,6 +49,14 @@ body:
       label: Driver Version
       description: What version of the driver are you running? Check with `RPI a2version`
       options:
+        - 002C (fix nano editor)
+        - 002B (fix keyboard delay)
+        - 002A (reduce CPU usage)
+        - 0029 (fix hang after shell exit)
+        - 0028 (add live drive loading and regeneration)
+        - 0027 (add dynamic drive support)
+        - 0026 (add error handling)
+        - 0025 (update RPi.command)
         - 0024 (fix VT100 arrow keys)
         - 0023 (replaced periph.io with rpio)
         - 0022 (added version info)
@@ -61,6 +69,7 @@ body:
       label: Shell Version
       description: What version of the shell are you running?`
       options:
+        - 000E (fix hang on exit)
         - 000D (added version info)
         - Older (pre-2022-Mar-01)
         - Not Applicable (bug not Shell related)

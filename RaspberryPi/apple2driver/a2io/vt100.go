@@ -1,4 +1,4 @@
-// Copyright Terence J. Boldt (c)2021-2022
+// Copyright Terence J. Boldt (c)2021-2024
 // Use of this source code is governed by an MIT
 // license that can be found in the LICENSE file.
 
@@ -220,7 +220,7 @@ func sendCharacter(comm A2Io, b byte) {
 }
 
 func readCharacter(comm A2Io) (string, error) {
-	b, err := comm.ReadByte()
+	b, err := comm.ReadByte(true)
 	var s = string(b)
 	if err == nil {
 		if applicationMode {
@@ -234,7 +234,7 @@ func readCharacter(comm A2Io) (string, error) {
 			case 0x08: // left
 				s = "\033OD"
 			case 0x0d: // return
-				s = string(byte(0x0a))
+				s = string(byte(0x0d))
 			}
 		} else {
 			switch b {
@@ -247,7 +247,7 @@ func readCharacter(comm A2Io) (string, error) {
 			case 0x08: // left
 				s = "\033[D"
 			case 0x0d: // return
-				s = string(byte(0x0a))
+				s = string(byte(0x0d))
 			}
 		}
 	}

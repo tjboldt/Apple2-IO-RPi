@@ -1,4 +1,4 @@
-// Copyright Terence J. Boldt (c)2020-2022
+// Copyright Terence J. Boldt (c)2020-2024
 // Use of this source code is governed by an MIT
 // license that can be found in the LICENSE file.
 
@@ -8,13 +8,12 @@ package handlers
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/tjboldt/ProDOS-Utilities/prodos"
 )
 
 // ReadBlockCommand handles requests to read ProDOS blocks
-func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
+func ReadBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt) (int, error) {
 	blockLow, _ := comm.ReadByte()
 	blockHigh, _ := comm.ReadByte()
 	var driveUnit byte
@@ -24,7 +23,7 @@ func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
 
 	if err != nil {
 		fmt.Printf("Failed to read block")
-		return
+		return 0, err
 	}
 
 	file := drive1
@@ -35,28 +34,30 @@ func ReadBlockCommand(drive1 *os.File, drive2 *os.File) {
 		driveNumber = 2
 	}
 
-	slotNumber := driveUnit &0x7F >> 4
+	slotNumber := driveUnit & 0x7F >> 4
 
 	block := int(blockHigh)*256 + int(blockLow)
 
 	fmt.Printf("Read block %04X in slot %d, drive %d...", block, slotNumber, driveNumber)
 
-	buffer,err := prodos.ReadBlock(file, block)
+	buffer, err := prodos.ReadBlock(file, block)
 	if err != nil {
-		fmt.Printf("failed %s\n",err)
-		return
+		fmt.Printf("failed %s\n", err)
+		return 0, err
 	}
 
 	err = comm.WriteBlock(buffer)
 	if err == nil {
 		fmt.Printf("succeeded\n")
 	} else {
-		fmt.Printf("failed %s\n",err)
+		fmt.Printf("failed %s\n", err)
 	}
+
+	return block, nil
 }
 
 // WriteBlockCommand handles requests to write ProDOS blocks
-func WriteBlockCommand(drive1 *os.File, drive2 *os.File) {
+func WriteBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt) error {
 	blockLow, _ := comm.ReadByte()
 	blockHigh, _ := comm.ReadByte()
 
@@ -66,7 +67,7 @@ func WriteBlockCommand(drive1 *os.File, drive2 *os.File) {
 	driveUnit, err = comm.ReadByte()
 	if err != nil {
 		fmt.Printf("Failed to write block")
-		return
+		return err
 	}
 
 	file := drive1
@@ -81,14 +82,14 @@ func WriteBlockCommand(drive1 *os.File, drive2 *os.File) {
 
 	block := int(blockHigh)*256 + int(blockLow)
 
-	slotNumber := driveUnit &0x7F >> 4
+	slotNumber := driveUnit & 0x7F >> 4
 
 	fmt.Printf("Write block %04X in slot %d, drive %d...", block, slotNumber, driveNumber)
 
 	err = comm.ReadBlock(buffer)
 	if err != nil {
-		fmt.Printf("failed %s\n",err)
-		return
+		fmt.Printf("failed %s\n", err)
+		return err
 	}
 	fmt.Printf("...")
 
@@ -98,4 +99,6 @@ func WriteBlockCommand(drive1 *os.File, drive2 *os.File) {
 	} else {
 		fmt.Printf("failed\n")
 	}
+
+	return nil
 }

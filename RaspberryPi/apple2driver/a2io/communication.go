@@ -1,4 +1,4 @@
-// Copyright Terence J. Boldt (c)2021-2022
+// Copyright Terence J. Boldt (c)2021-2024
 // Use of this source code is governed by an MIT
 // license that can be found in the LICENSE file.
 
@@ -15,7 +15,7 @@ type A2Io interface {
 	WriteString(outString string) error
 	WriteBlock(buffer []byte) error
 	WriteBuffer(buffer []byte) error
-	ReadByte() (byte, error)
+	ReadByte(noDelay ...bool) (byte, error)
 	ReadString() (string, error)
 	ReadBlock(buffer []byte) error
 	SendCharacter(character byte)

@@ -1,4 +1,4 @@
-// Copyright Terence J. Boldt (c)2020-2022
+// Copyright Terence J. Boldt (c)2020-2024
 // Use of this source code is governed by an MIT
 // license that can be found in the LICENSE file.
 
@@ -19,8 +19,10 @@ import (
 	"go.bug.st/serial"
 
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
+	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/drive"
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/handlers"
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/info"
+	"github.com/tjboldt/ProDOS-Utilities/prodos"
 )
 
 const resetCommand = 0
@@ -35,7 +37,13 @@ const menuCommand = 8
 const shellCommand = 9
 
 func main() {
-	drive1, drive2, cdc := getFlags()
+	drive1Name, drive2Name, cdc := getFlags()
+	drive1, drive2 := getDriveFiles(drive1Name, drive2Name)
+
+	driveImageDir, err := drive.GetDriveImageDirectory()
+	if err == nil {
+		os.Chdir(driveImageDir)
+	}
 
 	fmt.Printf("Starting Apple II RPi v%s...\n", info.Version)
 
@@ -49,15 +57,12 @@ func main() {
 	handlers.SetCommunication(comm)
 	comm.Init()
 
-	lastCommandTime := time.Now()
-
 	// In case Apple II is waiting, send 0 byte to start
 	comm.WriteByte(0)
 
 	for {
 		command, err := comm.ReadByte()
 		if err == nil {
-			lastCommandTime = time.Now()
 			switch command {
 			case resetCommand:
 				handlers.ResetCommand()
@@ -68,7 +73,7 @@ func main() {
 			case getTimeCommand:
 				handlers.GetTimeCommand()
 			case execCommand:
-				handlers.ExecCommand()
+				handlers.ExecCommand(&drive1, &drive2)
 			case loadFileCommand:
 				handlers.LoadFileCommand()
 			case menuCommand:
@@ -77,20 +82,20 @@ func main() {
 				handlers.ShellCommand()
 			}
 			// the A2Io interface should be extended in one way or another
-			// to encapsulate this, e.g. by a ReadByte variant / parameter 
+			// to encapsulate this, e.g. by a ReadByte variant / parameter
 		} else if cdc {
 			var portErr *serial.PortError
 			if errors.As(err, &portErr) && portErr.Code() == serial.PortClosed {
 				comm.Init()
 			}
 			// temporary workaround for busy wait loop heating up the RPi
-		} else if time.Since(lastCommandTime) > time.Millisecond*100 {
-			time.Sleep(time.Millisecond * 100)
+		} else {
+			time.Sleep(time.Millisecond * 200)
 		}
 	}
 }
 
-func getFlags() (*os.File, *os.File, bool) {
+func getFlags() (string, string, bool) {
 	var drive1Name string
 	var drive2Name string
 	var cdc bool
@@ -99,48 +104,43 @@ func getFlags() (*os.File, *os.File, bool) {
 	path := filepath.Dir(execName)
 	path = filepath.Join(path, "..")
 	path, _ = filepath.EvalSymlinks(path)
-	defaultFileName := filepath.Join(path, "Apple2-IO-RPi.hdv")
 
 	flag.StringVar(&drive1Name, "d1", "", "A ProDOS format drive image for drive 1")
-	flag.StringVar(&drive2Name, "d2", defaultFileName, "A ProDOS format drive image for drive 2 and will be used for drive 1 if drive 1 empty")
+	flag.StringVar(&drive2Name, "d2", "", "A ProDOS format drive image for drive 2 and will be used for drive 1 if drive 1 empty")
 	flag.BoolVar(&cdc, "cdc", false, "Use ACM CDC serial device")
 	flag.Parse()
 
-	var drive1 *os.File
-	var drive2 *os.File
+	return drive1Name, drive2Name, cdc
+}
+
+func getDriveFiles(drive1Name string, drive2Name string) (prodos.ReaderWriterAt, prodos.ReaderWriterAt) {
+	var drive1 prodos.ReaderWriterAt
+	var drive2 prodos.ReaderWriterAt
 	var err error
 
 	if len(drive1Name) > 0 {
 		fmt.Printf("Opening Drive 1 as: %s\n", drive1Name)
 		drive1, err = os.OpenFile(drive1Name, os.O_RDWR, 0755)
-		if err != nil {
-			fmt.Printf("ERROR: %s", err.Error())
-			os.Exit(1)
-		}
+		logAndExitOnErr(err)
+	} else {
+		directory, err := drive.GetDriveImageDirectory()
+		logAndExitOnErr(err)
+		drive1, err = drive.GenerateDriveFromDirectory("APPLE2.IO.RPI", directory)
+		logAndExitOnErr(err)
 	}
 
 	if len(drive2Name) > 0 {
-		if drive1 == nil {
-			fmt.Printf("Opening Drive 1 as: %s because Drive 1 was empty\n", drive2Name)
-			drive1, err = os.OpenFile(drive2Name, os.O_RDWR, 0755)
-			if err != nil {
-				fmt.Printf("ERROR: %s", err.Error())
-				os.Exit(1)
-			}
-		} else {
-			fmt.Printf("Opening Drive 2 as: %s\n", drive2Name)
-			drive2, err = os.OpenFile(drive2Name, os.O_RDWR, 0755)
-			if err != nil {
-				fmt.Printf("ERROR: %s", err.Error())
-				os.Exit(1)
-			}
-		}
-	}
-
-	if drive1 == nil {
-		flag.PrintDefaults()
-		os.Exit(1)
+		fmt.Printf("Opening Drive 2 as: %s\n", drive2Name)
+		drive2, err = os.OpenFile(drive2Name, os.O_RDWR, 0755)
+		logAndExitOnErr(err)
 	}
 
 	return drive1, drive2, cdc
+}
+
+func logAndExitOnErr(err error) {
+	if err != nil {
+		fmt.Printf("ERROR: %s", err.Error())
+		os.Exit(1)
+	}
 }

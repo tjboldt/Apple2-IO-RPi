@@ -1,4 +1,4 @@
-; Copyright Terence J. Boldt (c)2020-2022
+; Copyright Terence J. Boldt (c)2020-2024
 ; Use of this source code is governed by an MIT
 ; license that can be found in the LICENSE file.
 
@@ -188,7 +188,7 @@ finishRead:
 
 Text:
 .byte	"Apple2-IO-RPi",$8d
-.byte	"(c)2020-2022 Terence J. Boldt",$8d
+.byte	"(c)2020-2024 Terence J. Boldt",$8d
 .byte   $8d
 .byte	"Waiting for RPi FW:000F..."
 end:

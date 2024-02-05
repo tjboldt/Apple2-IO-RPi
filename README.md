@@ -25,7 +25,7 @@ The card enables the Apple II to boot from and write to virtual hard drive image
 If you have a problem or idea for enhancement, log an issue [here](https://github.com/tjboldt/Apple2-IO-RPi/issues) or start a [discussion](https://github.com/tjboldt/Apple2-IO-RPi/discussions/categories/general). I recommend starring/watching the project for updates on GitHub. You are welcome to fork the project and submit pull requests which I will review. The latest version has an in-memory virtual drive representing current working directory in Linux for ease of copying files between Linux and ProDOS when the drive 1 is not specified as a file.
 
 ### Pico Hardware
-Ralle Palaveev has a version of the hardware that uses a RPi Pico to handle firmware and communications to the host over USB.
+Ralle Palaveev has a version of the hardware that uses a RPi Pico to handle firmware and communications to the host over USB. This uses Oliver Schmidt's PIO code.
 
 ## Roadmap
 See [List of issues tagged roadmap](https://github.com/tjboldt/Apple2-IO-RPi/issues?q=is%3Aissue+is%3Aopen+label%3Aroadmap+author%3Atjboldt) 
@@ -49,7 +49,7 @@ See [List of issues tagged roadmap](https://github.com/tjboldt/Apple2-IO-RPi/iss
 - ([@Abysmal](https://github.com/Abysmal)) for shell and rpi.command testing
 - ([@bfranske](https://github.com/bfranske)) for suggesting adding the 5V jumper
 - Tim Boldt ([@timboldt](https://github.com/timboldt)) for recommending removing sysfs based GPIO code
-- Oliver Schmidt ([@oliverschmidt])(https://github.com/oliverschmidt/apple2-io-rpi/)) for writing the Pico PIO and firmware
+- Oliver Schmidt ([@oliverschmidt](https://github.com/oliverschmidt/apple2-io-rpi/)) for writing the Pico PIO and firmware
 - Ralle Palaveev ([@rallepalaveev](https://github.com/rallepalaveev/a2pico)) for Pico hardware design
 
 ## Similar Project

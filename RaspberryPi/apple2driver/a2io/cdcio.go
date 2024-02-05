@@ -31,8 +31,8 @@ func (a2 CDCio) Init() {
 		portInfos, err := enumerator.GetDetailedPortsList()
 		if err == nil {
 			for _, portInfo := range portInfos {
-				if portInfo.IsUSB && 
-				        strings.ToUpper(portInfo.VID) == "2E8A" &&
+				if portInfo.IsUSB &&
+					strings.ToUpper(portInfo.VID) == "2E8A" &&
 					strings.ToUpper(portInfo.PID) == "000A" {
 					name = portInfo.Name
 					fmt.Printf("Found CDC port %s\n", name)
@@ -50,12 +50,12 @@ func (a2 CDCio) Init() {
 		var err error
 		port, err = serial.Open(name, &serial.Mode{})
 		if err == nil {
-			break;
+			break
 		}
 		var portErr *serial.PortError
-		if !errors.As(err, &portErr) || 
+		if !errors.As(err, &portErr) ||
 			portErr.Code() != serial.PortNotFound &&
-			portErr.Code() != serial.PermissionDenied {
+				portErr.Code() != serial.PermissionDenied {
 			panic(err)
 		}
 		time.Sleep(time.Millisecond)
@@ -68,9 +68,9 @@ func (a2 CDCio) Init() {
 }
 
 // ReadByte reads a byte from the Apple II via Raspberry Pi's CDC driver
-func (a2 CDCio) ReadByte() (byte, error) {
+func (a2 CDCio) ReadByte(noDelay ...bool) (byte, error) {
 	var data [1]byte
-	n, err := port.Read(data[:]);
+	n, err := port.Read(data[:])
 	if err != nil {
 		return 0, err
 	}
@@ -82,7 +82,7 @@ func (a2 CDCio) ReadByte() (byte, error) {
 
 // WriteByte writes a byte to the Apple II via Raspberry Pi's CDC driver
 func (a2 CDCio) WriteByte(data byte) error {
-	_, err := port.Write([]byte{data});
+	_, err := port.Write([]byte{data})
 	return err
 }
 
@@ -117,7 +117,7 @@ func (a2 CDCio) WriteString(outString string) error {
 
 // WriteBlock writes 512 bytes to the Apple II via Raspberry Pi's CDC driver
 func (a2 CDCio) WriteBlock(buffer []byte) error {
-	_, err := port.Write(buffer);
+	_, err := port.Write(buffer)
 	return err
 }
 
@@ -136,7 +136,7 @@ func (a2 CDCio) ReadBlock(buffer []byte) error {
 
 // WriteBuffer writes a buffer of bytes to the Apple II via Raspberry Pi's CDC driver
 func (a2 CDCio) WriteBuffer(buffer []byte) error {
-	_, err := port.Write(buffer);
+	_, err := port.Write(buffer)
 	return err
 }
 

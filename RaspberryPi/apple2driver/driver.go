@@ -135,7 +135,7 @@ func getDriveFiles(drive1Name string, drive2Name string) (prodos.ReaderWriterAt,
 		logAndExitOnErr(err)
 	}
 
-	return drive1, drive2, cdc
+	return drive1, drive2
 }
 
 func logAndExitOnErr(err error) {

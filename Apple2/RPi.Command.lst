@@ -1,0 +1,280 @@
+ca65 V2.18 - Debian 2.19-1
+Main file   : RPi.Command.asm
+Current file: RPi.Command.asm
+
+000000r 1               ; Copyright Terence J. Boldt (c)2021-2024
+000000r 1               ; Use of this source code is governed by an MIT
+000000r 1               ; license that can be found in the LICENSE file.
+000000r 1               
+000000r 1               ; This file contains the source for the RPI.COMMAND
+000000r 1               ; application that runs on the Apple II and extends
+000000r 1               ; ProDOS BASIC.SYSTEM to add the RPI command which
+000000r 1               ; allows commands to be executed on the Raspberry Pi
+000000r 1               
+000000r 1                           .ORG  $300
+000300  1               INBUF      =  $200     ;GETLN input buffer.
+000300  1               WAIT       =  $FCA8    ;Monitor wait routine.
+000300  1               BELL       =  $FF3A    ;Monitor bell routine.
+000300  1               EXTRNCMD   =  $BE06    ;External cmd JMP vector.
+000300  1               XTRNADDR   =  $BE50    ;Ext cmd implementation addr.
+000300  1               XLEN       =  $BE52    ;length of command string-1.
+000300  1               XCNUM      =  $BE53    ;CI cmd no. (ext cmd - 0).
+000300  1               PBITS      =  $BE54    ;Command parameter bits.
+000300  1               XRETURN    =  $FF58    ;Known RTS instruction.
+000300  1               InputByte = $c08e
+000300  1               OutputByte = $c08d
+000300  1               InputFlags = $c08b
+000300  1               OutputFlags = $c087
+000300  1               
+000300  1               ReadBlockCommand = $01
+000300  1               WriteBlockCommand = $02
+000300  1               GetTimeCommand = $03
+000300  1               ChangeDriveCommand = $04
+000300  1               ExecCommand = $05
+000300  1               LoadFileCommand = $06
+000300  1               SaveFileCommand = $07
+000300  1               MenuCommand = $08
+000300  1               
+000300  1               InputString = $fd67
+000300  1               PrintChar = $fded
+000300  1               Keyboard = $c000
+000300  1               ClearKeyboard = $c010
+000300  1               Wait = $fca8
+000300  1               
+000300  1               LastChar = $06
+000300  1               SlotL = $fe
+000300  1               SlotH = $ff
+000300  1               ESC = $9b
+000300  1               
+000300  1               ;macro for string with high-bit set
+000300  1               .macro aschi str
+000300  1               .repeat .strlen (str), c
+000300  1               .byte .strat (str, c) | $80
+000300  1               .endrep
+000300  1               .endmacro
+000300  1               
+000300  1                .org $2000
+002000  1  A2 07         ldx #$07 ; start at slot 7
+002002  1               DetectSlot:
+002002  1  A0 00         ldy #$00
+002004  1  A9 FC         lda #$fc
+002006  1  85 FE         sta SlotL
+002008  1  8A            txa
+002009  1  09 C0         ora #$c0
+00200B  1  85 FF         sta SlotH
+00200D  1  B1 FE         lda (SlotL),y
+00200F  1  D0 1C         bne nextSlot
+002011  1  C8            iny
+002012  1  B1 FE         lda (SlotL),y
+002014  1  D0 17         bne nextSlot
+002016  1  C8            iny
+002017  1  B1 FE         lda (SlotL),y
+002019  1  C9 17         cmp #$17
+00201B  1  D0 10         bne nextSlot
+00201D  1  C8            iny
+00201E  1  B1 FE         lda (SlotL),y
+002020  1  C9 14         cmp #$14
+002022  1  D0 09         bne nextSlot
+002024  1  8A            txa
+002025  1  0A            asl
+002026  1  0A            asl
+002027  1  0A            asl
+002028  1  0A            asl
+002029  1  AA            tax
+00202A  1  18            clc
+00202B  1  90 04         bcc Start
+00202D  1               nextSlot:
+00202D  1  CA            dex
+00202E  1  D0 D2         bne DetectSlot
+002030  1  60            rts
+002031  1               Start:
+002031  1  8E 31 21      stx slotx + $1e01 ;set the slot for the driver
+002034  1  A0 00          ldy #$00
+002036  1               PrintString:
+002036  1  B9 93 20      lda Text,y
+002039  1  F0 08         beq copyDriver
+00203B  1  09 80         ora #$80
+00203D  1  20 ED FD      jsr PrintChar
+002040  1  C8            iny
+002041  1  D0 F3         bne PrintString
+002043  1               copyDriver:
+002043  1  A0 00         ldy #$00
+002045  1               copyDriverByte:
+002045  1  B9 00 21      lda $2100,y
+002048  1  99 00 03      sta $0300,y
+00204B  1  C8            iny
+00204C  1  C0 E6         cpy #$e6
+00204E  1  D0 F5         bne copyDriverByte
+002050  1                ;
+002050  1                ; FIRST SAVE THE EXTERNAL COMMAND ADDRESS SO YOU WON'T
+002050  1                ; DISCONNECT ANY PREVIOUSLY CONNECTED COMMAND.
+002050  1                ;
+002050  1  AD 07 BE                 LDA  EXTRNCMD+1
+002053  1  8D AD 03                 STA  NXTCMD
+002056  1  AD 08 BE                 LDA  EXTRNCMD+2
+002059  1  8D AE 03                 STA  NXTCMD+1
+00205C  1                ;
+00205C  1  A9 00                    LDA  #<RPI      ;Install the address of our
+00205E  1  8D 07 BE                 STA  EXTRNCMD+1  ; command handler in the
+002061  1  A9 03                    LDA  #>RPI      ; external command JMP
+002063  1  8D 08 BE                 STA  EXTRNCMD+2  ; vector.
+002066  1               
+002066  1  A9 05         lda #ExecCommand
+002068  1  20 6F 03      jsr SendByte
+00206B  1  A0 00         ldy #$00
+00206D  1               nextCommandByte:
+00206D  1  B9 8C 20      lda a2help, y
+002070  1  F0 07         beq finishCommand
+002072  1  20 6F 03      jsr SendByte
+002075  1  C8            iny
+002076  1  4C 6D 20      jmp nextCommandByte
+002079  1               finishCommand:
+002079  1  A9 00         lda #$00
+00207B  1  20 6F 03      jsr SendByte
+00207E  1               showVersion:
+00207E  1  20 8D 03      jsr GetByte
+002081  1  C9 00         cmp #$00
+002083  1  F0 06         beq FinishDriver
+002085  1  20 ED FD      jsr PrintChar
+002088  1  4C 7E 20      jmp showVersion
+00208B  1               FinishDriver:
+00208B  1  60            rts
+00208C  1               
+00208C  1               a2help:
+00208C  1  61 32 68 65   .byte "a2help", $00
+002090  1  6C 70 00     
+002093  1               
+002093  1               Text:
+002093  1  D2 D0 C9 A0   aschi "RPI command version: 000E"
+002097  1  E3 EF ED ED  
+00209B  1  E1 EE E4 A0  
+0020AC  1  8D            .byte $8d
+0020AD  1               end:
+0020AD  1  00            .byte $00
+0020AE  1               
+0020AE  1  00 00 00 00  .repeat	255-<end
+0020B2  1  00 00 00 00  
+0020B6  1  00 00 00 00  
+002100  1               .byte 0
+002100  1               .endrepeat
+002100  1               
+002100  1               .org $0300
+000300  1  A2 00         RPI:       LDX  #0          ;Check for our command.
+000302  1  BD 00 02      NXTCHR:     LDA  INBUF,X     ;Get first character.
+000305  1  09 20                    ora  #$20        ;Make it lower case
+000307  1  DD AA 03                 CMP  CMD,X       ;Does it match?
+00030A  1  D0 29                    BNE  NOTOURS     ;No, back to CI.
+00030C  1  E8                       INX              ;Next character
+00030D  1  E0 03                    CPX  #CMDLEN     ;All characters yet?
+00030F  1  D0 F1                    BNE  NXTCHR      ;No, read next one.
+000311  1                ;
+000311  1  A9 02                    LDA  #CMDLEN-1   ;Our cmd! Put cmd length-1
+000313  1                           ;lda #$8d
+000313  1                           ;sta $02ff
+000313  1                           ;lda #$fe
+000313  1  8D 52 BE                 STA  XLEN        ; in CI global XLEN.
+000316  1  A9 58                    LDA  #<XRETURN   ;Point XTRNADDR to a known
+000318  1  8D 50 BE                 STA  XTRNADDR    ; RTS since we'll handle
+00031B  1  A9 FF                    LDA  #>XRETURN   ; at the time we intercept
+00031D  1               
+00031D  1  8D 51 BE                 STA  XTRNADDR+1  ; our command.
+000320  1  A9 00                    LDA  #0          ;Mark the cmd number as
+000322  1  8D 53 BE                 STA  XCNUM       ; zero (external).
+000325  1  8D 54 BE                 STA  PBITS       ;And indicate no parameters
+000328  1  8D 55 BE                 STA  PBITS+1     ; to be parsed.
+00032B  1  A9 8D                    lda #$8d
+00032D  1  20 ED FD                 jsr $fded
+000330  1  A2 70        slotx:      ldx #$70        ; set x to slot # in high nibble
+000332  1  18                       clc
+000333  1  90 04                    bcc SendCommand
+000335  1                 ;
+000335  1  38            NOTOURS:    SEC              ; ALWAYS SET CARRY IF NOT YOUR
+000336  1  6C AD 03                 JMP  (NXTCMD)    ; CMD AND LET NEXT COMMAND TRY
+000339  1                ;                           ; TO CLAIM IT.
+000339  1               
+000339  1               SendCommand:
+000339  1  2C 10 C0      bit ClearKeyboard
+00033C  1  A9 05         lda #$05 ;send command 5 = exec
+00033E  1  20 6F 03      jsr SendByte
+000341  1  A0 03         ldy #$03 ;skip over "RPI"
+000343  1               getInput:
+000343  1  B9 00 02      lda $0200,y
+000346  1  C9 8D         cmp #$8d
+000348  1  F0 08         beq sendNullTerminator
+00034A  1  29 7F         and #$7f
+00034C  1  20 6F 03      jsr SendByte
+00034F  1  C8            iny
+000350  1  D0 F1         bne getInput
+000352  1               sendNullTerminator:
+000352  1  A9 00         lda #$00
+000354  1  20 6F 03      jsr SendByte
+000357  1               DumpOutput:
+000357  1  20 8D 03      jsr GetByte
+00035A  1  C9 00         cmp #$00
+00035C  1  F0 06         beq endOutput
+00035E  1  20 ED FD      jsr PrintChar
+000361  1  18            clc
+000362  1  90 F3         bcc DumpOutput
+000364  1               endOutput:
+000364  1  18            clc
+000365  1  6C AD 03      jmp (NXTCMD)
+000368  1               
+000368  1               HelpCommand:
+000368  1  61 32 68 65   .byte "a2help",$00
+00036C  1  6C 70 00     
+00036F  1               
+00036F  1               SendByte:
+00036F  1  48            pha
+000370  1               waitWrite:
+000370  1  BD 8B C0      lda InputFlags,x
+000373  1  2A            rol
+000374  1  2A            rol
+000375  1  B0 F9         bcs waitWrite
+000377  1  68            pla
+000378  1  9D 8D C0      sta OutputByte,x
+00037B  1               .if HW_TYPE = 0
+00037B  1  A9 1E         lda #$1e ; set bit 0 low to indicate write started
+00037D  1  9D 87 C0      sta OutputFlags,x
+000380  1               finishWrite:
+000380  1  BD 8B C0      lda InputFlags,x
+000383  1  2A            rol
+000384  1  2A            rol
+000385  1  90 F9         bcc finishWrite
+000387  1  A9 1F         lda #$1f
+000389  1  9D 87 C0      sta OutputFlags,x
+00038C  1               .endif
+00038C  1  60            rts
+00038D  1               
+00038D  1               GetByte:
+00038D  1               .if HW_TYPE = 0
+00038D  1  A9 1D         lda #$1d ;set read flag low
+00038F  1  9D 87 C0      sta OutputFlags,x
+000392  1               .endif
+000392  1               waitRead:
+000392  1  BD 8B C0      lda InputFlags,x
+000395  1  2A            rol
+000396  1  B0 FA         bcs waitRead
+000398  1               readByte:
+000398  1  BD 8E C0      lda InputByte,x
+00039B  1               .if HW_TYPE = 0
+00039B  1  48            pha
+00039C  1  A9 1F         lda #$1f ;set all flags high
+00039E  1  9D 87 C0      sta OutputFlags,x
+0003A1  1               finishRead:
+0003A1  1  BD 8B C0      lda InputFlags,x
+0003A4  1  2A            rol
+0003A5  1  90 FA         bcc finishRead
+0003A7  1  68            pla
+0003A8  1               .endif
+0003A8  1  18            clc ;success
+0003A9  1  60            rts
+0003AA  1               
+0003AA  1               
+0003AA  1  F2 F0 E9     CMD:   aschi   "rpi"
+0003AD  1                CMDLEN     =  3       ;Our command length
+0003AD  1                ;
+0003AD  1  00 00         NXTCMD:    .byte    0,0           ; STORE THE NEXT EXT CMD'S
+0003AF  1                                            ; ADDRESS HERE.
+0003AF  1               
+0003AF  1               
+0003AF  1               

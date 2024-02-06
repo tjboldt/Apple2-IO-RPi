@@ -177,19 +177,21 @@ finishWrite:
 
 GetByte:
 .if HW_TYPE = 0
- ldx #$0d ;set read flag low
- stx OutputFlags
+ lda #$0d ;set read flag low
+ sta OutputFlags
 .endif
 waitRead:
  bit InputFlags
  bmi waitRead
  lda InputByte
 .if HW_TYPE = 0
- ldx #$0f ;set all flags high
- stx OutputFlags
+ pha
+ lda #$0f ;set all flags high
+ sta OutputFlags
 finishRead:
  bit InputFlags
  bpl finishRead
+ pla
 .endif
 end:
  rts

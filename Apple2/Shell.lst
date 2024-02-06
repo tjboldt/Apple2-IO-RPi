@@ -1,0 +1,309 @@
+ca65 V2.18 - Debian 2.19-1
+Main file   : Shell.asm
+Current file: Shell.asm
+
+000000r 1               ; Copyright Terence J. Boldt (c)2021-2024
+000000r 1               ; Use of this source code is governed by an MIT
+000000r 1               ; license that can be found in the LICENSE file.
+000000r 1               
+000000r 1               ; This file contains the source for the SHELL
+000000r 1               ; application that runs on the Apple II to talk
+000000r 1               ; to the Raspberry Pi
+000000r 1               
+000000r 1               ;ProDOS Zero Page
+000000r 1               Command = $42 ;ProDOS Command
+000000r 1               Unit = $43 ;ProDOS unit (SDDD0000)
+000000r 1               BufferLo = $44
+000000r 1               BufferHi = $45
+000000r 1               BlockLo = $46
+000000r 1               BlockHi = $47
+000000r 1               
+000000r 1               ; ProDOS Error Codes
+000000r 1               IOError = $27
+000000r 1               NoDevice = $28
+000000r 1               WriteProtect = $2B
+000000r 1               
+000000r 1               InputByte = $c08e
+000000r 1               OutputByte = $c08d
+000000r 1               InputFlags = $c08b
+000000r 1               OutputFlags = $c087
+000000r 1               
+000000r 1               ResetCommand = $00
+000000r 1               ReadBlockCommand = $01
+000000r 1               WriteBlockCommand = $02
+000000r 1               GetTimeCommand = $03
+000000r 1               ChangeDriveCommand = $04
+000000r 1               ExecCommand = $05
+000000r 1               LoadFileCommand = $06
+000000r 1               SaveFileCommand = $07
+000000r 1               MenuCommand = $08
+000000r 1               ShellCommand = $09
+000000r 1               
+000000r 1               InputString = $fd6a
+000000r 1               StringBuffer = $0200
+000000r 1               PrintChar = $fded
+000000r 1               Keyboard = $c000
+000000r 1               ClearKeyboard = $c010
+000000r 1               Home = $fc58
+000000r 1               Wait = $fca8
+000000r 1               PromptChar = $33
+000000r 1               Read80Col = $c01f
+000000r 1               TextPage1 = $c054
+000000r 1               TextPage2 = $c055
+000000r 1               
+000000r 1               htab = $24
+000000r 1               vtab = $25
+000000r 1               BasL = $28
+000000r 1               htab80 = $057b
+000000r 1               BasCalc = $fbc1
+000000r 1               
+000000r 1               LastChar = $06
+000000r 1               SlotL = $fe
+000000r 1               SlotH = $ff
+000000r 1               ESC = $9b
+000000r 1               
+000000r 1                .org $2000
+002000  1  A2 07         ldx #$07 ; start at slot 7
+002002  1               DetectSlot:
+002002  1  A0 00         ldy #$00
+002004  1  A9 FC         lda #$fc
+002006  1  85 FE         sta SlotL
+002008  1  8A            txa
+002009  1  09 C0         ora #$c0
+00200B  1  85 FF         sta SlotH
+00200D  1  B1 FE         lda (SlotL),y
+00200F  1  D0 1C         bne nextSlot
+002011  1  C8            iny
+002012  1  B1 FE         lda (SlotL),y
+002014  1  D0 17         bne nextSlot
+002016  1  C8            iny
+002017  1  B1 FE         lda (SlotL),y
+002019  1  C9 17         cmp #$17
+00201B  1  D0 10         bne nextSlot
+00201D  1  C8            iny
+00201E  1  B1 FE         lda (SlotL),y
+002020  1  C9 14         cmp #$14
+002022  1  D0 09         bne nextSlot
+002024  1  8A            txa
+002025  1  0A            asl
+002026  1  0A            asl
+002027  1  0A            asl
+002028  1  0A            asl
+002029  1  AA            tax
+00202A  1  18            clc
+00202B  1  90 04         bcc Init
+00202D  1               nextSlot:
+00202D  1  CA            dex
+00202E  1  D0 D2         bne DetectSlot
+002030  1  60            rts
+002031  1               
+002031  1               Init:
+002031  1  A9 8D         lda #$8d
+002033  1  20 00 C3      jsr $c300 ; force 80 columns
+002036  1               
+002036  1  A0 00         ldy #$00
+002038  1               PrintString:
+002038  1  B9 73 21      lda Text,y
+00203B  1  F0 08         beq Start
+00203D  1  09 80         ora #$80
+00203F  1  20 ED FD      jsr PrintChar
+002042  1  C8            iny
+002043  1  D0 F3         bne PrintString
+002045  1               
+002045  1               Start:
+002045  1  A5 06         lda LastChar
+002047  1  48            pha
+002048  1  2C 10 C0      bit ClearKeyboard
+00204B  1               ; lda #ResetCommand
+00204B  1               ; jsr SendByte
+00204B  1  A9 09         lda #ShellCommand
+00204D  1  20 C7 20      jsr SendByte
+002050  1  20 57 20      jsr DumpOutput
+002053  1  68            pla
+002054  1  85 06         sta LastChar
+002056  1  60            rts
+002057  1               
+002057  1               DumpOutput:
+002057  1  20 E5 20      jsr GetByte
+00205A  1  C9 00         cmp #$00
+00205C  1  F0 26         beq endOutput
+00205E  1  48            pha
+00205F  1  20 5E 21      jsr ClearCursor
+002062  1  68            pla
+002063  1  C9 48         cmp #'H'
+002065  1  F0 27         beq setColumn
+002067  1  C9 56         cmp #'V'
+002069  1  F0 31         beq setRow
+00206B  1  C9 43         cmp #'C'
+00206D  1  F0 16         beq clearScreen
+00206F  1  C9 54         cmp #'T'
+002071  1  F0 37         beq setTop
+002073  1  C9 42         cmp #'B'
+002075  1  F0 3B         beq setBottom
+002077  1  C9 55         cmp #'U'
+002079  1  F0 3F         beq moveUp
+00207B  1  20 ED FD      jsr PrintChar
+00207E  1  20 2D 21      jsr SetCursor
+002081  1  4C 57 20      jmp DumpOutput
+002084  1               endOutput:
+002084  1  60            rts
+002085  1               clearScreen:
+002085  1  20 58 FC      jsr Home
+002088  1  20 2D 21      jsr SetCursor
+00208B  1  4C 57 20      jmp DumpOutput
+00208E  1               setColumn:
+00208E  1  20 E5 20      jsr GetByte
+002091  1  85 24         sta htab
+002093  1  8D 7B 05      sta htab80
+002096  1  20 2D 21      jsr SetCursor
+002099  1  4C 57 20      jmp DumpOutput
+00209C  1               setRow:
+00209C  1  20 E5 20      jsr GetByte
+00209F  1  85 25         sta vtab
+0020A1  1  20 C1 FB      jsr BasCalc
+0020A4  1  20 2D 21      jsr SetCursor
+0020A7  1  4C 57 20      jmp DumpOutput
+0020AA  1               setTop:
+0020AA  1  20 E5 20      jsr GetByte
+0020AD  1  85 22         sta $22
+0020AF  1  4C 57 20      jmp DumpOutput
+0020B2  1               setBottom:
+0020B2  1  20 E5 20      jsr GetByte
+0020B5  1  85 23         sta $23
+0020B7  1  4C 57 20      jmp DumpOutput
+0020BA  1               moveUp:
+0020BA  1  C6 25         dec vtab
+0020BC  1  A5 25         lda vtab
+0020BE  1  20 C1 FB      jsr BasCalc
+0020C1  1  20 2D 21      jsr SetCursor
+0020C4  1  4C 57 20      jmp DumpOutput
+0020C7  1               
+0020C7  1               SendByte:
+0020C7  1  48            pha
+0020C8  1               waitWrite:
+0020C8  1  BD 8B C0      lda InputFlags,x
+0020CB  1  2A            rol
+0020CC  1  2A            rol
+0020CD  1  B0 F9         bcs waitWrite
+0020CF  1  68            pla
+0020D0  1  9D 8D C0      sta OutputByte,x
+0020D3  1               .if HW_TYPE = 0
+0020D3  1  A9 1E         lda #$1e ; set bit 0 low to indicate write started
+0020D5  1  9D 87 C0      sta OutputFlags,x
+0020D8  1               finishWrite:
+0020D8  1  BD 8B C0      lda InputFlags,x
+0020DB  1  2A            rol
+0020DC  1  2A            rol
+0020DD  1  90 F9         bcc finishWrite
+0020DF  1  A9 1F         lda #$1f
+0020E1  1  9D 87 C0      sta OutputFlags,x
+0020E4  1               .endif
+0020E4  1  60            rts
+0020E5  1               
+0020E5  1               GetByte:
+0020E5  1               .if HW_TYPE = 0
+0020E5  1  A9 1D         lda #$1d ;set read flag low
+0020E7  1  9D 87 C0      sta OutputFlags,x
+0020EA  1               .endif
+0020EA  1               waitRead:
+0020EA  1  BD 8B C0      lda InputFlags,x
+0020ED  1  2A            rol
+0020EE  1  90 2B         bcc readByte
+0020F0  1  2C 00 C0      bit Keyboard ;keypress will abort waiting to read
+0020F3  1  10 F5         bpl waitRead
+0020F5  1               keyPressed:
+0020F5  1  BD 8B C0      lda InputFlags,x
+0020F8  1  2A            rol
+0020F9  1  2A            rol
+0020FA  1  B0 F9         bcs keyPressed
+0020FC  1  AD 00 C0      lda Keyboard ;send keypress to RPi
+0020FF  1  29 7F         and #$7f
+002101  1  9D 8D C0      sta OutputByte,x
+002104  1  2C 10 C0      bit ClearKeyboard
+002107  1               .if HW_TYPE = 0
+002107  1  A9 1C         lda #$1c ;set write flag low too
+002109  1  9D 87 C0      sta OutputFlags,x
+00210C  1               finishKeyPress:
+00210C  1  BD 8B C0      lda InputFlags,x
+00210F  1  2A            rol
+002110  1  2A            rol
+002111  1  90 F9         bcc finishKeyPress
+002113  1  A9 1D         lda #$1d ;set flags back for reading
+002115  1  9D 87 C0      sta OutputFlags,x
+002118  1               .endif
+002118  1  4C EA 20      jmp waitRead
+00211B  1               readByte:
+00211B  1  BD 8E C0      lda InputByte,x
+00211E  1               .if HW_TYPE = 0
+00211E  1  48            pha
+00211F  1  A9 1F         lda #$1f ;set all flags high
+002121  1  9D 87 C0      sta OutputFlags,x
+002124  1               finishRead:
+002124  1  BD 8B C0      lda InputFlags,x
+002127  1  2A            rol
+002128  1  90 FA         bcc finishRead
+00212A  1  68            pla
+00212B  1               .endif
+00212B  1  18            clc ;success
+00212C  1               end:
+00212C  1  60            rts
+00212D  1               
+00212D  1               SetCursor:
+00212D  1  AD 7B 05      lda htab80 ;get horizontal location / 2
+002130  1  4A            lsr
+002131  1  A8            tay
+002132  1  AD 55 C0      lda TextPage2
+002135  1  90 03         bcc setChar
+002137  1  AD 54 C0      lda TextPage1
+00213A  1               setChar:
+00213A  1  B1 28         lda (BasL),y
+00213C  1  85 06         sta LastChar ; save so ClearCursor will pick it up
+00213E  1  C9 E0         cmp #$e0
+002140  1  10 0C         bpl lowerCase
+002142  1  C9 C0         cmp #$c0
+002144  1  10 0D         bpl upperCase
+002146  1  C9 A0         cmp #$a0
+002148  1  10 04         bpl symbol
+00214A  1  C9 80         cmp #$80
+00214C  1  10 0A         bpl noop
+00214E  1               symbol:
+00214E  1               lowerCase:
+00214E  1               invert:
+00214E  1  49 80         eor #$80
+002150  1  4C 58 21      jmp storeChar
+002153  1               upperCase:
+002153  1  29 1F         and #$1f
+002155  1  4C 58 21      jmp storeChar
+002158  1               noop:
+002158  1               storeChar:
+002158  1  91 28         sta (BasL),y
+00215A  1  AD 54 C0      lda TextPage1
+00215D  1  60            rts
+00215E  1               
+00215E  1               ClearCursor:
+00215E  1  AD 7B 05      lda htab80 ;get horizontal location / 2
+002161  1  4A            lsr
+002162  1  A8            tay
+002163  1  AD 55 C0      lda TextPage2
+002166  1  90 03         bcc restoreChar
+002168  1  AD 54 C0      lda TextPage1
+00216B  1               restoreChar:
+00216B  1  A5 06         lda LastChar
+00216D  1  91 28         sta (BasL),y
+00216F  1  AD 54 C0      lda TextPage1
+002172  1  60            rts
+002173  1               
+002173  1               Text:
+002173  1               .if HW_TYPE = 0
+002173  1  41 70 70 6C  .byte	"Apple2-IO-RPi Shell Version 000F",$8d
+002177  1  65 32 2D 49  
+00217B  1  4F 2D 52 50  
+002194  1               .else
+002194  1               .byte	"Apple2-IO-RPi Shell Version 800F",$8d
+002194  1               .endif
+002194  1  28 63 29 32  .byte	"(c)2020-2024 Terence J. Boldt",$8d
+002198  1  30 32 30 2D  
+00219C  1  32 30 32 34  
+0021B2  1  8D           .byte   $8d
+0021B3  1  00           .byte   $00
+0021B3  1               

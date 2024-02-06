@@ -290,7 +290,11 @@ restoreChar:
  rts
 
 Text:
-.byte	"Apple2-IO-RPi Shell Version 000E",$8d
+.if HW_TYPE = 0
+.byte	"Apple2-IO-RPi Shell Version 000F",$8d
+.else
+.byte	"Apple2-IO-RPi Shell Version 800F",$8d
+.endif
 .byte	"(c)2020-2024 Terence J. Boldt",$8d
 .byte   $8d
 .byte   $00

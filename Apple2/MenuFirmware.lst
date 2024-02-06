@@ -1,0 +1,231 @@
+ca65 V2.18 - Debian 2.19-1
+Main file   : MenuFirmware.asm
+Current file: MenuFirmware.asm
+
+000000r 1               ; Copyright Terence J. Boldt (c)2020-2024
+000000r 1               ; Use of this source code is governed by an MIT
+000000r 1               ; license that can be found in the LICENSE file.
+000000r 1               
+000000r 1               ; This file contains the source for the firmware
+000000r 1               ; that displays the copyright message on boot
+000000r 1               ; and checks for the RPi status to be ready before
+000000r 1               ; attempting to boot
+000000r 1               
+000000r 1               ;ProDOS Zero Page
+000000r 1               Command = $42 ;ProDOS Command
+000000r 1               Unit = $43 ;ProDOS unit (SDDD0000)
+000000r 1               BufferLo = $44
+000000r 1               BufferHi = $45
+000000r 1               BlockLo = $46
+000000r 1               BlockHi = $47
+000000r 1               
+000000r 1               ; ProDOS Error Codes
+000000r 1               IOError = $27
+000000r 1               NoDevice = $28
+000000r 1               WriteProtect = $2B
+000000r 1               
+000000r 1               InputByte = $c08e+SLOT*$10
+000000r 1               OutputByte = $c08d+SLOT*$10
+000000r 1               InputFlags = $c08b+SLOT*$10
+000000r 1               OutputFlags = $c087+SLOT*$10
+000000r 1               
+000000r 1               ResetCommand = $00
+000000r 1               ReadBlockCommand = $01
+000000r 1               WriteBlockCommand = $02
+000000r 1               GetTimeCommand = $03
+000000r 1               ChangeDriveCommand = $04
+000000r 1               ExecCommand = $05
+000000r 1               LoadFileCommand = $06
+000000r 1               SaveFileCommand = $07
+000000r 1               MenuCommand = $08
+000000r 1               
+000000r 1               Wait = $fca8
+000000r 1               PrintChar = $fded
+000000r 1               Home = $fc58
+000000r 1               ReadChar = $fd0c
+000000r 1               BasCalc = $fbc1
+000000r 1               htab = $24
+000000r 1               vtab = $25
+000000r 1               BasL = $28
+000000r 1               htab80 = $057b
+000000r 1               
+000000r 1                .org SLOT*$100 + $C000
+00C700  1               ;ID bytes for booting and drive detection
+00C700  1  E0 20         cpx #$20    ;ID bytes for ProDOS and the
+00C702  1  E0 00         cpx #$00    ; Apple Autostart ROM
+00C704  1  E0 03         cpx #$03    ;
+00C706  1               
+00C706  1  A2 70         ldx #SLOT*$10
+00C708  1  86 2B         stx $2b
+00C70A  1  86 43         stx Unit
+00C70C  1               
+00C70C  1               ;force EPROM to second page on boot
+00C70C  1  A9 3F         lda #$3f ;set all flags high and page 1 of EPROMi
+00C70E  1               PageJump:
+00C70E  1  8D F7 C0      sta OutputFlags
+00C711  1  4C 19 C7      jmp Start
+00C714  1               
+00C714  1               ;entry points for ProDOS
+00C714  1               DriverEntry:
+00C714  1  A9 0F         lda #$0f ;set all flags high and page 0 of EPROM
+00C716  1  8D F7 C0      sta OutputFlags
+00C719  1               ;since the firmware page changes to 0, this falls through to the driver
+00C719  1               
+00C719  1               Start:
+00C719  1  A9 F0         lda #$f0	;restore COUT after PR# called
+00C71B  1  85 36         sta $36
+00C71D  1  A9 FD         lda #$fd
+00C71F  1  85 37         sta $37
+00C721  1                ;jsr Home	;clear screen and show menu options
+00C721  1  A9 02         lda #$02
+00C723  1  85 25         sta vtab
+00C725  1  20 C1 FB      jsr BasCalc
+00C728  1  A0 00         ldy #$00
+00C72A  1  84 24         sty htab
+00C72C  1               PrintString:
+00C72C  1  B9 AB C7      lda Text,y
+00C72F  1  F0 08         beq WaitForRPi
+00C731  1  09 80         ora #$80
+00C733  1  20 ED FD      jsr PrintChar
+00C736  1  C8            iny
+00C737  1  D0 F3         bne PrintString
+00C739  1               
+00C739  1               .if HW_TYPE = 0
+00C739  1               
+00C739  1               WaitForRPi:
+00C739  1  2C FB C0      bit InputFlags
+00C73C  1  30 0D         bmi Reset
+00C73E  1  A9 FF         lda #$ff
+00C740  1  20 A8 FC      jsr Wait
+00C743  1  A9 AE         lda #'.'+$80
+00C745  1  20 ED FD      jsr PrintChar
+00C748  1  4C 39 C7      jmp WaitForRPi
+00C74B  1               
+00C74B  1               Reset:
+00C74B  1  A9 DF         lda #'_'|$80
+00C74D  1  20 ED FD      jsr PrintChar
+00C750  1  A9 00         lda #ResetCommand
+00C752  1  20 7B C7      jsr SendByte
+00C755  1  A9 88         lda #$88
+00C757  1  20 ED FD      jsr PrintChar
+00C75A  1  A9 AE         lda #'.'|$80
+00C75C  1  20 ED FD      jsr PrintChar
+00C75F  1  20 93 C7      jsr GetByte
+00C762  1  F0 03         beq Ok
+00C764  1  4C 4B C7      jmp Reset
+00C767  1               
+00C767  1               .else
+00C767  1               
+00C767  1               WaitForRPi:
+00C767  1               @1:
+00C767  1                bit InputFlags
+00C767  1                bmi @2
+00C767  1                lda InputByte
+00C767  1                jmp @1
+00C767  1               @2:
+00C767  1                bit InputFlags
+00C767  1                bpl @4
+00C767  1                bvs @3
+00C767  1                lda #ResetCommand
+00C767  1                sta OutputByte
+00C767  1               @3:
+00C767  1                lda #$ff
+00C767  1                jsr Wait
+00C767  1                lda #'.'+$80
+00C767  1                jsr PrintChar
+00C767  1                jmp @2
+00C767  1               @4:
+00C767  1                lda #$ff
+00C767  1                jsr Wait
+00C767  1               @5:
+00C767  1                bit InputFlags
+00C767  1                bmi Ok
+00C767  1                lda InputByte
+00C767  1                jmp @5
+00C767  1               
+00C767  1               .endif
+00C767  1               
+00C767  1               Ok:
+00C767  1  A9 8D         lda #$8D
+00C769  1  20 ED FD      jsr PrintChar
+00C76C  1  A9 CF         lda #'O'|$80
+00C76E  1  20 ED FD      jsr PrintChar
+00C771  1  A9 CB         lda #'K'|$80
+00C773  1  20 ED FD      jsr PrintChar
+00C776  1               
+00C776  1               Boot:
+00C776  1  A9 0F         lda #$0f
+00C778  1  4C 0E C7      jmp PageJump
+00C77B  1               
+00C77B  1               SendByte:
+00C77B  1  2C FB C0      bit InputFlags
+00C77E  1  70 FB         bvs SendByte
+00C780  1  8D FD C0      sta OutputByte
+00C783  1               .if HW_TYPE = 0
+00C783  1  A9 3E         lda #$3e ; set bit 0 low to indicate write started
+00C785  1  8D F7 C0      sta OutputFlags
+00C788  1               finishWrite:
+00C788  1  2C FB C0      bit InputFlags
+00C78B  1  50 FB         bvc finishWrite
+00C78D  1  A9 3F         lda #$3f
+00C78F  1  8D F7 C0      sta OutputFlags
+00C792  1               .endif
+00C792  1  60            rts
+00C793  1               
+00C793  1               GetByte:
+00C793  1               .if HW_TYPE = 0
+00C793  1  A2 3D         ldx #$3d ;set read flag low
+00C795  1  8E F7 C0      stx OutputFlags
+00C798  1               .endif
+00C798  1               waitRead:
+00C798  1  2C FB C0      bit InputFlags
+00C79B  1  30 FB         bmi waitRead
+00C79D  1  AD FE C0      lda InputByte
+00C7A0  1               .if HW_TYPE = 0
+00C7A0  1  A2 3F         ldx #$3f ;set all flags high
+00C7A2  1  8E F7 C0      stx OutputFlags
+00C7A5  1               finishRead:
+00C7A5  1  2C FB C0      bit InputFlags
+00C7A8  1  10 FB         bpl finishRead
+00C7AA  1               .endif
+00C7AA  1  60            rts
+00C7AB  1               
+00C7AB  1               Text:
+00C7AB  1  41 70 70 6C  .byte	"Apple2-IO-RPi",$8d
+00C7AF  1  65 32 2D 49  
+00C7B3  1  4F 2D 52 50  
+00C7B7  1  69 8D        
+00C7B9  1  28 63 29 32  .byte	"(c)2020-2024 Terence J. Boldt",$8d
+00C7BD  1  30 32 30 2D  
+00C7C1  1  32 30 32 34  
+00C7C5  1  20 54 65 72  
+00C7C9  1  65 6E 63 65  
+00C7CD  1  20 4A 2E 20  
+00C7D1  1  42 6F 6C 64  
+00C7D5  1  74 8D        
+00C7D7  1  8D           .byte   $8d
+00C7D8  1               .if HW_TYPE = 0
+00C7D8  1  57 61 69 74  .byte	"Waiting for RPi FW:0010..."
+00C7DC  1  69 6E 67 20  
+00C7E0  1  66 6F 72 20  
+00C7E4  1  52 50 69 20  
+00C7E8  1  46 57 3A 30  
+00C7EC  1  30 31 30 2E  
+00C7F0  1  2E 2E        
+00C7F2  1               .else
+00C7F2  1               .byte   "Waiting for RPi FW:8010..."
+00C7F2  1               .endif
+00C7F2  1               end:
+00C7F2  1  00           .byte	$00
+00C7F3  1               
+00C7F3  1  00 00 00 00  .repeat	251-<end
+00C7F7  1  00 00 00 00  
+00C7FB  1  00           
+00C7FC  1               .byte 0
+00C7FC  1               .endrepeat
+00C7FC  1               
+00C7FC  1  00 00        .byte      0,0     ;0000 blocks = check status
+00C7FE  1  07           .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
+00C7FF  1  14           .byte     DriverEntry&$00FF ;low byte of entry
+00C800  1               
+00C800  1               

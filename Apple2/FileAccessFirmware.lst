@@ -1,0 +1,183 @@
+ca65 V2.18 - Debian 2.19-1
+Main file   : FileAccessFirmware.asm
+Current file: FileAccessFirmware.asm
+
+000000r 1               ; Copyright Terence J. Boldt (c)2020-2024
+000000r 1               ; Use of this source code is governed by an MIT
+000000r 1               ; license that can be found in the LICENSE file.
+000000r 1               
+000000r 1               ; This file contains the source for the firmware
+000000r 1               ; that was formerly used to copy files from RPi
+000000r 1               ; to Apple II RAM
+000000r 1               
+000000r 1               ;ProDOS Zero Page
+000000r 1               Command = $42 ;ProDOS Command
+000000r 1               Unit = $43 ;ProDOS unit (SDDD0000)
+000000r 1               BufferLo = $44
+000000r 1               BufferHi = $45
+000000r 1               BlockLo = $46
+000000r 1               BlockHi = $47
+000000r 1               
+000000r 1               ; ProDOS Error Codes
+000000r 1               IOError = $27
+000000r 1               NoDevice = $28
+000000r 1               WriteProtect = $2B
+000000r 1               
+000000r 1               InputByte = $c08e+SLOT*$10
+000000r 1               OutputByte = $c08d+SLOT*$10
+000000r 1               InputFlags = $c08b+SLOT*$10
+000000r 1               OutputFlags = $c087+SLOT*$10
+000000r 1               
+000000r 1               ReadBlockCommand = $01
+000000r 1               WriteBlockCommand = $02
+000000r 1               GetTimeCommand = $03
+000000r 1               ChangeDriveCommand = $04
+000000r 1               ExecCommand = $05
+000000r 1               LoadFileCommand = $06
+000000r 1               SaveFileCommand = $07
+000000r 1               MenuCommand = $08
+000000r 1               
+000000r 1               InputString = $fd67
+000000r 1               Monitor = $ff59
+000000r 1               
+000000r 1                .org SLOT*$100 + $C000
+00C700  1               ;ID bytes for booting and drive detection
+00C700  1  E0 20         cpx #$20    ;ID bytes for ProDOS and the
+00C702  1  E0 00         cpx #$00    ; Apple Autostart ROM
+00C704  1  E0 03         cpx #$03    ;
+00C706  1               
+00C706  1  A2 70         ldx #SLOT*$10
+00C708  1  86 2B         stx $2b
+00C70A  1  86 43         stx Unit
+00C70C  1               
+00C70C  1               ;force EPROM to second page on boot
+00C70C  1  A9 3F         lda #$3f ;set all flags high and page 3 of EPROM for menu
+00C70E  1               PageJump:
+00C70E  1  8D F7 C0      sta OutputFlags
+00C711  1  4C 19 C7      jmp Start ;this jump is only called if coming in from PageJump with A=$2f
+00C714  1               
+00C714  1               ;entry points for ProDOS
+00C714  1               DriverEntry:
+00C714  1  A9 0F         lda #$0f ;set all flags high and page 0 of EPROM
+00C716  1  8D F7 C0      sta OutputFlags
+00C719  1               
+00C719  1               Start:
+00C719  1  A9 A4         lda #$a4
+00C71B  1  85 33         sta $33
+00C71D  1               
+00C71D  1               GetFilename:
+00C71D  1  20 67 FD      jsr InputString
+00C720  1               
+00C720  1               LoadFile:
+00C720  1  A9 00         lda #$00
+00C722  1  85 44         sta BufferLo
+00C724  1  A9 20         lda #$20
+00C726  1  85 45         sta BufferHi
+00C728  1  A9 06         lda #$06 ; send command 6 = load
+00C72A  1  20 74 C7      jsr SendByte
+00C72D  1  A0 00         ldy #$00
+00C72F  1               sendFilename:
+00C72F  1  B9 00 02      lda $0200,y
+00C732  1  C9 8D         cmp #$8d
+00C734  1  F0 08         beq sendNullTerminator
+00C736  1  29 7F         and #$7f
+00C738  1  20 74 C7      jsr SendByte
+00C73B  1  C8            iny
+00C73C  1  D0 F1         bne sendFilename
+00C73E  1               sendNullTerminator:
+00C73E  1  A9 00         lda #$00
+00C740  1  20 74 C7      jsr SendByte
+00C743  1               
+00C743  1  20 8C C7      jsr GetByte
+00C746  1  85 46         sta BlockLo ; not really a block, just using the memory space
+00C748  1  20 8C C7      jsr GetByte
+00C74B  1  85 47         sta BlockHi
+00C74D  1               NextPage:
+00C74D  1  A5 47         lda BlockHi
+00C74F  1  F0 10         beq ReadFinalPage
+00C751  1  A0 00         ldy #$00
+00C753  1               NextByte:
+00C753  1  20 8C C7      jsr GetByte
+00C756  1  91 44         sta (BufferLo),y
+00C758  1  C8            iny
+00C759  1  D0 F8         bne NextByte
+00C75B  1  E6 45         inc BufferHi
+00C75D  1  C6 47         dec BlockHi
+00C75F  1  D0 EC         bne NextPage
+00C761  1               ReadFinalPage:
+00C761  1  A5 46         lda BlockLo
+00C763  1  F0 0C         beq ExitToMonitor
+00C765  1  A0 00         ldy #$00
+00C767  1               NextByteFinal:
+00C767  1  20 8C C7      jsr GetByte
+00C76A  1  91 44         sta (BufferLo),y
+00C76C  1  C8            iny
+00C76D  1  C4 46         cpy BlockLo
+00C76F  1  D0 F6         bne NextByteFinal
+00C771  1               ExitToMonitor:
+00C771  1  20 59 FF      jsr Monitor
+00C774  1               
+00C774  1               SendByte:
+00C774  1  2C FB C0      bit InputFlags
+00C777  1  70 FB         bvs SendByte
+00C779  1  8D FD C0      sta OutputByte
+00C77C  1               .if HW_TYPE = 0
+00C77C  1  A9 2E         lda #$2e ; set bit 0 low to indicate write started
+00C77E  1  8D F7 C0      sta OutputFlags
+00C781  1               finishWrite:
+00C781  1  2C FB C0      bit InputFlags
+00C784  1  50 FB         bvc finishWrite
+00C786  1  A9 2F         lda #$2f
+00C788  1  8D F7 C0      sta OutputFlags
+00C78B  1               .endif
+00C78B  1  60            rts
+00C78C  1               
+00C78C  1               GetByte:
+00C78C  1               .if HW_TYPE = 0
+00C78C  1  A2 2D         ldx #$2d ;set read flag low
+00C78E  1  8E F7 C0      stx OutputFlags
+00C791  1               .endif
+00C791  1               waitRead:
+00C791  1  2C FB C0      bit InputFlags
+00C794  1  30 FB         bmi waitRead
+00C796  1  AD FE C0      lda InputByte
+00C799  1               .if HW_TYPE = 0
+00C799  1  A2 2F         ldx #$2f ;set all flags high
+00C79B  1  8E F7 C0      stx OutputFlags
+00C79E  1               finishRead:
+00C79E  1  2C FB C0      bit InputFlags
+00C7A1  1  10 FB         bpl finishRead
+00C7A3  1               .endif
+00C7A3  1               end:
+00C7A3  1  60            rts
+00C7A4  1               
+00C7A4  1  00 00 00 00  .repeat	251-<end
+00C7A8  1  00 00 00 00  
+00C7AC  1  00 00 00 00  
+00C7B0  1  00 00 00 00  
+00C7B4  1  00 00 00 00  
+00C7B8  1  00 00 00 00  
+00C7BC  1  00 00 00 00  
+00C7C0  1  00 00 00 00  
+00C7C4  1  00 00 00 00  
+00C7C8  1  00 00 00 00  
+00C7CC  1  00 00 00 00  
+00C7D0  1  00 00 00 00  
+00C7D4  1  00 00 00 00  
+00C7D8  1  00 00 00 00  
+00C7DC  1  00 00 00 00  
+00C7E0  1  00 00 00 00  
+00C7E4  1  00 00 00 00  
+00C7E8  1  00 00 00 00  
+00C7EC  1  00 00 00 00  
+00C7F0  1  00 00 00 00  
+00C7F4  1  00 00 00 00  
+00C7F8  1  00 00 00 00  
+00C7FC  1               .byte 0
+00C7FC  1               .endrepeat
+00C7FC  1               
+00C7FC  1  00 00        .byte      0,0     ;0000 blocks = check status
+00C7FE  1  07           .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
+00C7FF  1  14           .byte     DriverEntry&$00FF ;low byte of entry
+00C800  1               
+00C800  1               

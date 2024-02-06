@@ -190,7 +190,11 @@ Text:
 .byte	"Apple2-IO-RPi",$8d
 .byte	"(c)2020-2024 Terence J. Boldt",$8d
 .byte   $8d
-.byte	"Waiting for RPi FW:000F..."
+.if HW_TYPE = 0
+.byte	"Waiting for RPi FW:0010..."
+.else
+.byte   "Waiting for RPi FW:8010..."
+.endif
 end:
 .byte	$00
 

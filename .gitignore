@@ -1,7 +1,5 @@
 *-bak
-*.lst
 *.o
-*.bin
 *.DS_Store
 RaspberryPi/apple2driver/apple2driver
 RaspberryPi/Apple2-IO-RPi.log

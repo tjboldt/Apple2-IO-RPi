@@ -109,7 +109,7 @@ Current file: CommandFirmware.asm
 00C766  1  A9 00         lda #$00
 00C768  1  20 95 C7      jsr SendByte
 00C76B  1               DumpOutput:
-00C76B  1  20 B3 C7      jsr GetByte
+00C76B  1  20 AD C7      jsr GetByte
 00C76E  1  B0 07         bcs skipOutput
 00C770  1  C9 00         cmp #$00
 00C772  1  F0 19         beq endOutput
@@ -132,60 +132,60 @@ Current file: CommandFirmware.asm
 00C792  1  6C 70 00     
 00C795  1               
 00C795  1               SendByte:
-00C795  1  48            pha
-00C796  1               waitWrite:
-00C796  1  AD FB C0      lda InputFlags
-00C799  1  2A            rol
-00C79A  1  2A            rol
-00C79B  1  B0 F9         bcs waitWrite
-00C79D  1  68            pla
-00C79E  1  8D FD C0      sta OutputByte
-00C7A1  1  A9 1E         lda #$1e ; set bit 0 low to indicate write started
-00C7A3  1  8D F7 C0      sta OutputFlags
-00C7A6  1               finishWrite:
-00C7A6  1  AD FB C0      lda InputFlags
-00C7A9  1  2A            rol
-00C7AA  1  2A            rol
-00C7AB  1  90 F9         bcc finishWrite
-00C7AD  1  A9 1F         lda #$1f
-00C7AF  1  8D F7 C0      sta OutputFlags
-00C7B2  1  60            rts
-00C7B3  1               
-00C7B3  1               GetByte:
-00C7B3  1  A9 1D         lda #$1d ;set read flag low
-00C7B5  1  8D F7 C0      sta OutputFlags
-00C7B8  1               waitRead:
-00C7B8  1  AD FB C0      lda InputFlags
-00C7BB  1  2A            rol
-00C7BC  1  90 0C         bcc readByte
-00C7BE  1  2C 00 C0      bit Keyboard ;keypress will abort waiting to read
-00C7C1  1  10 F5         bpl waitRead
-00C7C3  1  A9 1F         lda #$1f ;set all flags high and exit
-00C7C5  1  8D F7 C0      sta OutputFlags
-00C7C8  1  38            sec ;failure
-00C7C9  1  60            rts
-00C7CA  1               readByte:
-00C7CA  1  AD FE C0      lda InputByte
-00C7CD  1  48            pha
-00C7CE  1  A9 1F         lda #$1f ;set all flags high
-00C7D0  1  8D F7 C0      sta OutputFlags
-00C7D3  1               finishRead:
-00C7D3  1  AD FB C0      lda InputFlags
-00C7D6  1  2A            rol
-00C7D7  1  90 FA         bcc finishRead
-00C7D9  1  68            pla
-00C7DA  1  18            clc ;success
-00C7DB  1               end:
-00C7DB  1  60            rts
-00C7DC  1               
-00C7DC  1  00 00 00 00  .repeat	251-<end
-00C7E0  1  00 00 00 00  
-00C7E4  1  00 00 00 00  
-00C7E8  1  00 00 00 00  
-00C7EC  1  00 00 00 00  
-00C7F0  1  00 00 00 00  
-00C7F4  1  00 00 00 00  
-00C7F8  1  00 00 00 00  
+00C795  1  2C FB C0      bit InputFlags
+00C798  1  70 FB         bvs SendByte
+00C79A  1  8D FD C0      sta OutputByte
+00C79D  1               .if HW_TYPE = 0
+00C79D  1  A9 1E         lda #$1e ; set bit 0 low to indicate write started
+00C79F  1  8D F7 C0      sta OutputFlags
+00C7A2  1               finishWrite:
+00C7A2  1  2C FB C0      bit InputFlags
+00C7A5  1  50 FB         bvc finishWrite
+00C7A7  1  A9 1F         lda #$1f
+00C7A9  1  8D F7 C0      sta OutputFlags
+00C7AC  1               .endif
+00C7AC  1  60            rts
+00C7AD  1               
+00C7AD  1               GetByte:
+00C7AD  1               .if HW_TYPE = 0
+00C7AD  1  A2 1D         ldx #$1d ;set read flag low
+00C7AF  1  8E F7 C0      stx OutputFlags
+00C7B2  1               .endif
+00C7B2  1               waitRead:
+00C7B2  1  2C FB C0      bit InputFlags
+00C7B5  1  10 0C         bpl readByte
+00C7B7  1  2C 00 C0      bit Keyboard ;keypress will abort waiting to read
+00C7BA  1  10 F6         bpl waitRead
+00C7BC  1               .if HW_TYPE = 0
+00C7BC  1  A9 1F         lda #$1f ;set all flags high and exit
+00C7BE  1  8D F7 C0      sta OutputFlags
+00C7C1  1               .endif
+00C7C1  1  38            sec ;failure
+00C7C2  1  60            rts
+00C7C3  1               readByte:
+00C7C3  1  AD FE C0      lda InputByte
+00C7C6  1               .if HW_TYPE = 0
+00C7C6  1  A2 1F         ldx #$1f ;set all flags high
+00C7C8  1  8E F7 C0      stx OutputFlags
+00C7CB  1               finishRead:
+00C7CB  1  2C FB C0      bit InputFlags
+00C7CE  1  10 FB         bpl finishRead
+00C7D0  1               .endif
+00C7D0  1  18            clc ;success
+00C7D1  1               end:
+00C7D1  1  60            rts
+00C7D2  1               
+00C7D2  1  00 00 00 00  .repeat	251-<end
+00C7D6  1  00 00 00 00  
+00C7DA  1  00 00 00 00  
+00C7DE  1  00 00 00 00  
+00C7E2  1  00 00 00 00  
+00C7E6  1  00 00 00 00  
+00C7EA  1  00 00 00 00  
+00C7EE  1  00 00 00 00  
+00C7F2  1  00 00 00 00  
+00C7F6  1  00 00 00 00  
+00C7FA  1  00 00        
 00C7FC  1               .byte 0
 00C7FC  1               .endrepeat
 00C7FC  1               

@@ -232,6 +232,7 @@ Current file: RPi.Command.asm
 000375  1  B0 F9         bcs waitWrite
 000377  1  68            pla
 000378  1  9D 8D C0      sta OutputByte,x
+00037B  1               .if HW_TYPE = 0
 00037B  1  A9 1E         lda #$1e ; set bit 0 low to indicate write started
 00037D  1  9D 87 C0      sta OutputFlags,x
 000380  1               finishWrite:
@@ -241,17 +242,21 @@ Current file: RPi.Command.asm
 000385  1  90 F9         bcc finishWrite
 000387  1  A9 1F         lda #$1f
 000389  1  9D 87 C0      sta OutputFlags,x
+00038C  1               .endif
 00038C  1  60            rts
 00038D  1               
 00038D  1               GetByte:
+00038D  1               .if HW_TYPE = 0
 00038D  1  A9 1D         lda #$1d ;set read flag low
 00038F  1  9D 87 C0      sta OutputFlags,x
+000392  1               .endif
 000392  1               waitRead:
 000392  1  BD 8B C0      lda InputFlags,x
 000395  1  2A            rol
 000396  1  B0 FA         bcs waitRead
 000398  1               readByte:
 000398  1  BD 8E C0      lda InputByte,x
+00039B  1               .if HW_TYPE = 0
 00039B  1  48            pha
 00039C  1  A9 1F         lda #$1f ;set all flags high
 00039E  1  9D 87 C0      sta OutputFlags,x
@@ -260,6 +265,7 @@ Current file: RPi.Command.asm
 0003A4  1  2A            rol
 0003A5  1  90 FA         bcc finishRead
 0003A7  1  68            pla
+0003A8  1               .endif
 0003A8  1  18            clc ;success
 0003A9  1  60            rts
 0003AA  1               

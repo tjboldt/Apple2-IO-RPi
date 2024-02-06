@@ -110,8 +110,8 @@ Start:
  lda LastChar
  pha
  bit ClearKeyboard
- lda #ResetCommand
- jsr SendByte
+; lda #ResetCommand
+; jsr SendByte
  lda #ShellCommand
  jsr SendByte
  jsr DumpOutput
@@ -183,6 +183,7 @@ waitWrite:
  bcs waitWrite
  pla
  sta OutputByte,x
+.if HW_TYPE = 0
  lda #$1e ; set bit 0 low to indicate write started
  sta OutputFlags,x 
 finishWrite:
@@ -192,11 +193,14 @@ finishWrite:
  bcc finishWrite
  lda #$1f
  sta OutputFlags,x
+.endif
  rts
 
 GetByte:
+.if HW_TYPE = 0
  lda #$1d ;set read flag low
  sta OutputFlags,x
+.endif
 waitRead:
  lda InputFlags,x
  rol
@@ -204,10 +208,15 @@ waitRead:
  bit Keyboard ;keypress will abort waiting to read
  bpl waitRead
 keyPressed:
+ lda InputFlags,x
+ rol
+ rol
+ bcs keyPressed
  lda Keyboard ;send keypress to RPi
  and #$7f
  sta OutputByte,x
  bit ClearKeyboard
+.if HW_TYPE = 0
  lda #$1c ;set write flag low too
  sta OutputFlags,x
 finishKeyPress:
@@ -217,9 +226,11 @@ finishKeyPress:
  bcc finishKeyPress
  lda #$1d ;set flags back for reading
  sta OutputFlags,x
+.endif
  jmp waitRead
 readByte:
  lda InputByte,x
+.if HW_TYPE = 0
  pha
  lda #$1f ;set all flags high
  sta OutputFlags,x
@@ -228,6 +239,7 @@ finishRead:
  rol
  bcc finishRead
  pla
+.endif
  clc ;success
 end:
  rts
@@ -278,7 +290,11 @@ restoreChar:
  rts
 
 Text:
-.byte	"Apple2-IO-RPi Shell Version 000E",$8d
+.if HW_TYPE = 0
+.byte	"Apple2-IO-RPi Shell Version 000F",$8d
+.else
+.byte	"Apple2-IO-RPi Shell Version 800F",$8d
+.endif
 .byte	"(c)2020-2024 Terence J. Boldt",$8d
 .byte   $8d
 .byte   $00

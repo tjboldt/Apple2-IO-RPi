@@ -21,16 +21,18 @@ if [ ! -d "ProDOS-Utilities" ]; then
   git clone https://github.com/tjboldt/ProDOS-Utilities.git
 fi
 cd ProDOS-Utilities || exit
+go mod tidy
 go build
 cd ~ || exit
 if [ -L "/usr/bin/ProDOS-Utilities" ]; then
     sudo rm /usr/bin/ProDOS-Utilities
 fi
-sudo ln -s /home/pi/ProDOS-Utilities/ProDOS-Utilities /usr/bin/ProDOS-Utilities
+sudo ln -s $HOME/ProDOS-Utilities/ProDOS-Utilities /usr/bin/ProDOS-Utilities
 if [ ! -d "Apple2-IO-RPi" ]; then
   git clone https://github.com/tjboldt/Apple2-IO-RPi.git
 fi
 cd Apple2-IO-RPi/RaspberryPi/apple2driver || exit
+go mod tidy
 go build
 sudo apt install cc65 vim -y
 cd ~ || exit
@@ -41,18 +43,18 @@ dtoverlay=disable-bt
 boot_delay=0
 EOF'
 sudo bash -c 'echo " quiet" >> /boot/cmdline.txt'
-bash -c 'cat > apple2driver.service << EOF
+sudo --preserve-env=HOME --preserve-env=USER bash -c 'cat > apple2driver.service << EOF
 [Unit]
 Description=Apple2-IO-RPi Driver
 
 [Service]
-ExecStart=/home/$USER/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver
+ExecStart=$HOME/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=apple2driver
 User=$USER
 Group=$USER
-WorkingDirectory=/home/$USER/Apple2-IO-RPi/RaspberryPi/apple2driver
+WorkingDirectory=$HOME/Apple2-IO-RPi/RaspberryPi/apple2driver
 
 [Install]
 WantedBy=basic.target

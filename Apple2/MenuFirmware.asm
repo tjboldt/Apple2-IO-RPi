@@ -73,10 +73,11 @@ Start:
  lda #$fd
  sta $37
  ;jsr Home	;clear screen and show menu options
- lda #$10
+ lda #$02
  sta vtab
  jsr BasCalc
  ldy #$00
+ sty htab
 PrintString:
  lda Text,y
  beq WaitForRPi
@@ -85,10 +86,11 @@ PrintString:
  iny
  bne PrintString
 
+.if HW_TYPE = 0
+
 WaitForRPi:
- lda InputFlags
- rol
- bcs Reset
+ bit InputFlags
+ bmi Reset
  lda #$ff
  jsr Wait
  lda #'.'+$80
@@ -108,6 +110,37 @@ Reset:
  beq Ok
  jmp Reset
 
+.else
+
+WaitForRPi:
+@1:
+ bit InputFlags
+ bmi @2 
+ lda InputByte
+ jmp @1
+@2:
+ bit InputFlags
+ bpl @4
+ bvs @3
+ lda #ResetCommand
+ sta OutputByte
+@3:
+ lda #$ff
+ jsr Wait
+ lda #'.'+$80
+ jsr PrintChar
+ jmp @2
+@4:
+ lda #$ff
+ jsr Wait
+@5:
+ bit InputFlags
+ bmi Ok 
+ lda InputByte
+ jmp @5
+
+.endif
+
 Ok:
  lda #$8D
  jsr PrintChar
@@ -121,50 +154,53 @@ Boot:
  jmp PageJump
 
 SendByte:
- pha 
-waitWrite: 
- lda InputFlags
- rol
- rol 
- bcs waitWrite
- pla
+ bit InputFlags
+ bvs SendByte
  sta OutputByte
+.if HW_TYPE = 0
  lda #$3e ; set bit 0 low to indicate write started
  sta OutputFlags 
 finishWrite:
- lda InputFlags
- rol
- rol
- bcc finishWrite
+ bit InputFlags
+ bvc finishWrite
  lda #$3f
  sta OutputFlags
+.endif
  rts
 
 GetByte:
- lda #$3d ;set read flag low
- sta OutputFlags
+.if HW_TYPE = 0
+ ldx #$3d ;set read flag low
+ stx OutputFlags
+.endif
 waitRead:
- lda InputFlags
- rol
- bcs waitRead
+ bit InputFlags
+ bmi waitRead
  lda InputByte
- pha
- lda #$3f ;set all flags high
- sta OutputFlags
+.if HW_TYPE = 0
+ ldx #$3f ;set all flags high
+ stx OutputFlags
 finishRead:
- lda InputFlags
- rol
- bcc finishRead
- pla
-end:
+ bit InputFlags
+ bpl finishRead
+.endif
  rts
 
-; NOTE: The text below exactly fills the remaining 256 bytes of firmware
 Text:
 .byte	"Apple2-IO-RPi",$8d
 .byte	"(c)2020-2024 Terence J. Boldt",$8d
 .byte   $8d
-.byte	"Waiting for RPi FW:000F...",$00
+.if HW_TYPE = 0
+.byte	"Waiting for RPi FW:0010..."
+.else
+.byte   "Waiting for RPi FW:8010..."
+.endif
+end:
+.byte	$00
+
+.repeat	251-<end
+.byte 0
+.endrepeat
 
 .byte      0,0     ;0000 blocks = check status
 .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)

@@ -22,15 +22,10 @@ body:
       label: Hardware Version
       description: What version of the hardware are you running?
       options:
-        - Sixth Prototype (Purchased from Terence)
-        - Sixth Prototype (Self-assembled)
-        - Sixth Prototype (Purchased from third party)
-        - Fifth Prototype (Purchased from Terence)
-        - Fifth Prototype (Self-assembled)
-        - Fifth Prototype (Purchased from third party)
-        - Fourth Prototype (Purchased from Terence)
-        - Fourth Prototype (Self-assembled)
-        - Fourth Prototype (Purchased from third party)
+        - RPi Pico
+        - Sixth Prototype (lastest classic hardware)
+        - Fifth Prototype (classic hardware without jumper)
+        - Fourth Prototype (classic hardware with EPROM)
     validations:
       required: true
   - type: dropdown
@@ -39,6 +34,8 @@ body:
       label: Firmware Version
       description: What version of the firmware are you running? (shown on boot screen)
       options:
+        - 8010 (initial RPi Pico hardware)
+        - 0010 (classic hardware)
         - 000F
         - Older (not shown on boot, pre-2022-Feb-07)
     validations:
@@ -49,6 +46,7 @@ body:
       label: Driver Version
       description: What version of the driver are you running? Check with `RPI a2version`
       options:
+        - 002D (add support for RPi Pico hardware)
         - 002C (fix nano editor)
         - 002B (fix keyboard delay)
         - 002A (reduce CPU usage)
@@ -69,6 +67,8 @@ body:
       label: Shell Version
       description: What version of the shell are you running?`
       options:
+        - 800F (initial RPi Pico support)
+        - 000F (classic hardware support)
         - 000E (fix hang on exit)
         - 000D (added version info)
         - Older (pre-2022-Mar-01)

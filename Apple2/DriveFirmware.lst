@@ -108,7 +108,7 @@ Current file: DriveFirmware.asm
 00C758  1  A9 03         lda #GetTimeCommand
 00C75A  1  20 C0 C7      jsr SendByte
 00C75D  1               getTimeByte:
-00C75D  1  20 DE C7      jsr GetByte
+00C75D  1  20 D8 C7      jsr GetByte
 00C760  1  99 90 BF      sta $bf90,y
 00C763  1  C8            iny
 00C764  1  C0 04         cpy #$04
@@ -132,7 +132,7 @@ Current file: DriveFirmware.asm
 00C78A  1  60            rts
 00C78B  1               
 00C78B  1               read256:
-00C78B  1  20 DE C7      jsr GetByte
+00C78B  1  20 D8 C7      jsr GetByte
 00C78E  1  91 44         sta (BufferLo),y
 00C790  1  C8            iny
 00C791  1  D0 F8         bne read256
@@ -165,45 +165,44 @@ Current file: DriveFirmware.asm
 00C7BF  1  60            rts
 00C7C0  1               
 00C7C0  1               SendByte:
-00C7C0  1  48            pha
-00C7C1  1               waitWrite:
-00C7C1  1  AD FB C0      lda InputFlags
-00C7C4  1  2A            rol
-00C7C5  1  2A            rol
-00C7C6  1  B0 F9         bcs waitWrite
-00C7C8  1  68            pla
-00C7C9  1  8D FD C0      sta OutputByte
-00C7CC  1  A9 0E         lda #$0e ; set bit 0 low to indicate write started
-00C7CE  1  8D F7 C0      sta OutputFlags
-00C7D1  1               finishWrite:
-00C7D1  1  AD FB C0      lda InputFlags
-00C7D4  1  2A            rol
-00C7D5  1  2A            rol
-00C7D6  1  90 F9         bcc finishWrite
-00C7D8  1  A9 0F         lda #$0f
+00C7C0  1  2C FB C0      bit InputFlags
+00C7C3  1  70 FB         bvs SendByte
+00C7C5  1  8D FD C0      sta OutputByte
+00C7C8  1               .if HW_TYPE = 0
+00C7C8  1  A9 0E         lda #$0e ; set bit 0 low to indicate write started
+00C7CA  1  8D F7 C0      sta OutputFlags
+00C7CD  1               finishWrite:
+00C7CD  1  2C FB C0      bit InputFlags
+00C7D0  1  50 FB         bvc finishWrite
+00C7D2  1  A9 0F         lda #$0f
+00C7D4  1  8D F7 C0      sta OutputFlags
+00C7D7  1               .endif
+00C7D7  1  60            rts
+00C7D8  1               
+00C7D8  1               GetByte:
+00C7D8  1               .if HW_TYPE = 0
+00C7D8  1  A9 0D         lda #$0d ;set read flag low
 00C7DA  1  8D F7 C0      sta OutputFlags
-00C7DD  1  60            rts
-00C7DE  1               
-00C7DE  1               GetByte:
-00C7DE  1  A9 0D         lda #$0d ;set read flag low
-00C7E0  1  8D F7 C0      sta OutputFlags
-00C7E3  1               waitRead:
-00C7E3  1  AD FB C0      lda InputFlags
-00C7E6  1  2A            rol
-00C7E7  1  B0 FA         bcs waitRead
-00C7E9  1  AD FE C0      lda InputByte
-00C7EC  1  48            pha
-00C7ED  1  A9 0F         lda #$0f ;set all flags high
-00C7EF  1  8D F7 C0      sta OutputFlags
-00C7F2  1               finishRead:
-00C7F2  1  AD FB C0      lda InputFlags
-00C7F5  1  2A            rol
-00C7F6  1  90 FA         bcc finishRead
-00C7F8  1  68            pla
-00C7F9  1               end:
-00C7F9  1  60            rts
-00C7FA  1               
-00C7FA  1  00 00        .repeat	251-<end
+00C7DD  1               .endif
+00C7DD  1               waitRead:
+00C7DD  1  2C FB C0      bit InputFlags
+00C7E0  1  30 FB         bmi waitRead
+00C7E2  1  AD FE C0      lda InputByte
+00C7E5  1               .if HW_TYPE = 0
+00C7E5  1  48            pha
+00C7E6  1  A9 0F         lda #$0f ;set all flags high
+00C7E8  1  8D F7 C0      sta OutputFlags
+00C7EB  1               finishRead:
+00C7EB  1  2C FB C0      bit InputFlags
+00C7EE  1  10 FB         bpl finishRead
+00C7F0  1  68            pla
+00C7F1  1               .endif
+00C7F1  1               end:
+00C7F1  1  60            rts
+00C7F2  1               
+00C7F2  1  00 00 00 00  .repeat	251-<end
+00C7F6  1  00 00 00 00  
+00C7FA  1  00 00        
 00C7FC  1               .byte 0
 00C7FC  1               .endrepeat
 00C7FC  1               

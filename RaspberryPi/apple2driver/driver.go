@@ -9,11 +9,14 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 	"time"
+
+	"go.bug.st/serial"
 
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/a2io"
 	"github.com/tjboldt/Apple2-IO-RPi/RaspberryPi/apple2driver/drive"
@@ -34,7 +37,7 @@ const menuCommand = 8
 const shellCommand = 9
 
 func main() {
-	drive1Name, drive2Name := getFlags()
+	drive1Name, drive2Name, cdc := getFlags()
 	drive1, drive2 := getDriveFiles(drive1Name, drive2Name)
 
 	driveImageDir, err := drive.GetDriveImageDirectory()
@@ -44,7 +47,12 @@ func main() {
 
 	fmt.Printf("Starting Apple II RPi v%s...\n", info.Version)
 
-	comm := a2io.A2Gpio{}
+	var comm a2io.A2Io
+	if cdc {
+		comm = a2io.CDCio{}
+	} else {
+		comm = a2io.A2Gpio{}
+	}
 
 	handlers.SetCommunication(comm)
 	comm.Init()
@@ -73,6 +81,13 @@ func main() {
 			case shellCommand:
 				handlers.ShellCommand()
 			}
+			// the A2Io interface should be extended in one way or another
+			// to encapsulate this, e.g. by a ReadByte variant / parameter
+		} else if cdc {
+			var portErr *serial.PortError
+			if errors.As(err, &portErr) && portErr.Code() == serial.PortClosed {
+				comm.Init()
+			}
 			// temporary workaround for busy wait loop heating up the RPi
 		} else {
 			time.Sleep(time.Millisecond * 200)
@@ -80,9 +95,10 @@ func main() {
 	}
 }
 
-func getFlags() (string, string) {
+func getFlags() (string, string, bool) {
 	var drive1Name string
 	var drive2Name string
+	var cdc bool
 
 	execName, _ := os.Executable()
 	path := filepath.Dir(execName)
@@ -91,9 +107,10 @@ func getFlags() (string, string) {
 
 	flag.StringVar(&drive1Name, "d1", "", "A ProDOS format drive image for drive 1")
 	flag.StringVar(&drive2Name, "d2", "", "A ProDOS format drive image for drive 2 and will be used for drive 1 if drive 1 empty")
+	flag.BoolVar(&cdc, "cdc", false, "Use ACM CDC serial device")
 	flag.Parse()
 
-	return drive1Name, drive2Name
+	return drive1Name, drive2Name, cdc
 }
 
 func getDriveFiles(drive1Name string, drive2Name string) (prodos.ReaderWriterAt, prodos.ReaderWriterAt) {

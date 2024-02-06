@@ -114,41 +114,36 @@ ExitToMonitor:
  jsr Monitor 
 
 SendByte:
- pha 
-waitWrite: 
- lda InputFlags
- rol
- rol 
- bcs waitWrite
- pla
+ bit InputFlags
+ bvs SendByte
  sta OutputByte
+.if HW_TYPE = 0
  lda #$2e ; set bit 0 low to indicate write started
  sta OutputFlags 
 finishWrite:
- lda InputFlags
- rol
- rol
- bcc finishWrite
+ bit InputFlags
+ bvc finishWrite
  lda #$2f
  sta OutputFlags
+.endif
  rts
 
 GetByte:
- lda #$2d ;set read flag low
- sta OutputFlags
+.if HW_TYPE = 0
+ ldx #$2d ;set read flag low
+ stx OutputFlags
+.endif
 waitRead:
- lda InputFlags
- rol
- bcs waitRead
+ bit InputFlags
+ bmi waitRead
  lda InputByte
- pha
- lda #$2f ;set all flags high
- sta OutputFlags
+.if HW_TYPE = 0
+ ldx #$2f ;set all flags high
+ stx OutputFlags
 finishRead:
- lda InputFlags
- rol
- bcc finishRead
- pla
+ bit InputFlags
+ bpl finishRead
+.endif
 end:
  rts
 

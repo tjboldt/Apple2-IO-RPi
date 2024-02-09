@@ -47,12 +47,12 @@ void __time_critical_func(board)(void) {
 
         if (read) {
             if (!io) {  // DEVSEL
-                switch (addr & 0x7) {
-                    case 0x3:
+                switch (addr & 0xF) {
+                    case 0xB:
                         a2pico_putdata(pio0, !multicore_fifo_rvalid() << 7 |
                                              !multicore_fifo_wready() << 6);
                         break;
-                    case 0x6:
+                    case 0xE:
                         a2pico_putdata(pio0, sio_hw->fifo_rd);
                         break;
                 }
@@ -64,12 +64,12 @@ void __time_critical_func(board)(void) {
         } else {
             uint32_t data = a2pico_getdata(pio0);
             if (!io) {  // DEVSEL
-                switch (addr & 0x7) {
-                    case 0x5:
-                        sio_hw->fifo_wr = data;
-                        break;
+                switch (addr & 0xF) {
                     case 0x7:
                         page = (data & 0x30) << 7;
+                        break;
+                    case 0xD:
+                        sio_hw->fifo_wr = data;
                         break;
                 }
             }

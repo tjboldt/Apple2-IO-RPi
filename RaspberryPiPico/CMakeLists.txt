@@ -18,11 +18,11 @@ FetchContent_Declare(a2pico
         )
 FetchContent_MakeAvailable(a2pico)
 
-set_source_files_properties(incbin.S OBJECT_DEPENDS ../../Apple2/AT28C64B.bin)
+set_source_files_properties(incbin.S OBJECT_DEPENDS ../../RaspberryPi/driveimage/AT28C64B.bin)
 add_custom_command(
         WORKING_DIRECTORY ../../Apple2
         COMMAND ./assemble.sh 1
-        OUTPUT ../../Apple2/AT28C64B.bin
+        OUTPUT ../../RaspberryPi/driveimage/AT28C64B.bin
         VERBATIM
         )
 

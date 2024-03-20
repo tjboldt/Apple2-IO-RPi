@@ -50,8 +50,10 @@ func main() {
 	var comm a2io.A2Io
 	if cdc {
 		comm = a2io.CDCio{}
+		fmt.Printf("Starting communications via serial port...\n")
 	} else {
 		comm = a2io.A2Gpio{}
+		fmt.Printf("Starting communications via GPIO ports...\n")
 	}
 
 	handlers.SetCommunication(comm)

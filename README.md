@@ -31,14 +31,12 @@ Ralle Palaveev has a version of the hardware that uses a RPi Pico to handle firm
 See [List of issues tagged roadmap](https://github.com/tjboldt/Apple2-IO-RPi/issues?q=is%3Aissue+is%3Aopen+label%3Aroadmap+author%3Atjboldt) 
 
 ## Setup on classic hardware
-[Setup card from scratch](https://github.com/tjboldt/Apple2-IO-RPi/discussions/63)
-
-[Setup if you received a complete board from me](https://github.com/tjboldt/Apple2-IO-RPi/discussions/64)
+[Setup card from scratch](/ClassicSetup.md)
 
 [Update to latest](https://github.com/tjboldt/Apple2-IO-RPi/discussions/65)
 
 ## Setup on Pico based hardware
-[Setup card with Pico hardware](https://github.com/tjboldt/Apple2-IO-RPi/discussions/162)
+[Setup card with Pico hardware](/PicoSetup.md)
 
 ## Contributions/Thanks
 - Hans Hübner ([@hanshuebner](https://github.com/hanshuebner)) for help cleaning up schematics

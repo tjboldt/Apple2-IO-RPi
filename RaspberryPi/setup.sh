@@ -36,8 +36,8 @@ go mod tidy
 go build
 sudo apt install cc65 vim -y
 cd ~ || exit
-cd Apple2-IO-RPI/Apple2 || exit
-./assemble $1
+cd Apple2-IO-RPi/Apple2 || exit
+./assemble.sh $1
 cd ~ || exit
 
 sudo bash -c 'cat > /boot/config.txt << EOF

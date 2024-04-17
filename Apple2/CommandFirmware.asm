@@ -2,8 +2,9 @@
 ; Use of this source code is governed by an MIT
 ; license that can be found in the LICENSE file.
 
-; This file contains the source for the firmware
-; that was formerly used to act as a pseudo-shell
+; This file formerly contained the source for the
+; firmware that had a pseudo command prompt
+; but is now empty except required common bytes
 
 ;ProDOS Zero Page
 Command = $42 ;ProDOS Command
@@ -32,141 +33,41 @@ LoadFileCommand = $06
 SaveFileCommand = $07
 MenuCommand = $08
 
-InputString = $fd67
-PrintChar = $fded
-Keyboard = $c000
-ClearKeyboard = $c010
-Wait = $fca8
-
  .org SLOT*$100 + $C000
 ;ID bytes for booting and drive detection
- cpx #$20    ;ID bytes for ProDOS and the
- cpx #$00    ; Apple Autostart ROM
+ cpx #$20    ;ID bytes for ProDOS
+ cpx #$00    ;
  cpx #$03    ;
+ cpx #$3C    ;ID byte for Autostart ROM
 
- ldx #SLOT*$10
- stx $2b
- stx Unit 
-
-;force EPROM to second page on boot
  lda #$3f ;set all flags high and page 3 of EPROM for menu
+ jmp PageJump
+
+;The following bytes must exist in this location for Pascal communications
+;as they are standard pointers for entry points
+.byte     CommInit&$00FF ;low byte of rts for init of Pascal comms
+.byte     $43 ; low byte of read for Pascal comms
+.byte     $49 ; low byte of write for Pascal comms
+.byte     $4F ; low byte of rts for status of Pascal comms
+
+CommInit:
+ lda #$0f ; set all flags high and page 0 for comm driver
+ sta OutputFlags
+ ldx #$00 ; set error code to 0 for success
+ rts
+
 PageJump:
  sta OutputFlags
- jmp Start ;this jump is only called if coming in from PageJump with A=$2f
+ jmp Start ;this jump is only called if coming in from PageJump with A=$0f
 
 ;entry points for ProDOS
 DriverEntry:
  lda #$0f ;set all flags high and page 0 of EPROM
  sta OutputFlags
+ jmp Start ; this is never called as the EPROM page changes
 
+;load first two blocks and execute to boot
 Start:
- jsr $c300 ;enable 80 columns
- lda #$05 ;execute command
- jsr SendByte
- ldy #$00
-sendHelp:
- lda HelpCommand,y
- beq endSendHelp
- jsr SendByte
- iny
- bne sendHelp
-endSendHelp:
- lda #$00
- jsr SendByte
- jsr DumpOutput
-
- lda $33
- pha
- lda #$a4
- sta $33
-GetCommand:
- jsr InputString
- lda $0200
- cmp #$8d ;skip when return found
- beq GetCommand
- jsr SendCommand
- clc
- bcc GetCommand
-
-SendCommand:
- bit ClearKeyboard
- lda #$05 ;send command 5 = exec
- jsr SendByte
- ldy #$00
-getInput:
- lda $0200,y
- cmp #$8d
- beq sendNullTerminator
- and #$7f
- jsr SendByte
- iny
- bne getInput
-sendNullTerminator:
- lda #$00
- jsr SendByte
-DumpOutput:
- jsr GetByte
- bcs skipOutput
- cmp #$00
- beq endOutput
- jsr PrintChar
-skipOutput:
- bit Keyboard ;check for keypress
- bpl DumpOutput ;keep dumping output if no keypress
- lda Keyboard ;send keypress to RPi
- jsr PrintChar
- and #$7f
- jsr SendByte
- bit ClearKeyboard
- clc
- bcc DumpOutput
-endOutput:
- rts
-
-HelpCommand:
- .byte "a2help",$00
-
-SendByte:
- bit InputFlags
- bvs SendByte
- sta OutputByte
-.if HW_TYPE = 0
- lda #$1e ; set bit 0 low to indicate write started
- sta OutputFlags 
-finishWrite:
- bit InputFlags
- bvc finishWrite
- lda #$1f
- sta OutputFlags
-.endif
- rts
-
-GetByte:
-.if HW_TYPE = 0
- ldx #$1d ;set read flag low
- stx OutputFlags
-.endif
-waitRead:
- bit InputFlags
- bpl readByte
- bit Keyboard ;keypress will abort waiting to read
- bpl waitRead
-.if HW_TYPE = 0
- lda #$1f ;set all flags high and exit
- sta OutputFlags
-.endif
- sec ;failure
- rts 
-readByte:
- lda InputByte
-.if HW_TYPE = 0
- ldx #$1f ;set all flags high
- stx OutputFlags
-finishRead:
- bit InputFlags
- bpl finishRead
-.endif
- clc ;success
 end:
  rts
 
@@ -175,5 +76,6 @@ end:
 .endrepeat
 
 .byte      0,0     ;0000 blocks = check status
-.byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
+.byte      23       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
 .byte     DriverEntry&$00FF ;low byte of entry
+

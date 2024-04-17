@@ -45,21 +45,32 @@ vtab = $25
 BasL = $28
 htab80 = $057b
 
- .org SLOT*$100 + $C000
+.org SLOT*$100 + $C000
 ;ID bytes for booting and drive detection
- cpx #$20    ;ID bytes for ProDOS and the
- cpx #$00    ; Apple Autostart ROM
+ cpx #$20    ;ID bytes for ProDOS
+ cpx #$00    ;
  cpx #$03    ;
+ cpx #$3C    ;ID byte for Autostart ROM
 
- ldx #SLOT*$10
- stx $2b
- stx Unit 
+ lda #$3f ;set all flags high and page 3 of EPROM for menu
+ jmp PageJump
 
-;force EPROM to second page on boot
- lda #$3f ;set all flags high and page 1 of EPROMi
+;The following bytes must exist in this location for Pascal communications
+;as they are standard pointers for entry points
+.byte     CommInit&$00FF ;low byte of rts for init of Pascal comms
+.byte     $43 ; low byte of read for Pascal comms
+.byte     $49 ; low byte of write for Pascal comms
+.byte     $4F ; low byte of rts for status of Pascal comms
+
+CommInit:
+ lda #$0f ; set all flags high and page 0 for comm driver
+ sta OutputFlags
+ ldx #$00 ; set error code to 0 for success
+ rts
+
 PageJump:
  sta OutputFlags
- jmp Start
+ jmp Start ;this jump is only called if coming in from PageJump with A=$0f
 
 ;entry points for ProDOS
 DriverEntry:
@@ -191,9 +202,9 @@ Text:
 .byte	"(c)2020-2024 Terence J. Boldt",$8d
 .byte   $8d
 .if HW_TYPE = 0
-.byte	"Waiting for RPi FW:0010..."
+.byte	"Waiting for RPi FW:0011"
 .else
-.byte   "Waiting for RPi FW:8010..."
+.byte   "Waiting for RPi FW:8011"
 .endif
 end:
 .byte	$00
@@ -205,4 +216,3 @@ end:
 .byte      0,0     ;0000 blocks = check status
 .byte      7       ;bit set(0=status 1=read 2=write) unset(3=format, 4/5=number of volumes, 6=interruptable, 7=removable)
 .byte     DriverEntry&$00FF ;low byte of entry
-

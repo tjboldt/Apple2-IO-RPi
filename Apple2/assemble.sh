@@ -51,6 +51,9 @@ ld65 Shell.o -o ../RaspberryPi/driveimage/Shell.bin -C ../.cicd/none.cfg  || exi
 ca65 RPi.Command.asm -D HW_TYPE=$HW_TYPE -o RPi.Command.o --listing RPi.Command.lst || exit 1
 ld65 RPi.Command.o -o ../RaspberryPi/driveimage/RPi.Command.bin -C ../.cicd/none.cfg  || exit 1
 
+ca65 Clock.Driver.asm -D HW_TYPE=$HW_TYPE -o Clock.Driver.o --listing Clock.Driver.lst || exit 1
+ld65 Clock.Driver.o -o ../RaspberryPi/driveimage/Clock.Driver.bin -C ../.cicd/none.cfg  || exit 1
+
 rm ./*.o
 rm DriveFirmware.bin
 rm MenuFirmware.bin

@@ -33,6 +33,7 @@ MenuCommand = $08
 
 InputString = $fd67
 PrintChar = $fded
+PrintHex = $fde3
 Keyboard = $c000
 ClearKeyboard = $c010
 Wait = $fca8
@@ -50,42 +51,60 @@ ESC = $9b
 .endmacro
 
  .org $2000
- ldx #$07 ; start at slot 7
-DetectSlot:
+; Find Apple2-IO-RPi card
+ ldx #$06
+ ldy #$09
+CheckIdBytes:
+ lda $C700,y ; !! Self modifying code
+ cmp IdBytes,y
+ bne NextCard
+ dey
+ bne CheckIdBytes
+ jmp FoundCard
+NextCard:
+ dec CheckIdBytes+2
+ ldy #$09
+ dex
+ bne CheckIdBytes
+CardNotFound:
  ldy #$00
- lda #$fc
- sta SlotL
+PrintCardNotFound:
+ lda TextCardNotFound,y
+ beq Failed
+ ora #$80
+ jsr PrintChar
+ iny
+ bne PrintCardNotFound
+Failed:
+ rts
+FoundCard:
+ ldy #$00
+PrintCardFound:
+ lda TextCardFound,y
+ beq PrintCardNumber
+ ora #$80
+ jsr PrintChar
+ iny
+ bne PrintCardFound
+PrintCardNumber:
+ inx
  txa
- ora #$c0
- sta SlotH 
- lda (SlotL),y
- bne nextSlot
- iny
- lda (SlotL),y
- bne nextSlot
- iny 
- lda (SlotL),y
- cmp #$17
- bne nextSlot
- iny
- lda (SlotL),y
- cmp #$1F
- bne nextSlot
+ jsr PrintHex
+ lda #$8D
+ jsr PrintChar 
+
+SetOffsetForCard:
  txa
  asl
  asl
  asl
  asl
  tax
- clc
- bcc Start
-nextSlot:
- dex
- bne DetectSlot
- rts 
+
+
 Start:
  stx slotx + $1e01 ;set the slot for the driver
-  ldy #$00
+ ldy #$00
 PrintString:
  lda Text,y
  beq copyDriver
@@ -96,7 +115,7 @@ PrintString:
 copyDriver: 
  ldy #$00
 copyDriverByte:
- lda $2100,y
+ lda $2200,y
  sta $0300,y
  iny
  cpy #$e6
@@ -142,8 +161,18 @@ a2help:
 Text:
  aschi "RPI command version: 000E"
  .byte $8d
-end:
  .byte $00 
+
+IdBytes:
+.byte  $E0,$20,$E0,$00,$E0,$03,$E0,$3C,$A9,$3F
+
+TextCardFound:
+.byte "Found Apple2-IO-RPi in slot ",$00
+
+TextCardNotFound:
+.byte "Apple2-IO-RPi not found",$8D
+end:
+.byte $00
 
 .repeat	255-<end
 .byte 0

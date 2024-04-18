@@ -69,7 +69,7 @@ DetectSlot:
  bne nextSlot
  iny
  lda (SlotL),y
- cmp #$14
+ cmp #$1F
  bne nextSlot
  txa
  asl

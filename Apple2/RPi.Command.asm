@@ -71,7 +71,6 @@ CardNotFound:
 PrintCardNotFound:
  lda TextCardNotFound,y
  beq Failed
- ora #$80
  jsr PrintChar
  iny
  bne PrintCardNotFound
@@ -82,7 +81,6 @@ FoundCard:
 PrintCardFound:
  lda TextCardFound,y
  beq PrintCardNumber
- ora #$80
  jsr PrintChar
  iny
  bne PrintCardFound
@@ -108,7 +106,6 @@ Start:
 PrintString:
  lda Text,y
  beq copyDriver
- ora #$80
  jsr PrintChar
  iny
  bne PrintString
@@ -159,18 +156,24 @@ a2help:
  .byte "a2help", $00
 
 Text:
- aschi "RPI command version: 000E"
- .byte $8d
- .byte $00 
+.if HW_TYPE = 0
+ aschi "RPI command version: 000F (classic)"
+.else
+ aschi "RPI command version: 800F (pico)"
+.endif
+.byte $8d
+.byte $00 
 
 IdBytes:
 .byte  $E0,$20,$E0,$00,$E0,$03,$E0,$3C,$A9,$3F
 
 TextCardFound:
-.byte "Found Apple2-IO-RPi in slot ",$00
+ aschi "Found Apple2-IO-RPi in slot "
+.byte $00
 
 TextCardNotFound:
-.byte "Apple2-IO-RPi not found",$8D
+ aschi "Apple2-IO-RPi not found"
+.byte $8D
 end:
 .byte $00
 

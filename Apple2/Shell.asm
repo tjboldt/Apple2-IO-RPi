@@ -310,9 +310,9 @@ restoreChar:
 
 Text:
 .if HW_TYPE = 0
-.byte	"Apple2-IO-RPi Shell Version 000F",$8d
+.byte	"Apple2-IO-RPi Shell Version 0010 (classic)",$8d
 .else
-.byte	"Apple2-IO-RPi Shell Version 800F",$8d
+.byte	"Apple2-IO-RPi Shell Version 8010 (pico)",$8d
 .endif
 .byte	"(c)2020-2024 Terence J. Boldt",$8d
 .byte   $8d

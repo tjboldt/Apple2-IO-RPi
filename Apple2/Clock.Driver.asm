@@ -122,7 +122,7 @@ TextCardNotFound:
 .byte "Apple2-IO-RPi not found",$8D,$00
 
 TextDriverInstalled:
-.byte "Clock driver installed",$8D,$00
+.byte "Apple2-IO-RPi Clock driver version 0001",$8D,$00
 
 Driver:
  lda #GetTimeCommand

@@ -9,6 +9,5 @@
 18  PRINT "To start a shell to the RPi, type:"
 19  PRINT "-shell"
 20  PRINT 
-21  PRINT "To add RPI command to ProDOS, type:"
-22  PRINT "-rpi.command"
-23  PRINT 
+21  PRINT CHR$ (4)"-clock.driver"
+22  PRINT CHR$ (4)"-rpi.command"

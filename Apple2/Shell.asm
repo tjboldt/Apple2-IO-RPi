@@ -38,6 +38,9 @@ ShellCommand = $09
 InputString = $fd6a
 StringBuffer = $0200
 PrintChar = $fded
+PrintHex = $FDE3
+PrintByte = $FDDA
+
 Keyboard = $c000
 ClearKeyboard = $c010
 Home = $fc58
@@ -59,39 +62,55 @@ SlotH = $ff
 ESC = $9b
 
  .org $2000
- ldx #$07 ; start at slot 7
-DetectSlot:
+; Find Apple2-IO-RPi card
+ ldx #$06
+ ldy #$09
+CheckIdBytes:
+ lda $C700,y ; !! Self modifying code
+ cmp IdBytes,y
+ bne NextCard
+ dey
+ bne CheckIdBytes
+ jmp FoundCard
+NextCard:
+ dec CheckIdBytes+2
+ ldy #$09
+ dex
+ bne CheckIdBytes
+CardNotFound:
  ldy #$00
- lda #$fc
- sta SlotL
+PrintCardNotFound:
+ lda TextCardNotFound,y
+ beq Failed
+ ora #$80
+ jsr PrintChar
+ iny
+ bne PrintCardNotFound
+Failed:
+ rts
+FoundCard:
+ ldy #$00
+PrintCardFound:
+ lda TextCardFound,y
+ beq PrintCardNumber
+ ora #$80
+ jsr PrintChar
+ iny
+ bne PrintCardFound
+PrintCardNumber:
+ inx
  txa
- ora #$c0
- sta SlotH 
- lda (SlotL),y
- bne nextSlot
- iny
- lda (SlotL),y
- bne nextSlot
- iny 
- lda (SlotL),y
- cmp #$17
- bne nextSlot
- iny
- lda (SlotL),y
- cmp #$14
- bne nextSlot
+ jsr PrintHex
+ lda #$8D
+ jsr PrintChar 
+
+SetOffsetForCard:
  txa
  asl
  asl
  asl
  asl
  tax
- clc
- bcc Init
-nextSlot:
- dex
- bne DetectSlot
- rts 
 
 Init:
  lda #$8d
@@ -291,10 +310,19 @@ restoreChar:
 
 Text:
 .if HW_TYPE = 0
-.byte	"Apple2-IO-RPi Shell Version 000F",$8d
+.byte	"Apple2-IO-RPi Shell Version 0010 (classic)",$8d
 .else
-.byte	"Apple2-IO-RPi Shell Version 800F",$8d
+.byte	"Apple2-IO-RPi Shell Version 8010 (pico)",$8d
 .endif
 .byte	"(c)2020-2024 Terence J. Boldt",$8d
 .byte   $8d
 .byte   $00
+
+IdBytes:
+.byte  $E0,$20,$E0,$00,$E0,$03,$E0,$3C,$A9,$3F
+
+TextCardFound:
+.byte "Found Apple2-IO-RPi in slot ",$00
+
+TextCardNotFound:
+.byte "Apple2-IO-RPi not found",$8D,$00

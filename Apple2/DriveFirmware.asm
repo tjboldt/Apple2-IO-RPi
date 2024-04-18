@@ -36,16 +36,27 @@ MenuCommand = $08
 
  .org SLOT*$100 + $C000
 ;ID bytes for booting and drive detection
- cpx #$20    ;ID bytes for ProDOS and the
- cpx #$00    ; Apple Autostart ROM
+ cpx #$20    ;ID bytes for ProDOS
+ cpx #$00    ;
  cpx #$03    ;
+ cpx #$3C    ;ID byte for Autostart ROM
 
- ldx #SLOT*$10
- stx $2b
- stx Unit 
-
-;force EPROM to second page on boot
  lda #$3f ;set all flags high and page 3 of EPROM for menu
+ jmp PageJump
+
+;The following bytes must exist in this location for Pascal communications
+;as they are standard pointers for entry points
+.byte     CommInit&$00FF ;low byte of rts for init of Pascal comms
+.byte     CommRead&$00FF ; low byte of read for Pascal comms
+.byte     CommWrite&$00FF ; low byte of write for Pascal comms
+.byte     CommStatus&$00FF ; low byte of rts for status of Pascal comms
+
+CommInit:
+ lda #$0f ; set all flags high and page 0 for comm driver
+ sta OutputFlags
+ ldx #$00 ; set error code to 0 for success
+ rts
+
 PageJump:
  sta OutputFlags
  jmp Start ;this jump is only called if coming in from PageJump with A=$0f
@@ -58,6 +69,10 @@ DriverEntry:
 
 ;load first two blocks and execute to boot
 Start:
+ ldx #SLOT*$10
+ stx $2b
+ stx Unit 
+
  lda     #$01    ;set read command
  sta     Command
  
@@ -71,6 +86,21 @@ Start:
 
  jmp     $801    ;execute the block
 
+CommRead:
+ jsr GetByte
+ ldx #$00 ; clear error code
+ rts
+
+CommWrite:
+ jsr SendByte
+ ldx #$00 ; clear error code
+ rts
+
+CommStatus:
+ ldx #$00 ; clear error code
+ sec ; set carry to indicate ready to read or write
+ rts 
+
 ; ProDOS Driver code
 ; First check that this is the right drive
 Driver: 
@@ -78,7 +108,7 @@ Driver:
  lda Command; Check which command is being requested
  beq GetStatus ;0 = Status command
  cmp #ReadBlockCommand
- beq ReadBlockAndSetTime
+ beq ReadBlock
  cmp #WriteBlockCommand
  beq WriteBlock
  sec ;set carry as we don't support any other commands
@@ -94,22 +124,7 @@ GetStatus:
  rts
 
 ; ProDOS Read Block Command
-ReadBlockAndSetTime: 
- lda BlockHi ; only get the time if block 0002
- bne readBlock
- lda BlockLo
- cmp #$02
- bne readBlock
- ldy #$00 ;Get the current time on each block read for now
- lda #GetTimeCommand
- jsr SendByte
-getTimeByte:
- jsr GetByte
- sta $bf90,y
- iny
- cpy #$04
- bne getTimeByte
-readBlock:
+ReadBlock:
  lda #ReadBlockCommand ;read the block after setting the clock
  jsr SendByte
  lda BlockLo

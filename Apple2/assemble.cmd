@@ -88,7 +88,12 @@ ca65 RPi.Command.asm -D HW_TYPE=%HW_TYPE% -o RPi.Command.o --listing RPi.Command
 ld65 RPi.Command.o -o RPi.Command.bin -C ../.cicd/none.cfg 
 @if errorlevel 1 goto exit
 
-del *.o
+ca65 Clock.Driver.asm -D HW_TYPE=%HW_TYPE% -o Clock.Driver.o --listing Clock.Driver.lst
+@if errorlevel 1 goto exit
+ld65 Clock.Driver.o -o Clock.Driver.bin -C ../.cicd/none.cfg 
+@if errorlevel 1 goto exit
+
+cdel *.o
 del DriveFirmware.bin
 del MenuFirmware.bin
 del CommandFirmware.bin

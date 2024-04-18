@@ -1,4 +1,11 @@
-EnableWriteLang = $C088
+; Copyright Terence J. Boldt (c)2024
+; Use of this source code is governed by an MIT
+; license that can be found in the LICENSE file.
+
+; This file contains the source for the clock
+; driver for the Apple2-IO-RPi
+
+EnableWriteLang = $C08B
 DisableWriteLang = $C082
 
 ProdosJump = $BF06
@@ -60,16 +67,12 @@ PrintCardNumber:
  ora #$C0
  sta GetByte+2
  sta SendByte+2
- jsr PrintByte
-
 
 ; Change destination to be ProDOS clock code location
  lda ProdosClockCode
  sta DriverDestination+1
- jsr PrintByte
  lda ProdosClockCode+1
  sta DriverDestination+2
- jsr PrintByte
 
 ; Changing RTS to JMP enables clock driver
  lda #$4C ; jump instruction
@@ -81,12 +84,13 @@ PrintCardNumber:
  lda EnableWriteLang
 
 ; write driver code to language card RAM
- ldy #EndDriver-Driver+1
+ ldy #$00
 WriteDriver:
  lda Driver,y
 DriverDestination:
- sta $D000,y ; !! this address gets modified above
- dey
+ sta $D742,y ; !! this address gets modified above
+ iny
+ cpy #EndDriver-Driver+2
  bne WriteDriver
 
 ; Disable writing to language card RAM
@@ -121,9 +125,6 @@ TextDriverInstalled:
 .byte "Clock driver installed",$8D,$00
 
 Driver:
- rts
- php
- pha
  lda #GetTimeCommand
 SendByte:
  jsr $C749 ; !! address gets modified on installation
@@ -135,7 +136,5 @@ GetByte:
  iny
  cpy #$04
  bne getTimeByte
- pla
- plp
 EndDriver:
  rts

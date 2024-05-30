@@ -1,5 +1,10 @@
 #!/bin/sh
 HW_TYPE=${1-0}
+if [ "$1" = '1' ]; then
+  echo Assembling for Pico based hardware
+else
+  echo Assembling for Classic hardware
+fi
 
 ca65 DriveFirmware.asm -D HW_TYPE=$HW_TYPE -D SLOT=0 -o DriveSlot0.o || exit 1
 ca65 DriveFirmware.asm -D HW_TYPE=$HW_TYPE -D SLOT=1 -o DriveSlot1.o || exit 1

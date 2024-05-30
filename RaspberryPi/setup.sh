@@ -1,4 +1,10 @@
 #!/bin/sh
+HW_TYPE=${1-0}
+if [ "$1" = '1' ]; then
+  echo Setting up for Pico based hardware
+else
+  echo Setting up for Classic hardware
+fi
 
 sudo apt update
 sudo apt install git -y

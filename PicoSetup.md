@@ -1,7 +1,8 @@
 ## Setup starting from scratch
 1. DIY instructions and PCB coming but it is recommended to buy a board from Ralle Palaveev
-2. Attach Raspberry Pi Zero 2 W with a micro USB OTG cable
-3. Install [Raspberry Pi OS](https://www.raspberrypi.org/software/) on microSD card using a modern computer
+2. Update the Pico firmware using Apple2-IO-RPi.uf2 from https://github.com/tjboldt/Apple2-IO-RPi/releases/latest
+3. Attach Raspberry Pi Zero 2 W with a micro USB OTG cable
+4. Install [Raspberry Pi OS](https://www.raspberrypi.org/software/) on microSD card using a modern computer
     1. Use Raspberry Pi Imager
     2. Click "Choose OS"
     3. Select Other => "Raspberry Pi OS Lite (64 bit)" for the Zero 2 W

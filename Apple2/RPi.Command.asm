@@ -157,9 +157,9 @@ a2help:
 
 Text:
 .if HW_TYPE = 0
- aschi "RPI command version: 000F (classic)"
+ aschi "RPI command version: 0010 (classic)"
 .else
- aschi "RPI command version: 800F (pico)"
+ aschi "RPI command version: 8010 (pico)"
 .endif
 .byte $8d
 .byte $00 

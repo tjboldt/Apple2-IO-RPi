@@ -101,7 +101,7 @@ SetOffsetForCard:
 
 
 Start:
- stx slotx + $1e01 ;set the slot for the driver
+ stx slotx + $1f01 ;set the slot for the driver
  ldy #$00
 PrintString:
  lda Text,y

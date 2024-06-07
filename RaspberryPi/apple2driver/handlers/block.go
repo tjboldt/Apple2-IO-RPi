@@ -22,7 +22,7 @@ func ReadBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt
 	driveUnit, err = comm.ReadByte()
 
 	if err != nil {
-		fmt.Printf("Failed to read block")
+		fmt.Printf("Failed to receive requested block number")
 		return 0, err
 	}
 
@@ -32,6 +32,11 @@ func ReadBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt
 	if driveUnit >= 128 {
 		file = drive2
 		driveNumber = 2
+	}
+
+	if file == nil {
+		fmt.Printf("Requested drive not loaded")
+		return 0, err
 	}
 
 	slotNumber := driveUnit & 0x7F >> 4

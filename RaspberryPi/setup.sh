@@ -76,6 +76,7 @@ sudo --preserve-env=HOME --preserve-env=USER bash -c 'cat > apple2driver.service
 Description=Apple2-IO-RPi Driver (Classic edition)
 
 [Service]
+Type=idle
 ExecStart=$HOME/Apple2-IO-RPi/RaspberryPi/apple2driver/apple2driver
 StandardOutput=syslog
 StandardError=syslog

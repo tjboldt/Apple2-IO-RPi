@@ -1,5 +1,5 @@
 ## Setup starting from scratch
-1. Have PCBs made from [PCBWay](https://www.pcbway.com/project/shareproject/Apple2_IO_RPi_v6_bfa4be82.html) or from the gerber and drill files in the Hardware folder or email me for a blank or fully assembled board
+1. Have PCBs made from [PCBWay](https://www.pcbway.com/project/shareproject/Apple2_IO_RPi_v7_65457a66.html) or from the gerber and drill files in the Hardware folder or email me for a blank or fully assembled board
 2. Solder chips, header and capacitors in place
 3. If you have an EPROM programmer, it is preferred to pre-populate the EEPROM with the contents of AT28C68B.bin
 4. Attach Raspberry Pi Zero 2 W facing outward from the card

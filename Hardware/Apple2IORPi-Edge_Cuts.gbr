@@ -1,11 +1,11 @@
-G04 #@! TF.GenerationSoftware,KiCad,Pcbnew,(6.0.2-0)*
-G04 #@! TF.CreationDate,2022-03-01T05:34:48-05:00*
-G04 #@! TF.ProjectId,Apple2IORPi,4170706c-6532-4494-9f52-50692e6b6963,0.6*
+G04 #@! TF.GenerationSoftware,KiCad,Pcbnew,8.0.3*
+G04 #@! TF.CreationDate,2024-06-18T13:39:18-04:00*
+G04 #@! TF.ProjectId,Apple2IORPi,4170706c-6532-4494-9f52-50692e6b6963,0.7*
 G04 #@! TF.SameCoordinates,Original*
 G04 #@! TF.FileFunction,Profile,NP*
 %FSLAX46Y46*%
 G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
-G04 Created by KiCad (PCBNEW (6.0.2-0)) date 2022-03-01 05:34:48*
+G04 Created by KiCad (PCBNEW 8.0.3) date 2024-06-18 13:39:18*
 %MOMM*%
 %LPD*%
 G01*

@@ -22,9 +22,10 @@ body:
       label: Hardware Version
       description: What version of the hardware are you running?
       options:
+        - Seventh Prototype (lastest classic hardware)
         - RPi Pico
-        - Sixth Prototype (lastest classic hardware)
-        - Fifth Prototype (classic hardware without jumper)
+        - Sixth Prototype (classic hardware power jumper)
+        - Fifth Prototype (classic hardware with EEPROM)
         - Fourth Prototype (classic hardware with EPROM)
     validations:
       required: true
@@ -34,9 +35,9 @@ body:
       label: Firmware Version
       description: What version of the firmware are you running? (shown on boot screen)
       options:
-        - 8010 (initial RPi Pico hardware)
-        - 0010 (classic hardware)
-        - 000F
+        - 0011 / 8011 (add clock driver)
+        - 0010 / 8010 (initial RPi Pico hardware)
+        - 000F (first version showing firmware rev on boot)
         - Older (not shown on boot, pre-2022-Feb-07)
     validations:
       required: true
@@ -46,6 +47,7 @@ body:
       label: Driver Version
       description: What version of the driver are you running? Check with `RPI a2version`
       options:
+        - 002E (fix driver crash on null drive)
         - 002D (add support for RPi Pico hardware)
         - 002C (fix nano editor)
         - 002B (fix keyboard delay)
@@ -67,8 +69,8 @@ body:
       label: Shell Version
       description: What version of the shell are you running?`
       options:
-        - 800F (initial RPi Pico support)
-        - 000F (classic hardware support)
+        - 0010 / 8010 (support latest firmware)
+        - 000F / 800F (add pico and classic hardware support)
         - 000E (fix hang on exit)
         - 000D (added version info)
         - Older (pre-2022-Mar-01)

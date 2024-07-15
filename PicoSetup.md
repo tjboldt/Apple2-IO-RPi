@@ -15,7 +15,7 @@
 7. Install the expansion card into the Apple II
 8. Power on the Apple II
 9. Use `ssh` to connect to the RPi using the password you configured
-10. `wget --no-cache -O - https://raw.githubusercontent.com/tjboldt/Apple2-IO-RPi/main/RaspberryPi/setup.sh 1 | bash`
+10. `wget --no-cache -O - https://raw.githubusercontent.com/tjboldt/Apple2-IO-RPi/main/RaspberryPi/setup.sh | bash -s 1`
 
 ## Options
 You can support two drives and change their drive images.

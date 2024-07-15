@@ -4,7 +4,7 @@ cd Apple2
 . assemble.sh 1
 cd ../RaspberryPiPico
 . build.sh
-cp Apple2-IO-RPi.elf ../release
+cp Apple2-IO-RPi.uf2 ../release
 cd ../RaspberryPi/driveimage
 ../../.cicd/ProDOS-Utilities -d ../../release/Apple2-IO-RPi.pico.hardware.hdv -c create -v APPLE2.IO.RPI
 ../../.cicd/ProDOS-Utilities -d ../../release/Apple2-IO-RPi.pico.hardware.hdv -c putall

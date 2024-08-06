@@ -47,8 +47,8 @@ See [List of issues tagged roadmap](https://github.com/tjboldt/Apple2-IO-RPi/iss
 - ([@Abysmal](https://github.com/Abysmal)) for shell and rpi.command testing
 - ([@bfranske](https://github.com/bfranske)) for suggesting adding the 5V jumper
 - Tim Boldt ([@timboldt](https://github.com/timboldt)) for recommending removing sysfs based GPIO code
-- Oliver Schmidt ([@oliverschmidt](https://github.com/oliverschmidt/apple2-io-rpi/)) for writing the Pico PIO and firmware
-- Ralle Palaveev ([@rallepalaveev](https://github.com/rallepalaveev/a2pico)) for Pico hardware design
+- Oliver Schmidt ([@oliverschmidt](https://github.com/oliverschmidt/a2pico)) for writing the Pico PIO and firmware
+- Ralle Palaveev ([@rallepalaveev](https://github.com/rallepalaveev)) for Pico hardware design
 
 ## Similar Project
 If you prefer having Apple II peripherals control a Raspberry Pi rather than simply using the Raspberry Pi to provide storage, network access and processing to the Apple II, have a look at David Schmenk's excellent [Apple2Pi](https://github.com/dschmenk/apple2pi) project. I am often asked about differences between these two projects. They are similar in some ways but essentially opposite. The Apple2Pi is meant for the primary machine to be the RPi, using the Apple II for it's peripherals. The Apple2-IO-RPi is meant to have the Apple II as the primary machine and just use the RPi for its processing, storage and network.

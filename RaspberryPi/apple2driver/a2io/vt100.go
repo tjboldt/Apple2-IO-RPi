@@ -223,31 +223,35 @@ func readCharacter(comm A2Io) (string, error) {
 	b, err := comm.ReadByte(true)
 	var s = string(b)
 	if err == nil {
-		if applicationMode {
-			switch b {
-			case 0x0b: // up
-				s = "\033OA"
-			case 0x0a: // down
-				s = "\033OB"
-			case 0x15: // right
-				s = "\033OC"
-			case 0x08: // left
-				s = "\033OD"
-			case 0x0d: // return
-				s = string(byte(0x0d))
-			}
+		if b >= 0x80 {
+			s = "\033" + string(b & 0x7f)
 		} else {
-			switch b {
-			case 0x0b: // up
-				s = "\033[A"
-			case 0x0a: // down
-				s = "\033[B"
-			case 0x15: // right
-				s = "\033[C"
-			case 0x08: // left
-				s = "\033[D"
-			case 0x0d: // return
-				s = string(byte(0x0d))
+			if applicationMode {
+				switch b {
+				case 0x0b: // up
+					s = "\033OA"
+				case 0x0a: // down
+					s = "\033OB"
+				case 0x15: // right
+					s = "\033OC"
+				case 0x08: // left
+					s = "\033OD"
+				case 0x0d: // return
+					s = string(byte(0x0d))
+				}
+			} else {
+				switch b {
+				case 0x0b: // up
+					s = "\033[A"
+				case 0x0a: // down
+					s = "\033[B"
+				case 0x15: // right
+					s = "\033[C"
+				case 0x08: // left
+					s = "\033[D"
+				case 0x0d: // return
+					s = string(byte(0x0d))
+				}
 			}
 		}
 	}

@@ -43,6 +43,7 @@ PrintByte = $FDDA
 
 Keyboard = $c000
 ClearKeyboard = $c010
+OpenApple = $c061
 Home = $fc58
 Wait = $fca8
 PromptChar = $33
@@ -232,7 +233,10 @@ keyPressed:
  rol
  bcs keyPressed
  lda Keyboard ;send keypress to RPi
- and #$7f
+ bit OpenApple
+ bmi noClearHighBit
+ and #$7f ; clear high bit unless Alt pressed
+noClearHighBit:
  sta OutputByte,x
  bit ClearKeyboard
 .if HW_TYPE = 0
@@ -310,9 +314,9 @@ restoreChar:
 
 Text:
 .if HW_TYPE = 0
-.byte	"Apple2-IO-RPi Shell Version 0010 (classic)",$8d
+.byte	"Apple2-IO-RPi Shell Version 0011 (classic)",$8d
 .else
-.byte	"Apple2-IO-RPi Shell Version 8010 (pico)",$8d
+.byte	"Apple2-IO-RPi Shell Version 8011 (pico)",$8d
 .endif
 .byte	"(c)2020-2024 Terence J. Boldt",$8d
 .byte   $8d

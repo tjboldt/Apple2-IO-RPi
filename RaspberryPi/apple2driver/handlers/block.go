@@ -13,7 +13,7 @@ import (
 )
 
 // ReadBlockCommand handles requests to read ProDOS blocks
-func ReadBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt) (int, error) {
+func ReadBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt) (uint16, error) {
 	blockLow, _ := comm.ReadByte()
 	blockHigh, _ := comm.ReadByte()
 	var driveUnit byte
@@ -41,7 +41,7 @@ func ReadBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterAt
 
 	slotNumber := driveUnit & 0x7F >> 4
 
-	block := int(blockHigh)*256 + int(blockLow)
+	block := uint16(blockHigh)*256 + uint16(blockLow)
 
 	fmt.Printf("Read block %04X in slot %d, drive %d...", block, slotNumber, driveNumber)
 
@@ -85,7 +85,7 @@ func WriteBlockCommand(drive1 prodos.ReaderWriterAt, drive2 prodos.ReaderWriterA
 
 	buffer := make([]byte, 512)
 
-	block := int(blockHigh)*256 + int(blockLow)
+	block := uint16(blockHigh)*256 + uint16(blockLow)
 
 	slotNumber := driveUnit & 0x7F >> 4
 

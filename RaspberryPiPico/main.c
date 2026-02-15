@@ -56,10 +56,8 @@ void main(void) {
     stdio_init_all();
     stdio_set_translate_crlf(&stdio_usb, false);
 
-#ifdef PICO_DEFAULT_LED_PIN
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
-#endif
 
 #ifdef TRACE
     uart_init(uart0, 115200);
@@ -90,8 +88,6 @@ void main(void) {
             }
         }
 
-#ifdef PICO_DEFAULT_LED_PIN
         gpio_put(PICO_DEFAULT_LED_PIN, conn);
-#endif
     }
 }

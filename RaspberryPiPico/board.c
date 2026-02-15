@@ -36,33 +36,33 @@ static uint32_t page;
 
 void __time_critical_func(board)(void) {
 
-    a2pico_init(pio0);
+    a2pico_init();
 
     while (true) {
-        uint32_t pico = a2pico_getaddr(pio0);
+        uint32_t pico = a2pico_getaddr();
         uint32_t addr = pico & 0x0FFF;
         uint32_t io   = pico & 0x0F00;  // IOSTRB or IOSEL
         uint32_t strb = pico & 0x0800;  // IOSTRB
-        uint32_t read = pico & 0x1000;  // R/W
+        uint32_t read = pico & RW_BIT;  // R/W
 
         if (read) {
             if (!io) {  // DEVSEL
                 switch (addr & 0xF) {
                     case 0xB:
-                        a2pico_putdata(pio0, !multicore_fifo_rvalid() << 7 |
-                                             !multicore_fifo_wready() << 6);
+                        a2pico_putdata(!multicore_fifo_rvalid() << 7 |
+                                       !multicore_fifo_wready() << 6);
                         break;
                     case 0xE:
-                        a2pico_putdata(pio0, sio_hw->fifo_rd);
+                        a2pico_putdata(sio_hw->fifo_rd);
                         break;
                 }
             } else {
                 if (!strb) {
-                    a2pico_putdata(pio0, firmware[page | addr]);
+                    a2pico_putdata(firmware[page | addr]);
                 }
             }
         } else {
-            uint32_t data = a2pico_getdata(pio0);
+            uint32_t data = a2pico_getdata();
             if (!io) {  // DEVSEL
                 switch (addr & 0xF) {
                     case 0x7:

@@ -1,7 +1,7 @@
 ## Setup starting from scratch
 This is for the A2Pico board (https://github.com/oliverschmidt/a2pico)
 1. DIY instructions and PCB coming but it is recommended to buy a board from Ralle Palaveev
-2. Update the Pico firmware using Apple2-IO-RPi.uf2 from https://github.com/tjboldt/Apple2-IO-RPi/releases/latest
+2. Update the Pico firmware using the .uf2 file matching your hardware from https://github.com/tjboldt/Apple2-IO-RPi/releases/latest
 3. Attach Raspberry Pi Zero 2 W with a micro USB OTG cable
 4. Install [Raspberry Pi OS](https://www.raspberrypi.org/software/) on microSD card using a modern computer
     1. Use Raspberry Pi Imager

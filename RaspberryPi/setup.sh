@@ -93,7 +93,4 @@ sudo mv apple2driver.service /etc/systemd/system/apple2driver.service
 sudo chown root:root /etc/systemd/system/apple2driver.service  
 sudo systemctl start apple2driver
 sudo systemctl enable apple2driver
-sudo systemctl disable avahi-daemon.service
-sudo systemctl disable triggerhappy.service
-sudo systemctl disable raspi-config.service
 sudo systemctl daemon-reload

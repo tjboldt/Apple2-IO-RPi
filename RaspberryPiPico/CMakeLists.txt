@@ -1,6 +1,6 @@
 set(PROJECT_NAME Apple2-IO-RPi)
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.13...3.27)
 include(pico_sdk_import.cmake)
 project(${PROJECT_NAME} C CXX ASM)
 pico_sdk_init()

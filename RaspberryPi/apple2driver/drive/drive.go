@@ -31,6 +31,6 @@ func GenerateDriveFromDirectory(volumeName string, directory string) (prodos.Rea
 	drive := prodos.NewMemoryFile(0x2000000)
 	fmt.Printf("Generating Drive in memory from: %s\n", directory)
 	prodos.CreateVolume(drive, volumeName, 65535)
-	err := prodos.AddFilesFromHostDirectory(drive, directory, "/"+volumeName+"/", true)
+	err := prodos.AddFilesFromHostDirectory(drive, directory, "/"+volumeName+"/", true, true)
 	return drive, err
 }

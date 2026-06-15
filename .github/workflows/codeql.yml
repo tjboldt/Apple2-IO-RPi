@@ -9,7 +9,7 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
-name: "CodeQL"
+name: "CodeQL Advanced"
 
 on:
   push:
@@ -17,7 +17,7 @@ on:
   pull_request:
     branches: [ "main" ]
   schedule:
-    - cron: '40 21 * * 4'
+    - cron: '30 8 * * 4'
 
 jobs:
   analyze:
@@ -43,9 +43,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
+        - language: actions
+          build-mode: none
+        - language: c-cpp
+          build-mode: autobuild
         - language: go
           build-mode: autobuild
-        # CodeQL supports the following values keywords for 'language': 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
+        # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'rust', 'swift'
         # Use `c-cpp` to analyze code written in C, C++ or both
         # Use 'java-kotlin' to analyze code written in Java, Kotlin or both
         # Use 'javascript-typescript' to analyze code written in JavaScript, TypeScript or both
@@ -57,10 +61,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.25'
+    # Add any setup steps before running the `github/codeql-action/init` action.
+    # This includes steps like installing compilers or runtimes (`actions/setup-node`
+    # or others). This is typically only required for manual builds.
+    # - name: Setup runtime (example)
+    #   uses: actions/setup-example@v1
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -81,7 +86,8 @@ jobs:
     # to build your code.
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-    - if: matrix.build-mode == 'manual'
+    - name: Run manual build steps
+      if: matrix.build-mode == 'manual'
       shell: bash
       run: |
         echo 'If you are using a "manual" build mode for one or more of the' \
@@ -95,3 +101,4 @@ jobs:
       uses: github/codeql-action/analyze@v4
       with:
         category: "/language:${{matrix.language}}"
+
